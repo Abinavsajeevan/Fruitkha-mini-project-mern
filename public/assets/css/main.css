@@ -2795,3 +2795,66 @@ table.order-details tbody td {
   transition: 0.3s;     /* Smooth effect on hover */
 }
 
+/* for login  */
+
+  /* Form container with light transparent background */
+ .login_part_form {
+  background: rgba(255, 255, 255, 0.15); /* Light transparency */
+  padding: 40px;
+  border-radius: 15px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.25);
+  color: #fff; /* Default text color white */
+}
+
+.login_part_form h3 {
+  color: #fff;
+}
+
+/* Labels, links, small text */
+.login_part_form label,
+.login_part_form a,
+.login_part_form .text-muted {
+  color: #e6e6e6 !important;
+}
+/* Input box text */
+.login_part_form .form-control {
+  color: #fff; /* White input text */
+  border: none;
+  border-bottom: 2px solid #F28123; /* Orange underline */
+  border-radius: 0;
+  background: transparent;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+/* Placeholder text */
+.login_part_form .form-control::placeholder {
+  color: rgba(255, 255, 255, 0.7);
+  font-style: italic;
+}
+  .login_part_form .form-control:focus {
+  border-bottom: 2px solid #fba661;
+  box-shadow: none;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Buttons */
+.login_part_form button.btn-primary {
+  background-color: #F28123;
+  border: none;
+  font-weight: 600;
+  border-radius: 30px;
+  transition: all 0.3s ease;
+}
+.login_part_form button.btn-primary:hover {
+  background-color: #fba661;
+}
+
+/* Google login button text */
+.login_part_form .btn-outline-danger {
+  color: #fff;
+  border-color: #dc3545;
+}
+.login_part_form .btn-outline-danger:hover {
+  background-color: #dc3545;
+  color: #fff;
+}

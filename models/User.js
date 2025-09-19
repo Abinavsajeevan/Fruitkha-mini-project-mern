@@ -14,6 +14,13 @@ const userSchema = new Schema({
         unique: true,
         lowercase: true
     },
+    mobile: {
+        type: Number,
+        required: true,
+        unique: true,
+        min: 10,
+        max: 13
+    },
     password: {
         type: String,
         required: true,

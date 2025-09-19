@@ -1,0 +1,435 @@
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="description" content="Responsive Bootstrap4 Shop Template, Created by Imran Hossain from https://imransdesign.com/">
+
+	<!-- title -->
+	<title>Fruitkha - Slider Version</title>
+
+	<!-- favicon -->
+	<link rel="shortcut icon" type="image/png" href="assets/img/favicon.png">
+	<!-- google font -->
+	<link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css?family=Poppins:400,700&display=swap" rel="stylesheet">
+	<!-- fontawesome -->
+	<link rel="stylesheet" href="assets/css/all.min.css">
+	<!-- bootstrap -->
+	<link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
+	<!-- owl carousel -->
+	<link rel="stylesheet" href="assets/css/owl.carousel.css">
+	<!-- magnific popup -->
+	<link rel="stylesheet" href="assets/css/magnific-popup.css">
+	<!-- animate css -->
+	<link rel="stylesheet" href="assets/css/animate.css">
+	<!-- mean menu css -->
+	<link rel="stylesheet" href="assets/css/meanmenu.min.css">
+	<!-- main style -->
+	<link rel="stylesheet" href="assets/css/main.css">
+	<!-- responsive -->
+	<link rel="stylesheet" href="assets/css/responsive.css">
+	<!-- bootsrap icon cdn link -->
+	 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+	 <style>
+.card {
+  background: linear-gradient(145deg, #ffffff, #f7f7f7);
+}
+
+.input-group-text {
+  border: none;
+}
+
+.btn-success {
+  background-color: #28a745;
+  border: none;
+}
+
+.btn-success:hover {
+  background-color: #218838;
+}
+
+h4.fw-bold {
+  letter-spacing: 0.5px;
+}
+#previewImg {
+  transition: transform 0.3s ease;
+}
+#previewImg:hover {
+  transform: scale(1.05);
+}
+
+
+</style>
+
+
+</head>
+<body>
+	
+	<!--PreLoader-->
+    <div class="loader">
+        <div class="loader-inner">
+            <div class="circle"></div>
+        </div>
+    </div>
+    <!--PreLoader Ends-->
+	
+	<!-- header -->
+	<div class="top-header-area" id="sticker">
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-12 col-sm-12 text-center">
+					<div class="main-menu-wrap">
+						<!-- logo -->
+						<div class="site-logo">
+							<a href="index.html">
+								<img src="assets/img/logo.png" alt="">
+							</a>
+						</div>
+						<!-- logo -->
+
+						<!-- menu start -->
+						<nav class="main-menu">
+							<ul>
+								<li class="current-list-item"><a href="index.html">Home</a>
+								</li>
+								<li><a href="about.html">About</a></li>
+					
+								<li><a href="contact.html">Contact</a></li>
+								<li><a href="shop.html">Shop</a>
+								</li>
+								<li>
+									<div class="header-icons">
+										
+										<a class="wishlist" href="wishlist.html"><i class="bi bi-heart-fill"></i></a>
+										<a class="shopping-cart" href="cart.html"><i class="fas fa-shopping-cart"></i></a>
+										
+										<a class="wishlist fs-5" href="cart.html"><i class="bi bi-person-circle"></i></a>
+									</div>
+								</li>
+							</ul>
+						</nav>
+						
+						<div class="mobile-menu"></div>
+						<!-- menu end -->
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- end header -->
+
+    	<!-- breadcrumb-section -->
+	<div class="breadcrumb-section breadcrumb-bg">
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-8 offset-lg-2 text-center">
+					<div class="breadcrumb-text">
+						<p>First you need to login</p>
+						<h1>Login</h1>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- end breadcrumb section -->
+
+<div class="container my-5">
+  <h2 class="text-center mb-4" style="color:#F28123;">My Profile</h2>
+
+  <!-- Navigation (changed from tabs to links) -->
+  <ul class="nav nav-tabs justify-content-center border-0" id="profileTabs">
+    <li class="nav-item">
+      <a href="/profile" class="nav-link active fw-bold"
+         style="color:#F28123;background-color: #051922; border:2px solid #F28123; border-bottom:none; border-radius:10px 10px 0 0;">
+        Profile Info
+      </a>
+    </li>
+    <li class="nav-item">
+      <a href="profileOrder.html" class="nav-link fw-bold text-dark"
+         style="border:2px solid #F28123; border-bottom:none; border-radius:10px 10px 0 0;">
+        Orders
+      </a>
+    </li>
+    <li class="nav-item">
+      <a href="profileAddress.html" class="nav-link fw-bold text-dark"
+         style="border:2px solid #F28123; border-bottom:none; border-radius:10px 10px 0 0;">
+        Addresses
+      </a>
+    </li>
+    <li class="nav-item">
+      <a href="profileSetting.html" class="nav-link fw-bold text-dark"
+         style="border:2px solid #F28123; border-bottom:none; border-radius:10px 10px 0 0;">
+        Settings
+      </a>
+    </li>
+  </ul>
+
+  <!-- Profile Info content -->
+  <div class="mt-4">
+    <div class="card shadow-lg border-0 rounded-4 p-4" style="background-color:#051922; color:#fff;">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <div></div>
+        <button id="editBtn" class="btn rounded-pill px-4 shadow-sm"
+                style="background-color:#F28123; color:white; border:none;">
+          <i class="bi bi-pencil-square"></i> Edit
+        </button>
+      </div>
+
+      <div class="text-center mb-4">
+        <img src="<%= user?.avatar || '/assets/img/default-avatar.png' %>"
+             alt="User Avatar"
+             class="rounded-circle border border-4 shadow"
+             style="border-color:#F28123; width:150px; height:150px; object-fit:cover;">
+        <h4 class="mt-3 fw-bold" style="color:#F28123;"><%= user?.name || 'John Doe' %></h4>
+      </div>
+
+      <hr class="mb-4" style="border-color:#F28123;">
+
+      <div class="row justify-content-center">
+        <div class="col-md-6">
+          <!-- Email -->
+          <div class="mb-4">
+            <label class="form-label fw-semibold" style="color:#F28123;">Email</label>
+            <div class="input-group shadow-sm">
+              <span class="input-group-text border-0" style="background-color:#F28123; color:#fff;">
+                <i class="bi bi-envelope"></i>
+              </span>
+              <input type="email" class="form-control border-0 bg-light"
+                     value="<%= user?.email || 'john@example.com' %>" readonly>
+            </div>
+          </div>
+
+          <!-- Phone -->
+          <div>
+            <label class="form-label fw-semibold" style="color:#F28123;">Phone</label>
+            <div class="input-group shadow-sm">
+              <span class="input-group-text border-0" style="background-color:#F28123; color:#fff;">
+                <i class="bi bi-telephone"></i>
+              </span>
+              <input type="text" class="form-control border-0 bg-light"
+                     value="<%= user?.phone || '+91 9876543210' %>" readonly>
+            </div>
+          </div>
+
+          <button id="saveBtn" type="submit"
+                  class="btn rounded-pill px-4 mt-3 d-none"
+                  style="background-color:#F28123; color:white; border:none;">
+            Save Changes
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+  <!-- modal -->
+
+ <!-- Edit Profile Modal -->
+<div class="modal fade" id="editProfileModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content rounded-4" style="border:2px solid #F28123;">
+      <!-- Modal Header -->
+      <div class="modal-header" style="background-color:#051922; color:#fff;">
+        <h5 class="modal-title">Edit Profile</h5>
+        <!-- Close Button -->
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <!-- Modal Body -->
+      <form id="editProfileForm">
+        <div class="modal-body" style="background-color:#f8f9fa;">
+          <!-- Profile Photo -->
+          <div class="mb-3 text-center">
+            <img id="previewImg" src="<%= user?.avatar || '/assets/img/default-avatar.png' %>"
+                 class="rounded-circle border border-3 shadow"
+                 style="width:100px; height:100px; object-fit:cover;">
+            <input class="form-control mt-3" type="file" id="profilePhoto" accept="image/*">
+          </div>
+          <!-- Name -->
+          <div class="form-floating mb-3">
+            <input type="text" class="form-control" id="editName" 
+                   value="<%= user?.name || 'John Doe' %>" placeholder="Full Name">
+            <label for="editName">Full Name</label>
+          </div>
+          <!-- Email -->
+          <div class="form-floating mb-3">
+            <input type="email" class="form-control" id="editEmail" 
+                   value="<%= user?.email || 'john@example.com' %>" placeholder="Email">
+            <label for="editEmail">Email</label>
+          </div>
+          <!-- Phone -->
+          <div class="form-floating mb-3">
+            <input type="tel" class="form-control" id="editPhone" 
+                   value="<%= user?.phone || '+91 9876543210' %>" 
+                   placeholder="Phone Number" pattern="[0-9]{10}" maxlength="10">
+            <label for="editPhone">Phone Number</label>
+          </div>
+        </div>
+
+        <!-- Modal Footer -->
+        <div class="modal-footer" style="background-color:#051922;">
+          <button type="button" class="btn text-white rounded-pill px-4" 
+                  style="background-color:#F28123;" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn text-white rounded-pill px-4" 
+                  style="background-color:#F28123;">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+	<!-- footer -->
+	<div class="footer-area">
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-3 col-md-6">
+					<div class="footer-box about-widget">
+						<h2 class="widget-title">About us</h2>
+						<p>Ut enim ad minim veniam perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae.</p>
+					</div>
+				</div>
+				<div class="col-lg-3 col-md-6">
+					<div class="footer-box get-in-touch">
+						<h2 class="widget-title">Get in Touch</h2>
+						<ul>
+							<li>34/8, East Hukupara, Gifirtok, Sadan.</li>
+							<li>support@fruitkha.com</li>
+							<li>+00 111 222 3333</li>
+						</ul>
+					</div>
+				</div>
+				<div class="col-lg-3 col-md-6">
+					<div class="footer-box pages">
+						<h2 class="widget-title">Pages</h2>
+						<ul>
+							<li><a href="index.html">Home</a></li>
+							<li><a href="about.html">About</a></li>
+							<li><a href="services.html">Shop</a></li>
+							<li><a href="contact.html">Contact</a></li>
+						</ul>
+					</div>
+				</div>
+				<div class="col-lg-3 col-md-6">
+					<div class="footer-box subscribe">
+						<h2 class="widget-title">Subscribe</h2>
+						<p>Subscribe to our mailing list to get the latest updates.</p>
+						<form action="index.html">
+							<input type="email" placeholder="Email">
+							<button type="submit"><i class="fas fa-paper-plane"></i></button>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- end footer -->
+	
+	<!-- copyright -->
+	<div class="copyright">
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-6 col-md-12">
+					<p>Copyrights &copy; 2019 - <a href="https://imransdesign.com/">Imran Hossain</a>,  All Rights Reserved.<br>
+						Distributed By - <a href="https://themewagon.com/">Themewagon</a>
+					</p>
+				</div>
+				<div class="col-lg-6 text-right col-md-12">
+					<div class="social-icons">
+						<ul>
+							<li><a href="#" target="_blank"><i class="fab fa-facebook-f"></i></a></li>
+							<li><a href="#" target="_blank"><i class="fab fa-twitter"></i></a></li>
+							<li><a href="#" target="_blank"><i class="fab fa-instagram"></i></a></li>
+							<li><a href="#" target="_blank"><i class="fab fa-linkedin"></i></a></li>
+							<li><a href="#" target="_blank"><i class="fab fa-dribbble"></i></a></li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- end copyright -->
+	
+	<!-- jquery -->
+	<script src="assets/js/jquery-1.11.3.min.js"></script>
+	<!-- bootstrap -->
+	<script src="assets/bootstrap/js/bootstrap.min.js"></script>
+	<!-- count down -->
+	<script src="assets/js/jquery.countdown.js"></script>
+	<!-- isotope -->
+	<script src="assets/js/jquery.isotope-3.0.6.min.js"></script>
+	<!-- waypoints -->
+	<script src="assets/js/waypoints.js"></script>
+	<!-- owl carousel -->
+	<script src="assets/js/owl.carousel.min.js"></script>
+	<!-- magnific popup -->
+	<script src="assets/js/jquery.magnific-popup.min.js"></script>
+	<!-- mean menu -->
+	<script src="assets/js/jquery.meanmenu.min.js"></script>
+	<!-- sticker js -->
+	<script src="assets/js/sticker.js"></script>
+	<!-- main js -->
+	<script src="assets/js/main.js"></script>
+	<script>
+  const editBtn = document.getElementById('editBtn');
+  const profilePhotoInput = document.getElementById('profilePhoto');
+  const previewImg = document.getElementById('previewImg');
+
+  // Show modal on edit button click
+  editBtn.addEventListener('click', () => {
+    const modal = new bootstrap.Modal(document.getElementById('editProfileModal'));
+    modal.show();
+  });
+
+  // Preview uploaded image
+  profilePhotoInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        previewImg.src = event.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+
+  // Handle form submission
+  document.getElementById('editProfileForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    console.log({
+      name: document.getElementById('editName').value,
+      email: document.getElementById('editEmail').value,
+      phone: document.getElementById('editPhone').value,
+      photo: previewImg.src
+    });
+    // Close modal after save
+    bootstrap.Modal.getInstance(document.getElementById('editProfileModal')).hide();
+  });
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+
+
+</body>
+</html>
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
