@@ -2,6 +2,7 @@ require('dotenv').config()
 const express = require('express');
 const connectDb = require('./config/db');
 const path = require('path');
+const cookieParser = require('cookie-parser');
 // all route files
 const routes = require('./routes/index')
 const session = require('express-session');
@@ -20,6 +21,7 @@ connectDb();
 app.set('view engine', 'ejs')
 app.set('views', 'views')
 
+app.use(cookieParser()); 
 app.use('/user', express.static(path.join(__dirname, 'public', 'user')));
 app.use('/admin', express.static(path.join(__dirname, 'public', 'user')));
 app.use(express.json())

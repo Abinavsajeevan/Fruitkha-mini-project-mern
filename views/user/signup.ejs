@@ -97,7 +97,7 @@
 						<div class="form-floating mb-3">
 							<input type="text" name="name" class="form-control rounded-pill bg-transparent text-white border-light" id="name" placeholder="Full Name">
 							<label for="name" class="text-light">Full Name</label>
-							<!-- display error message -->
+							<%# display error message %>
 							<% if(errors && errors.length) {
 								const error = errors.find(err => err.path === 'name');
 								if( error ) { %>
@@ -227,8 +227,6 @@
 		 })
 
 		}
-
-	
 		</script>
 
 </body>

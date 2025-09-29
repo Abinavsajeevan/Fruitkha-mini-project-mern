@@ -65,7 +65,7 @@
 						<div class="login_part_text text-center p-5" style="background: linear-gradient(135deg, #f0f0f0a3, #fba661af); color: white; border-radius: 10px;">
 							<h2 style="color: #051922;">New to our Shop?</h2>
 							<p class="fs-5">There are fresh and delicious fruits are available in our shop. Lorem, ipsum dolor sit amet consectetur adipisicing elit. Voluptatem illo, maiores excepturi laborum facere quidem provide</p>
-							<a href="/signup" class="btn btn-outline-light mt-3">Create an Account</a>
+							<a href="/signup" class="btn btn-outline-dark mt-3">Create an Account</a>
 						</div>
 					</div>
 
@@ -81,18 +81,30 @@
 							<div class="text-center text-muted mb-3">or use your email or mobile number</div>
 
 							<!-- Login Form -->
-							<form>
+							<form action="/login" method="POST">
 								<div class="mb-3">
-									<input type="text" class="form-control" placeholder="Username" required>
+									<input type="text" name="user" class="form-control" placeholder="email or phone" required>
 								</div>
+									<%# display error message %>
+								<% if(errors && errors.length ) {
+								const error = errors.find(err => err.path === 'user'  || err.path === 'no_user' || err.path === 'google' || err.path ==='block');
+								if( error) { %>
+									<div class="text-danger " style="     text-shadow: 0px 4px 6px rgb(0 0 0);background-color: black;border: 1px solid black;border-radius: 26px 0px;text-align: center;font-size: 13px;font-weight: bold;"><%= error.msg %></div>
+									<% }
+								} %>
 								<div class="mb-3">
-									<input type="password" class="form-control" placeholder="Password" required>
+									<input type="password" name="password" class="form-control" placeholder="Password" required>
+							
 								</div>
-								<div class="d-flex justify-content-between align-items-center mb-3">
-									<div class="form-check">
-										<input class="form-check-input" type="checkbox" value="" id="rememberMe">
-										<label class="form-check-label" for="rememberMe">Remember me</label>
-									</div>
+										
+								<% if(errors && errors.length ) {
+								const error = errors.find(err => err.path === 'password');
+								if( error) { %>
+									<div class="text-danger " style="     text-shadow: 0px 4px 6px rgb(0 0 0);background-color: black;border: 1px solid black;border-radius: 26px 0px;text-align: center;font-size: 13px;font-weight: bold;"><%= error.msg %></div>
+									<% }
+								} %>
+								<div class="d-flex justify-content-end align-items-center mb-3">
+									
 									<a href="#">Forget Password?</a>
 								</div>
 								<button type="submit" class="btn btn-primary w-100">Log In</button>
@@ -130,6 +142,18 @@
 	<script src="/user/assets/js/sticker.js"></script>
 	<!-- main js -->
 	<script src="/user/assets/js/main.js"></script>
+	<script>
+		const inputField = document.getElementsByTagName("input");
+
+		for( field of inputField){
+		 field.addEventListener("focus", () => {
+			
+			 const errors = document.querySelectorAll('.text-danger');
+      		errors.forEach(err => err.style.display = 'none');
+		 })
+
+		}
+		</script>
 
 </body>
 </html>

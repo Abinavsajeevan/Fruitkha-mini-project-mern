@@ -15,26 +15,24 @@ const userSchema = new Schema({
         lowercase: true
     },
     mobile: {
-         type: String, // use string instead of number
-      
+         type: String, 
       unique: true,
       match: [/^\d{10,13}$/, 'Mobile number must be 10-13 digits'] 
     },
     password: {
         type: String,
-       
         minlength:  6
     },
      googleId: {
     type: String,
     unique: true,
     sparse: true
-  },
-  provider: {
-    type: String,
-    enum: ['local', 'google'],
-    default: 'local'
-  },
+    },
+    provider: {
+        type: String,
+        enum: ['local', 'google'],
+        default: 'local'
+    },
     isBlocked: {
         type: Boolean,
         default: false

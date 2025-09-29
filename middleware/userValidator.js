@@ -23,4 +23,23 @@ const signupValidation = [
     .withMessage('Passwords do not match')
 ];
 
-module.exports =  {signupValidation} ;
+const loginValidation = [
+ body('user')
+  .notEmpty().withMessage('email or mobile is required')
+  .custom(value => {
+    const isEmail = /\S+@\S+\.\S+/.test(value);
+    const isMobile = /^[0-9]{10,13}$/.test(value);
+    if (!isEmail && !isMobile) {
+      throw new Error('Must be a valid email or mobile number');
+    }
+    return true;
+  }),
+  
+  body('password')
+    .notEmpty().withMessage('Password is required')
+]
+
+module.exports =  {
+  signupValidation,
+  loginValidation
+} ;
