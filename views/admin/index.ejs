@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <!-- <title>Index</title> -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+ <link rel="stylesheet" href="/admin/assets/css/style.css">
+</head>
+<body class="bg-light">
+<div class="d-flex">
+  <aside class="sidebar border-end">
+    <h5 class="p-3 border-bottom"><%=admin?.name ? admin.name.split(' ')[0] : 'Admin'%></h5>
+    <nav class="list-group list-group-flush">
+      <a href="/admin" class="list-group-item list-group-item-action active">Dashboard</a>
+      <a href="orders.html" class="list-group-item list-group-item-action">Orders</a>
+      <a href="products.html" class="list-group-item list-group-item-action">Products</a>
+      <a href="customers.html" class="list-group-item list-group-item-action">Customers</a>
+      <a href="analytics.html" class="list-group-item list-group-item-action">Analytics</a>
+      <a href="coupons.html" class="list-group-item list-group-item-action">Coupons</a>
+      <a href="/admin/settings" class="list-group-item list-group-item-action">Settings</a>
+      <a href="support.html" class="list-group-item list-group-item-action">Support</a>
+      <a href="logs.html" class="list-group-item list-group-item-action">Logs</a>
+      <a href="profile.html" class="list-group-item list-group-item-action">Profile</a>
+      <!-- Add extra items to test scrolling -->
+      <a href="#" class="list-group-item list-group-item-action">Extra 1</a>
+      <a href="#" class="list-group-item list-group-item-action">Extra 2</a>
+      <a href="#" class="list-group-item list-group-item-action">Extra 3</a>
+      <a href="#" class="list-group-item list-group-item-action">Extra 4</a>
+      <a href="#" class="list-group-item list-group-item-action">Extra 5</a>
+    </nav>
+  </aside>
+
+  <main class="flex-fill p-4" style="background-color:#e27a25; color:#000;">
+  <h3 class="mb-4">Dashboard</h3>
+  
+  <!-- Top Summary Cards -->
+  <div class="row g-4">
+    <div class="col-sm-6 col-lg-3">
+      <div class="card shadow-sm text-center p-3">
+        <h5 class="text-success">Total Sales</h5>
+        <h3>₹45,200</h3>
+        <p class="text-muted mb-0">This Month</p>
+      </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+      <div class="card shadow-sm text-center p-3">
+        <h5 class="text-warning">Orders</h5>
+        <h3>320</h3>
+        <p class="text-muted mb-0">Pending: 12</p>
+      </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+      <div class="card shadow-sm text-center p-3">
+        <h5 class="text-primary">Products</h5>
+        <h3>68</h3>
+        <p class="text-muted mb-0">In Stock</p>
+      </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+      <div class="card shadow-sm text-center p-3">
+        <h5 class="text-danger">Customers</h5>
+        <h3>1,245</h3>
+        <p class="text-muted mb-0">New: 24</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Orders Table -->
+  <div class="card mt-5 shadow-sm">
+    <div class="card-header bg-dark text-white">
+      Recent Orders
+    </div>
+    <div class="table-responsive">
+      <table class="table mb-0 table-striped align-middle">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Customer</th>
+            <th>Fruit</th>
+            <th>Quantity</th>
+            <th>Status</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>101</td>
+            <td>Aarav</td>
+            <td>Mangoes</td>
+            <td>10 kg</td>
+            <td><span class="badge bg-success">Delivered</span></td>
+            <td>₹1,500</td>
+          </tr>
+          <tr>
+            <td>102</td>
+            <td>Sneha</td>
+            <td>Apples</td>
+            <td>5 kg</td>
+            <td><span class="badge bg-warning text-dark">Pending</span></td>
+            <td>₹750</td>
+          </tr>
+          <tr>
+            <td>103</td>
+            <td>Rahul</td>
+            <td>Bananas</td>
+            <td>12 kg</td>
+            <td><span class="badge bg-danger">Cancelled</span></td>
+            <td>₹600</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Low Stock Products -->
+  <div class="card mt-5 shadow-sm">
+    <div class="card-header bg-dark text-white">
+      Low Stock Products
+    </div>
+    <ul class="list-group list-group-flush">
+      <li class="list-group-item d-flex justify-content-between">
+        <span>Kiwi</span> <span class="text-danger">3 left</span>
+      </li>
+      <li class="list-group-item d-flex justify-content-between">
+        <span>Oranges</span> <span class="text-danger">5 left</span>
+      </li>
+    </ul>
+  </div>
+</main>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

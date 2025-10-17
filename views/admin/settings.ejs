@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Settings</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+   <link rel="stylesheet" href="/admin/assets/css/style.css">
+
+</head>
+<body class="bg-light">
+<div class="d-flex">
+  <aside class="sidebar border-end">
+    <h5 class="p-3 border-bottom"><%=admin?.name ? admin.name.split(' ')[0] : 'Admin'%></h5>
+    <nav class="list-group list-group-flush">
+      <a href="/admin" class="list-group-item list-group-item-action">Dashboard</a>
+      <a href="orders.html" class="list-group-item list-group-item-action">Orders</a>
+      <a href="products.html" class="list-group-item list-group-item-action">Products</a>
+      <a href="customers.html" class="list-group-item list-group-item-action">Customers</a>
+      <a href="analytics.html" class="list-group-item list-group-item-action">Analytics</a>
+      <a href="coupons.html" class="list-group-item list-group-item-action">Coupons</a>
+      <a href="/admin/settings" class="list-group-item list-group-item-action active">Settings</a>
+      <a href="support.html" class="list-group-item list-group-item-action">Support</a>
+      <a href="logs.html" class="list-group-item list-group-item-action">Logs</a>
+      <a href="profile.html" class="list-group-item list-group-item-action">Profile</a>
+    </nav>
+  </aside>
+
+  <main class="flex-fill p-4" style="background-color:#e27a25; color:#000;">
+    <h3 class="mb-4">Settings</h3>
+
+    <!-- Admin Account Card -->
+    <div class="card shadow-sm mb-4">
+      <div class="card-header bg-dark text-white">
+        Admin Account
+      </div>
+      <div class="card-body">
+           <% if(errors && errors.length) {
+								const error = errors.find(err => err.path === 'exist');
+								if( error ) { %>
+									<div class="text-danger " style="text-shadow: 0px 4px 6px rgb(0 0 0);background-color: black;border: 1px solid black;border-radius: 26px 0px;text-align: center;font-size: 13px;font-weight: bold;"><%= error.msg %></div>
+									<% }
+								} %>
+                <% if(errors && errors.length) {
+								const error = errors.find(err => err.path === 'success');
+								if( error ) { %>
+									<div class="text-success " style="text-shadow: 0px 4px 6px rgb(0 0 0);background-color: black;border: 1px solid black;border-radius: 26px 0px;text-align: center;font-size: 13px;font-weight: bold;"><%= error.msg %></div>
+									<% }
+								} %>
+        <form action="/admin/settings" method="POST">
+          <!-- Name Field -->
+           <% if(errors && errors.length) {
+								const error = errors.find(err => err.path === 'name');
+								if( error ) { %>
+									<div class="text-danger " style="text-shadow: 0px 4px 6px rgb(0 0 0);background-color: black;border: 1px solid black;border-radius: 26px 0px;text-align: center;font-size: 13px;font-weight: bold;"><%= error.msg %></div>
+									<% }
+								} %>
+          <div class="mb-3">
+            <label for="adminName" class="form-label text-dark fw-bold">Name</label>
+            <input type="text" id="adminName" name="name" class="form-control" required value = "<%=admin?admin.name:'' %>"      placeholder="Enter admin name">
+          </div>
+
+          <!-- Email Field -->
+          <% if(errors && errors.length) {
+								const error = errors.find(err => err.path === 'email');
+								if( error ) { %>
+									<div class="text-danger " style="text-shadow: 0px 4px 6px rgb(0 0 0);background-color: black;border: 1px solid black;border-radius: 26px 0px;text-align: center;font-size: 13px;font-weight: bold;"><%= error.msg %></div>
+									<% }
+								} %>
+          <div class="mb-3">
+            <label for="adminEmail" class="form-label text-dark fw-bold">Email</label>
+            <input type="email" id="adminEmail" name="email" class="form-control" required value = "<%=admin?admin.email:'' %>" placeholder="Enter email address">
+          </div>
+
+          <!-- Password Field -->
+          <% if(errors && errors.length) {
+								const error = errors.find(err => err.path === 'password');
+								if( error ) { %>
+									<div class="text-danger " style="text-shadow: 0px 4px 6px rgb(0 0 0);background-color: black;border: 1px solid black;border-radius: 26px 0px;text-align: center;font-size: 13px;font-weight: bold;"><%= error.msg %></div>
+									<% }
+								} %>
+          <div class="mb-3">
+            <label for="adminPassword" class="form-label text-dark fw-bold">Password</label>
+            <input type="password" id="adminPassword" name="password" class="form-control" value= "<%=admin?admin.password:'' %>"  placeholder="enter new password">
+          </div>
+
+          <!-- Submit Button -->
+          <button type="submit" class="btn btn-dark">Update Profile</button>
+        </form>
+      </div>
+
+    </div>
+
+    <!-- Logout Card -->
+    <div class="card shadow-sm">
+      <div class="card-body text-center">
+        <a href="logout.html" class="btn btn-danger">Logout</a>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  const inputField = document.getElementsByTagName("input");
+  for(field of inputField) {
+    field.addEventListener('focus', ()=> {
+      const errors = document.querySelectorAll('.text-danger');
+      const errors1 = document.querySelector('.text-success')
+      errors1.style.display = 'none'
+      errors.forEach(err => err.style.display = 'none')
+    })
+  }
+  </script>
+</body>
+</html>

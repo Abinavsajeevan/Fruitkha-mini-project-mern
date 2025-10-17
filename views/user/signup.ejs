@@ -77,17 +77,15 @@
 
 					<!-- Google button -->
 					 
-					<a href="auth/google" class="btn btn-google w-100"><button class="btn w-100 mb-4 border-0 text-white" 
+					<a href="auth/google/signup" class="btn btn-google w-100"><button class="btn w-100 mb-4 border-0 text-white" 
 						style="background-color:#db4437; border-radius:50px;">
 						<i class="fab fa-google me-2"></i> Sign Up with Google
 					</button></a>
 
-					<% if(errors && errors.length) {
-								const error = errors.find(err => err.path === null);
-								if( error ) { %>
-									<div class="text-danger " style="text-shadow: 0px 4px 6px rgb(0 0 0);background-color: black;border: 1px solid black;border-radius: 26px 0px;text-align: center;font-size: 13px;font-weight: bold;"><%= error.msg %></div>
-									<% }
-								} %>
+					<% if (error && error.length > 0) { %>
+   						<div class="text-danger " style="text-shadow: 0px 4px 6px rgb(0 0 0);background-color: black;border: 1px solid black;border-radius: 26px 0px;text-align: center;font-size: 13px;font-weight: bold;"><%= error[0] %></div>
+					<% } %>
+
 
 
 					<div class="text-center text-light mb-4">or use your email and mobile number</div>

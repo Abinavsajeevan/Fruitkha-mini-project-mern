@@ -1,0 +1,95 @@
+/* Sidebar container */
+.sidebar {
+  width: 150px;
+  height: 100vh;
+  overflow-y: auto;
+  position: sticky;
+  top: 0;
+  background-color: #051922;  /* Dark background */
+  border-right: 1px solid #033047;
+ 
+}
+
+/* Sidebar heading */
+.sidebar h5 {
+  
+  color: #F28123;
+  position: sticky;
+  top: 0;
+  z-index: 2;                 /* Higher than scrolling links */
+  background-color: #051922;  /* Same as sidebar background */
+  padding: 0.75rem;           /* Adds spacing around the text */
+  border-bottom: 1px solid #033047;
+}
+
+/* Inactive links: light by default */
+.sidebar .list-group-item {
+  background-color: #051922;
+  color: white;  /* Light text for inactive items */
+  border: none;
+  transition: color 0.3s ease, background-color 0.3s ease;
+ 
+  z-index: 1;
+}
+
+/* Hover effect: brighten and highlight */
+.sidebar .list-group-item:hover {
+  color: #ffffff;                    /* Bright white on hover */
+  background-color: #F28123;; /* Subtle orange tint */
+}
+
+/* Active link: strong contrast */
+.sidebar .list-group-item.active {
+  background-color: #F28123;
+  color: #051922;
+  font-weight: 600;
+}
+
+.sidebar::-webkit-scrollbar {
+  display: none; /* Completely hides the scrollbar */
+}
+
+/* ---------- Responsive Adjustments ---------- */
+
+/* Medium devices (tablets, <992px) */
+@media (max-width: 991.98px) {
+  .sidebar {
+    width: 120px;              /* Slightly narrower sidebar */
+  }
+  main {
+    padding: 1rem !important;  /* Reduce padding for smaller screens */
+  }
+}
+
+/* Small devices (phones, <768px) */
+@media (max-width: 767.98px) {
+ 
+  .sidebar {
+    width: 120px;              /* Full width on mobile */
+    height: auto;             /* Let height adjust */
+    position: relative;       /* Remove sticky on small screens */
+    border-right: none;
+    border-bottom: 1px solid #033047;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .sidebar h5 {
+    width: 100%;              /* Full width heading */
+    text-align: center;
+    position: relative;
+    border-bottom: 1px solid #033047;
+  }
+  .sidebar .list-group-item {
+    flex: 1 1 45%;            /* Items wrap into grid-like layout */
+    text-align: center;
+    padding: 0.5rem;
+  }
+}
+
+/* Extra small devices (<576px) */
+@media (max-width: 575.98px) {
+  .sidebar .list-group-item {
+    flex: 1 1 100%;           /* Single column for very small screens */
+  }
+}

@@ -75,9 +75,12 @@
 							<h3 class="mb-4">Welcome Back! <br> Please Sign in now</h3>
 
 							<!-- Google Login Button -->
-							<button class="btn btn-outline-danger w-100 mb-3">
+									<a href="auth/google/login" class="btn btn-google w-100"><button class="btn btn-outline-danger w-100 mb-3">
 								<i class="fab fa-google me-2"></i> Login with Google
-							</button>
+							</button></a>
+							<% if (error && error.length > 0) { %>
+   						<div class="text-danger " style="text-shadow: 0px 4px 6px rgb(0 0 0);background-color: black;border: 1px solid black;border-radius: 26px 0px;text-align: center;font-size: 13px;font-weight: bold;"><%= error[0] %></div>
+					<% } %>
 							<div class="text-center text-muted mb-3">or use your email or mobile number</div>
 
 							<!-- Login Form -->
@@ -105,7 +108,7 @@
 								} %>
 								<div class="d-flex justify-content-end align-items-center mb-3">
 									
-									<a href="#">Forget Password?</a>
+									<a href="/forgotPassword" id="forget">Forget Password?</a>
 								</div>
 								<button type="submit" class="btn btn-primary w-100">Log In</button>
 							</form>
@@ -144,6 +147,10 @@
 	<script src="/user/assets/js/main.js"></script>
 	<script>
 		const inputField = document.getElementsByTagName("input");
+		const forgot = document.getElementById('forget').addEventListener("click", () => {
+			const errors = document.querySelectorAll(".text-danger");
+			errors.forEach(err => err.style.display = 'none');
+		})
 
 		for( field of inputField){
 		 field.addEventListener("focus", () => {
@@ -153,7 +160,7 @@
 		 })
 
 		}
-		</script>
+	</script>
 
 </body>
 </html>

@@ -41,7 +41,15 @@ const userSchema = new Schema({
     {
         type: String, 
         default: null 
-    }  },
+    },
+    otpExpiresAt: 
+    {
+        type: Date,
+        default: null
+    }, 
+profilePhoto: {
+  type: String
+}  },
 { timestamps: true }
 )
 // connect mongodb to users

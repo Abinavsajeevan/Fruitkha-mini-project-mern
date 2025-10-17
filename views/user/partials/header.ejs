@@ -5,7 +5,26 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="description" content="Responsive Bootstrap4 Shop Template, Created by Imran Hossain from https://imransdesign.com/">
+<style>
+	.header-icons {
+  display: flex;
+  align-items: center;
+  gap: 15px; /* space between icons */
+}
 
+.header-icons a {
+  display: flex;
+  align-items: center;
+  color: #fff;
+  text-decoration: none;
+}
+
+.header-icons a h5 {
+  margin: 0 0 0 6px; /* small space after icon */
+  font-size: 16px;
+}
+
+</style>
 </head>
 <body>
     	<!--PreLoader-->
@@ -46,7 +65,23 @@
 										<a class="wishlist" href="wishlist.ejs"><i class="bi bi-heart-fill"></i></a>
 										<a class="shopping-cart" href="cart.ejs"><i class="fas fa-shopping-cart"></i></a>
 										
-										<a class="wishlist fs-5" href="/login"><i class="bi bi-person-circle"></i></a>
+										<a class="wishlist fs-5 d-flex align-items-center" 
+										<%if(user) {%>
+											href="/profile"
+										<%} else {%>
+											href="/login"
+											<%}%>
+										>
+											<i class="bi bi-person-circle"></i>
+											<% if (user) {
+												let namePart = user.name.split(' ');
+												let firstName = namePart[0]
+												%>
+												<h5 class="ms-2 mb-0 text-light"><%=firstName%></h5>
+
+											<%} %>
+										</a>
+
 										
 									</div>
 								</li>
