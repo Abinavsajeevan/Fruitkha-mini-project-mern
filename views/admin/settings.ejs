@@ -15,7 +15,7 @@
     <nav class="list-group list-group-flush">
       <a href="/admin" class="list-group-item list-group-item-action">Dashboard</a>
       <a href="orders.html" class="list-group-item list-group-item-action">Orders</a>
-      <a href="products.html" class="list-group-item list-group-item-action">Products</a>
+      <a href="/admin/products" class="list-group-item list-group-item-action">Products</a>
       <a href="customers.html" class="list-group-item list-group-item-action">Customers</a>
       <a href="analytics.html" class="list-group-item list-group-item-action">Analytics</a>
       <a href="coupons.html" class="list-group-item list-group-item-action">Coupons</a>
@@ -42,7 +42,7 @@
 									<% }
 								} %>
                 <% if(errors && errors.length) {
-								const error = errors.find(err => err.path === 'success');
+								const error = errors.find(err => err.path === 'true');
 								if( error ) { %>
 									<div class="text-success " style="text-shadow: 0px 4px 6px rgb(0 0 0);background-color: black;border: 1px solid black;border-radius: 26px 0px;text-align: center;font-size: 13px;font-weight: bold;"><%= error.msg %></div>
 									<% }
@@ -94,7 +94,7 @@
     <!-- Logout Card -->
     <div class="card shadow-sm">
       <div class="card-body text-center">
-        <a href="logout.html" class="btn btn-danger">Logout</a>
+        <a href="/admin/logout" class="btn btn-danger">Logout</a>
       </div>
     </div>
 

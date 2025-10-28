@@ -2858,3 +2858,27 @@ table.order-details tbody td {
   background-color: #dc3545;
   color: #fff;
 }
+
+.cart-btn-custom {
+  font-family: 'Poppins', sans-serif;
+  display: inline-block;
+  background-color: #F28123;
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 50px;
+  font-weight: 500;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  border: none;
+  cursor: pointer;
+}
+
+.cart-btn-custom i {
+  margin-right: 8px;
+}
+
+.cart-btn-custom:hover {
+  background-color: #051922;
+  color: #F28123;
+}
+

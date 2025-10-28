@@ -2,18 +2,21 @@ const express = require('express');
 const router = express.Router();
 const passport = require('passport');
 const {verifyToken, verifyTokenIndex} = require('../middleware/authMiddleware');
-const { googleLogin, resendOtp, logout, deleteAccount } = require('../controller/userAuthController');
+const { googleLogin, resendOtp, logout, deleteAccount, getShop, getCart } = require('../controller/userAuthController');
 const { adminVerifyToken } = require('../middleware/adminAuthMiddleware');
 const Admin = require('../models/Admin');
+const { logoutAdmin } = require('../controller/adminAuthController');
+const Product = require('../models/Product');
 //=================================================
 
 //------------------USER SIDE----------------------
 
 // ======================================================
 //index page
-router.get('/', verifyTokenIndex, (req, res) => { 
+router.get('/', verifyTokenIndex, async (req, res) => { 
     req.session.email = null;
-    res.render('user/index', {user: req.user});
+    const getProducts = await Product.find().limit(3);
+    res.render('user/index', {user: req.user, products: getProducts});
 })
 
 //-----------------user without login-------------------
@@ -50,6 +53,8 @@ router.get("/resend-otp", resendOtp);
 
 
 //-----------------user with login-------------------
+
+
 ///=======================================================
 
 //---------------profile page----------------------
@@ -82,10 +87,24 @@ router.get('/profileSetting', verifyToken, (req, res) => {
 router.get('/logout', verifyToken, logout)
 
 
+///=======================================================
+
+//---------------shop page----------------------
+
+ router.get('/shop', verifyToken, getShop)
+
+
+///=======================================================
+
+//---------------cart page----------------------
+
+ router.get('/cart', verifyToken, getCart)
 
 
 
+///=======================================================
 
+//  ----------[passsport]-------------
 // it is for passport js
 router.get('/auth/google/signup', passport.authenticate('google-signup', { scope: ['profile', 'email'] }));
 
@@ -119,17 +138,38 @@ router.get('/admin/login', (req, res) => {
 })
 
 //admin dash or index page
-router.get('/admin', adminVerifyToken,async (req, res) => {
+router.get('/admin', adminVerifyToken, (req, res) => {
     console.log('dash ', req.session.email)
     
     res.render('admin/index',{admin: req.admin} )
 })
 
+//--------------------------------------
+//----------admin setting page -------------
+//---------------------------------------
+
 //admin settings
 router.get('/admin/settings',adminVerifyToken, (req, res) => {
     console.log('sett ', req.session.email)
+  res.render('admin/settings' ,{admin: req.admin, errors: [{msg: 'updated successfully' , path:`${req.query.success}`}]})
+})
 
-  res.render('admin/settings' ,{admin: req.admin, errors: []})
+//logout 
+router.get('/admin/logout', adminVerifyToken, logoutAdmin)
+
+//--------------------------------------
+//----------admin product page -------------
+//---------------------------------------
+router.get('/admin/products', adminVerifyToken, async(req, res) => {
+  const getProducts = await Product.find();
+  res.render('admin/products',  {showAddProductModal :false, products: getProducts, showEditProductModal : false, errors: [], prod: false})
+})
+//edit button
+router.get('/admin/products/edit/:id', async(req, res) => {
+  const product = await Product.findById(req.params.id)
+   const getProducts = await Product.find();
+  if(!product) return res.redirect('/admin/products');
+  res.render('admin/products',  {showAddProductModal :false, products: getProducts, showEditProductModal : true, errors: [], prod: product})
 })
 
 

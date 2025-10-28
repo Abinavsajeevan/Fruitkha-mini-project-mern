@@ -4,6 +4,9 @@ const bcrypt = require('bcrypt');
 const passport = require('passport');
 const jwt = require('jsonwebtoken');
 const { sendOtpEmail } = require('../utils/sendOtp');
+const Product = require('../models/Product');
+const Cart = require('../models/Cart');
+const paginationShop = require('../utils/paginateShop');
 
 
 // registration 
@@ -338,7 +341,7 @@ const updateProfile = async (req, res) => {
         user.email = email;
         user.mobile = mobile;
         
-       if(req.file) user.profilePhoto = `/uploads/${req.file.filename}`;
+       if(req.file) user.profilePhoto = `/uploads/profile/${req.file.filename}`;
        
         await user.save();
         const updateUser = await User.findOne({email: req.session.email})
@@ -357,6 +360,134 @@ const updateProfile = async (req, res) => {
     }
 }
 
+//shop page METHOD = GET
+const getShop = async (req, res) => {
+  try {
+      const page = parseInt(req.query.page) || 1;
+      const category = req.query.category || '';
+      const availability = req.query.availability || '';
+      const sort = req.query.sort || '';
+    //filteing the products it used as a query 
+      const filter = {};
+      if(category) filter.category = category;
+      if(availability === 'In Stock') filter.stock = {$gt: 0};
+      if(availability === 'Out of Stock') filter.stock = { $lte: 0};
+
+      let sortOption = {};
+      if(sort === 'low-high') sortOption.price = 1;
+      else if(sort === 'high-low') sortOption.price = -1;
+      else if(sort === 'newest') sortOption.createdAt = -1;
+      else sortOption.updatedAt = 1;
+
+      const  { getProducts, totalPages } = await paginationShop(page, filter, sortOption);
+     
+
+    return res.render('user/shop', {user: req.user, products: getProducts, currentPage: page, totalPages, category, availability, sort, msg:null, path:null});
+  }catch (err) {
+    console.log('Error occured in shop ', err)
+  }
+ }
+
+//add to cart METHOD = POST
+const addToCart = async (req, res) => {
+    try {
+        const userId = req.user._id;
+        const { productId } = req.body;
+        // console.log(userId, productId);
+        const page = parseInt(req.query.page) || 1;
+        const filter = {}
+        const sortOption = { updatedAt : 1}
+        const { getProducts, totalPages } = await paginationShop(parseInt(page, filter, sortOption));//taking pagination values from inbuilt function
+
+        const product = await Product.findById(productId)
+        if(!product) return res.redirect('/shop');
+        
+        let cart = await Cart.findOne({user: userId});
+      
+        if(!cart) {
+            cart = new Cart({
+                user: userId,
+                products: [],
+                subTotal:0,
+                shipping: 0,
+                total:0
+            })
+            await cart.save();
+        } 
+        const existingProduct = cart.products.find(item => item.product.equals(productId))//here equals use one is string  and  objectid so it easily compares
+        if(existingProduct) {
+            return res.render('user/shop', {user: req.user, products: getProducts, currentPage: page, totalPages, msg:'product already added to cart⚠️', path:'error'});
+        }else {
+            cart.products.push({
+                product: productId,
+                price: product.price,
+                totalPrice: product.price,
+            });
+        }
+        cart.subTotal = cart.products.reduce((sum, product) => sum + product.totalPrice, 0);
+        cart.shipping = 45;
+        cart.total = cart.subTotal + cart.shipping;
+        await cart.save();
+        return res.render('user/shop', {user: req.user, products: getProducts, currentPage: page, totalPages, msg:'product added to cart✅', path:'success'});        
+    } catch(err) {
+        console.log('error occured in adding to cart', err)
+    }
+}
+
+//cart page show
+const getCart = async (req, res) => {
+    try {
+        const userId = req.user._id;
+        const cart = await Cart.findOne({user: userId}).populate('products.product');
+        return res.render('user/cart', { cart, user: req.user });
+        
+    } catch (err) {
+        console.log('error occured in getting cart', err)
+    }
+}
+
+//update cart 
+const updateCart = async (req, res) => {
+    try {
+        const userId = req.user._id;
+        const { productId, quantity } = req.body;
+        const cart = await Cart.findOne({ user: userId }).populate('products.product');
+        const productItem = cart.products.find(item => item.product._id.equals(productId));//take the exact of product item
+        productItem.quantity = parseInt(quantity);
+        productItem.totalPrice = productItem.quantity * productItem.price;
+        //calculating sub total
+        cart.subTotal = cart.products.reduce((sum, product) => sum + product.totalPrice, 0);
+        cart.total = cart.subTotal + cart.shipping;
+        await cart.save();
+        return res.redirect('/cart')
+
+    }catch(err) {
+        console.log('error occured in update cart ', err)
+    }
+}
+
+//remove cart
+const removeCart = async (req, res) => {
+    try {
+        const userId = req.user._id;
+        const { productId } = req.body;
+
+        await Cart.updateOne(
+            {user: userId},
+            {$pull: {products: {product: productId}}}
+        )
+        const cart = await Cart.findOne({ user: userId});
+        cart.subTotal = cart.products.reduce((sum, item) => sum + item.totalPrice, 0);
+        cart.total = cart.shipping + cart.subTotal;
+        await cart.save();
+        return res.redirect('/cart');
+
+
+    } catch (err) {
+        console.log('error occured in removing cart', err)
+    }
+}
+
 module.exports = {
     registerUser,
     loginUser,
@@ -369,5 +500,10 @@ module.exports = {
     deleteAccount,
     forgotProfile,
     changePassword,
-    updateProfile
+    updateProfile,
+    getShop,
+    addToCart,
+    getCart,
+    updateCart,
+    removeCart
 }

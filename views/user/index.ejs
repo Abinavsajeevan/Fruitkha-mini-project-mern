@@ -48,7 +48,7 @@
 								<p class="subtitle">Fresh & Organic</p>
 								<h1>Delicious Seasonal Fruits</h1>
 								<div class="hero-btns">
-									<a href="shop.html" class="boxed-btn">Fruit Collection</a>
+									<a href="/shop" class="boxed-btn">Fruit Collection</a>
 									<a href="contact.html" class="bordered-btn">Contact Us</a>
 								</div>
 							</div>
@@ -67,7 +67,7 @@
 								<p class="subtitle">Fresh Everyday</p>
 								<h1>100% Organic Collection</h1>
 								<div class="hero-btns">
-									<a href="shop.html" class="boxed-btn">Visit Shop</a>
+									<a href="/shop" class="boxed-btn">Visit Shop</a>
 									<a href="contact.html" class="bordered-btn">Contact Us</a>
 								</div>
 							</div>
@@ -86,7 +86,7 @@
 								<p class="subtitle">Mega Sale Going On!</p>
 								<h1>Get December Discount</h1>
 								<div class="hero-btns">
-									<a href="shop.html" class="boxed-btn">Visit Shop</a>
+									<a href="/shop" class="boxed-btn">Visit Shop</a>
 									<a href="contact.html" class="bordered-btn">Contact Us</a>
 								</div>
 							</div>
@@ -153,8 +153,9 @@
 					</div>
 				</div>
 			</div>
-
+			<% if(products && products.length > 0) { %>
 			<div class="row">
+				<% products.forEach(product => { %>
 				<div class="col-lg-4 col-md-6 text-center"> 
 					<div class="single-product-item"> 
 						<!-- Wishlist Button -->
@@ -163,43 +164,27 @@
 						</button>
 						
 						<div class="product-image"> 
-							<a href="single-product.html"><img src="/user/assets/img/products/product-img-1.jpg" alt="A Strawberry image"></a> 
+							<a href="single-product.html"><img src="<%= product.image %>" alt="A <%= product.name %> image"></a> 
 						</div> 
-						<h3>Strawberry</h3> 
-						<p class="product-price"><span>Per Kg</span> ₹85 </p> 
-						<a href="cart.html" class="cart-btn"><i class="fas fa-shopping-cart"></i> Add to Cart</a> 
+						<h3><%= product.name %></h3> 
+						<p class="product-price"><span>Per Kg</span> ₹<%= product.price %> </p> 
+						<form action="/cart/add" method="POST">
+							<input type="hidden" name="productId" value="<%= product._id %>">
+							<% if(!user)  {%> 
+								<a href="/cart" class="cart-btn"><i class="fas fa-shopping-cart"></i> Add to Cart</a>
+							<%} else {%>
+								<button type="submit" class="cart-btn-custom">
+									<i class="fas fa-shopping-cart"></i> Add to Cart
+								</button>
+							<%}%>
+
+						</form>
 					</div> 
 				</div>
-
-				<div class="col-lg-4 col-md-6 text-center">
-					<div class="single-product-item">
-						<!-- Wishlist Button -->
-						<button class="wishlist-btn">
-						<i class="fas fa-heart"></i>
-						</button>
-						<div class="product-image">
-							<a href="single-product.html"><img src="/user/assets/img/products/product-img-2.jpg" alt=""></a>
-						</div>
-						<h3>Berry</h3>
-						<p class="product-price"><span>Per Kg</span> ₹70 </p>
-						<a href="cart.html" class="cart-btn"><i class="fas fa-shopping-cart"></i> Add to Cart</a>
-					</div>
-				</div>
-				<div class="col-lg-4 col-md-6 offset-md-3 offset-lg-0 text-center">
-					<div class="single-product-item">
-						<!-- Wishlist Button -->
-						<button class="wishlist-btn">
-						<i class="fas fa-heart"></i>
-						</button>
-						<div class="product-image">
-							<a href="single-product.html"><img src="/user/assets/img/products/product-img-3.jpg" alt=""></a>
-						</div>
-						<h3>Lemon</h3>
-						<p class="product-price"><span>Per Kg</span> ₹35 </p>
-						<a href="cart.html" class="cart-btn"><i class="fas fa-shopping-cart"></i> Add to Cart</a>
-					</div>
-				</div>
+			<% }) %>
+				
 			</div>
+			<% } %>
 		</div>
 	</div>
 	<!-- end product section -->
@@ -290,7 +275,7 @@
     	<div class="container">
         	<h3>December sale is on! <br> with big <span class="orange-text">Discount...</span></h3>
             <div class="sale-percent"><span>Sale! <br> Upto</span>50% <span>off</span></div>
-            <a href="shop.html" class="cart-btn btn-lg">Shop Now</a>
+            <a href="/shop" class="cart-btn btn-lg">Shop Now</a>
         </div>
     </section>
 	<!-- end shop banner -->
