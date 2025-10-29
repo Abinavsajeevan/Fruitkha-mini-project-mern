@@ -1327,7 +1327,9 @@ ul.product-share li:hover a {
   top: 10px;
   right: 31px;
   background: transparent;
-  border: none;
+  border: none !important; /* removes any border */
+  outline: none !important; /* removes focus outline */
+  box-shadow: none !important; /* removes browser highlight */
   font-size: 36px;
   color: #aaa;
   cursor: pointer;
@@ -1337,6 +1339,14 @@ ul.product-share li:hover a {
 .wishlist-btn:hover {
   color: #F28123; /* Hover color */
 }
+
+.wishlist-btn:focus,
+.wishlist-btn:active {
+  outline: none !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
 
 .single-product-item:hover {
   -webkit-box-shadow: none;

@@ -100,6 +100,14 @@ router.get('/logout', verifyToken, logout)
 
  router.get('/cart', verifyToken, getCart)
 
+///=======================================================
+
+//---------------cart page----------------------
+
+ router.get('/wishlist', verifyToken, (req, res) => {
+    res.render('user/wishlist', {user:req.user})
+ })
+
 
 
 ///=======================================================

@@ -7,6 +7,8 @@ const { sendOtpEmail } = require('../utils/sendOtp');
 const Product = require('../models/Product');
 const Cart = require('../models/Cart');
 const paginationShop = require('../utils/paginateShop');
+const shopFilter = require('../utils/shopFilterQuery');
+const Wishlist = require('../models/Wishlist');
 
 
 // registration 
@@ -363,26 +365,12 @@ const updateProfile = async (req, res) => {
 //shop page METHOD = GET
 const getShop = async (req, res) => {
   try {
-      const page = parseInt(req.query.page) || 1;
-      const category = req.query.category || '';
-      const availability = req.query.availability || '';
-      const sort = req.query.sort || '';
-    //filteing the products it used as a query 
-      const filter = {};
-      if(category) filter.category = category;
-      if(availability === 'In Stock') filter.stock = {$gt: 0};
-      if(availability === 'Out of Stock') filter.stock = { $lte: 0};
-
-      let sortOption = {};
-      if(sort === 'low-high') sortOption.price = 1;
-      else if(sort === 'high-low') sortOption.price = -1;
-      else if(sort === 'newest') sortOption.createdAt = -1;
-      else sortOption.updatedAt = 1;
+       const { page, filter, sortOption, category, availability, sort, min_max, offer } = await shopFilter(req.query)
 
       const  { getProducts, totalPages } = await paginationShop(page, filter, sortOption);
      
 
-    return res.render('user/shop', {user: req.user, products: getProducts, currentPage: page, totalPages, category, availability, sort, msg:null, path:null});
+    return res.render('user/shop', {user: req.user, products: getProducts, currentPage: page, totalPages, category, availability, sort, min_max, offer, msg:null, path:null});
   }catch (err) {
     console.log('Error occured in shop ', err)
   }
@@ -390,49 +378,82 @@ const getShop = async (req, res) => {
 
 //add to cart METHOD = POST
 const addToCart = async (req, res) => {
-    try {
-        const userId = req.user._id;
-        const { productId } = req.body;
-        // console.log(userId, productId);
-        const page = parseInt(req.query.page) || 1;
-        const filter = {}
-        const sortOption = { updatedAt : 1}
-        const { getProducts, totalPages } = await paginationShop(parseInt(page, filter, sortOption));//taking pagination values from inbuilt function
+  try {
+    const userId = req.user._id;
+    const { productId } = req.body;
 
-        const product = await Product.findById(productId)
-        if(!product) return res.redirect('/shop');
-        
-        let cart = await Cart.findOne({user: userId});
-      
-        if(!cart) {
-            cart = new Cart({
-                user: userId,
-                products: [],
-                subTotal:0,
-                shipping: 0,
-                total:0
-            })
-            await cart.save();
-        } 
-        const existingProduct = cart.products.find(item => item.product.equals(productId))//here equals use one is string  and  objectid so it easily compares
-        if(existingProduct) {
-            return res.render('user/shop', {user: req.user, products: getProducts, currentPage: page, totalPages, msg:'product already added to cart⚠️', path:'error'});
-        }else {
-            cart.products.push({
-                product: productId,
-                price: product.price,
-                totalPrice: product.price,
-            });
-        }
-        cart.subTotal = cart.products.reduce((sum, product) => sum + product.totalPrice, 0);
-        cart.shipping = 45;
-        cart.total = cart.subTotal + cart.shipping;
-        await cart.save();
-        return res.render('user/shop', {user: req.user, products: getProducts, currentPage: page, totalPages, msg:'product added to cart✅', path:'success'});        
-    } catch(err) {
-        console.log('error occured in adding to cart', err)
+    const { page, filter, sortOption, category, availability, sort, min_max, offer } = await shopFilter(req.query)
+
+    // ---------- Pagination ----------
+    const { getProducts, totalPages } = await paginationShop(page, filter, sortOption);
+
+    
+    const product = await Product.findById(productId);
+    if (!product) return res.redirect('/shop');
+
+
+    let cart = await Cart.findOne({ user: userId });
+    if (!cart) {
+      cart = new Cart({
+        user: userId,
+        products: [],
+        subTotal: 0,
+        shipping: 0,
+        total: 0
+      });
+      await cart.save();
     }
+
+    const existingProduct = cart.products.find(item => item.product.equals(productId));
+    if (existingProduct) {
+      return res.render('user/shop', {
+        user: req.user,
+        products: getProducts,
+        currentPage: page,
+        totalPages,
+        category,
+        availability,
+        sort,
+        min_max,
+        offer,
+        msg: 'Product already added to cart ⚠️',
+        path: 'error'
+      });
+    } else {
+      cart.products.push({
+        product: productId,
+        price: product.price,
+        totalPrice: product.price,
+      });
+    }
+
+    // ---------- Update Totals ----------
+    cart.subTotal = cart.products.reduce((sum, item) => sum + item.totalPrice, 0);
+    cart.shipping = 45;
+    cart.total = cart.subTotal + cart.shipping;
+    await cart.save();
+
+    // ---------- Render Shop Page ----------
+    return res.render('user/shop', {
+      user: req.user,
+      products: getProducts,
+      currentPage: page,
+      totalPages,
+      category,
+      availability,
+      sort,
+      min_max,
+      offer,
+      msg: 'Product added to cart ✅',
+      path: 'success'
+    });
+
+  } catch (err) {
+    console.log('Error occurred in adding to cart:', err);
+    res.redirect('/shop');
+  }
 }
+
 
 //cart page show
 const getCart = async (req, res) => {
@@ -488,6 +509,61 @@ const removeCart = async (req, res) => {
     }
 }
 
+//wishlist add METHOD = POST
+const wishlistAdd = async (req, res) => {
+    try {
+        const userId = req.user._id;
+        const { productId } = req.body;
+        
+         const { page, filter, sortOption, category, availability, sort, min_max, offer } = await shopFilter(req.query);
+          const { getProducts, totalPages } = await paginationShop(page, filter, sortOption);
+
+        const product = await Product.findById(productId);
+        if(!product) return res.redirect('/shop');
+
+        let wishlist = await Wishlist.findOne({user: userId});
+        if(!wishlist) wishlist = new Wishlist({
+            user: userId,
+            products: []
+        })
+        const existProduct = wishlist.products.some(product => product.toString() === productId.toString()) //it checks only true or false not entire elements
+        if(existProduct) return res.render('user/shop', {
+      user: req.user,
+      products: getProducts,
+      currentPage: page,
+      totalPages,
+      category,
+      availability,
+      sort,
+      min_max,
+      offer,
+      msg: 'Product already in wishlist 🧡',
+      path: 'error',
+           }) 
+
+            wishlist.products.push(productId);
+            await wishlist.save();
+
+
+          return res.render('user/shop', {
+      user: req.user,
+      products: getProducts,
+      currentPage: page,
+      totalPages,
+      category,
+      availability,
+      sort,
+      min_max,
+      offer,
+      msg: 'Added to wishlist 🧡',
+      path: 'success',
+           })
+
+
+    }catch(err) {
+        console.log('error occured in wishlist adding ', err)
+    }
+}
 module.exports = {
     registerUser,
     loginUser,
@@ -505,5 +581,6 @@ module.exports = {
     addToCart,
     getCart,
     updateCart,
-    removeCart
+    removeCart,
+    wishlistAdd
 }

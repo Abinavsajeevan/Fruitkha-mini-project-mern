@@ -13,7 +13,7 @@ const productSchema = new Schema({
   price: { type: Number, required: true },
   stock: { type: Number, required: true, min: 0 },
   image: { type: String },
-  freshness: { type: String, enum: ["Fresh", "Normal", "Rotten"], default: "Fresh" },
+  discount: { type: String },
   origin: { type: String, default: "India" },
 }, { timestamps: true });
 

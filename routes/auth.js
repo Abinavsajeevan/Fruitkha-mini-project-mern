@@ -1,5 +1,5 @@
 const express = require('express');
-const { registerUser, loginUser, forgotPassword, otpVerify, resetPassword, deleteAccount, forgotProfile, changePassword, updateProfile, addToCart, updateCart, removeCart } = require('../controller/userAuthController');
+const { registerUser, loginUser, forgotPassword, otpVerify, resetPassword, deleteAccount, forgotProfile, changePassword, updateProfile, addToCart, updateCart, removeCart, wishlistAdd } = require('../controller/userAuthController');
 const { signupValidation, loginValidation, forgotValidation, resetPasswordValidation, updateProfileValidation } = require('../middleware/userValidator');
 const { verifyToken } = require('../middleware/authMiddleware');
 const createMulter = require('../middleware/profilePhotoUpload');
@@ -32,6 +32,14 @@ router.post('/updateProfile', verifyToken, profileUpload.single('profilePhoto'),
 router.post('/shop', verifyToken, addToCart)//adding to cart
 router.post('/cart/update', verifyToken, updateCart)//update cart
 router.post('/cart/remove', verifyToken, removeCart)//removing cart
+
+
+
+// ----------------------------------------------
+//  -------- WISHLIST SECTIONS------------------
+// ------------------------------------------------
+router.post('/wishlist/add', verifyToken, wishlistAdd)//add wishlist to items
+
 
 //=====================================================================================
 

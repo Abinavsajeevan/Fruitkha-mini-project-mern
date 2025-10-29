@@ -32,8 +32,17 @@
 	<link rel="stylesheet" href="/user/assets/css/responsive.css">
 	<!-- bootsrap icon cdn link -->
 	 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-	 <style>
-		/* Hamburger icon */
+	<style>
+		/* ===== FILTER BAR STYLING ===== */
+.filter-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: nowrap;
+  gap: 15px;
+}
+
+/* Hamburger icon */
 .filter-toggle {
   background-color: #F28123;
   color: white;
@@ -42,41 +51,42 @@
   border-radius: 6px;
   padding: 8px 14px;
   cursor: pointer;
-  display: none; /* hidden by default */
-}
-/* Filter content (form + button) */
-.filter-content {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  gap: 15px;
-}
-.filter-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between; /* evenly distributes items */
-  flex-wrap: wrap;
-  gap: 15px; /* consistent spacing between items */
+  display: none; /* hidden on desktop */
 }
 
+/* Filter content (form + button together) */
+.filter-content {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex: 1;
+  gap: 15px;
+}
+
+/* Form setup */
 .filter-bar form {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  flex: 1; /* take full row width */
-  gap: 15px; /* equal space between selects */
+  flex-wrap: nowrap;
+  gap: 15px;
+  width: 100%;
   margin: 0;
 }
 
+/* All dropdowns same size */
 .custom-select-box {
-  flex: 1; /* equal width for all selects */
-  min-width: 200px; /* prevents shrinking too small */
+  flex: 1;
   padding: 8px 12px;
   border-radius: 6px;
   border: 1px solid #ccc;
   background-color: #F28123;
+  color: white;
+  font-weight: 600;
+  min-width: 160px;
+  text-align: center;
 }
 
+/* Button style */
 .filter-btn {
   padding: 8px 16px;
   border-radius: 6px;
@@ -84,68 +94,51 @@
   color: white;
   border: none;
   transition: 0.3s ease;
-  flex-shrink: 0; /* keeps button fixed width */
+  font-weight: 600;
+  white-space: nowrap;
 }
 
 .filter-btn:hover {
-  background-color: #F28123;
+  background-color: #e07010;
 }
 
+/* ===== RESPONSIVE ===== */
 
-/* Medium screens (tablets) */
+/* For tablets & below */
 @media (max-width: 992px) {
-
-
-  .custom-select-box,
-  .filter-btn {
-    flex: 1 1 100%;
-    width: 100%;
-    max-width: 100%;
-  }
-   .filter-toggle {
-    display: block; /* show hamburger */
-  }
-
-  .filter-content {
-    display: none; /* hidden initially */
+  .filter-bar {
     flex-direction: column;
-    width: 100%;
-    margin-top: 10px;
+    align-items: stretch;
   }
 
-  .filter-content.active {
-    display: flex; /* shown when toggle clicked */
-  }
-}
-
-/* Small screens (mobiles) */
-@media (max-width: 576px) {
-
-  .custom-select-box,
-  .filter-btn {
-    flex: 1 1 100%;
-    width: 100%;
-    max-width: 100%;
-  }
   .filter-toggle {
     display: block; /* show hamburger */
+    align-self: flex-start;
   }
 
   .filter-content {
-    display: none; /* hidden initially */
+    display: none;
     flex-direction: column;
     width: 100%;
     margin-top: 10px;
   }
 
   .filter-content.active {
-    display: flex; /* shown when toggle clicked */
+    display: flex;
   }
 
+  .filter-bar form {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .custom-select-box,
+  .filter-btn {
+    width: 100%;
+  }
 }
 
-
-	 </style>
+	</style>
 
 </head>
 <body>
@@ -204,11 +197,11 @@
     <% } else { %>
       <i class="bi bi-exclamation-circle-fill me-2"></i>
     <% } %>
-    <%= msg %>
+	<%= msg %>
 	</div>
 <% } %>
 	<!-- products -->
-	 <% if(products && products.length > 0  ||( category  || availability || sort)) { %>
+	 <% if(products && products.length > 0  ||( category  || availability || sort || min_max)) { %>
 	<div class="product-section mt-100 mb-150">
 		<div class="container">
 
@@ -252,12 +245,29 @@
           <option value="high-low" <%= sort === 'high-low' ? 'selected' : '' %>>Price: High to Low</option>
           <option value="newest" <%= sort === 'newest' ? 'selected' : '' %>>Newest Arrivals</option>
         </select>
-      </form>
 
-      <!-- Filters Button -->
-      <button class="filter-btn" data-bs-toggle="modal" data-bs-target="#filterModal">
-        Filters
-      </button>
+		<!-- min max -->
+		 <select name="min_max" class="custom-select-box" onchange="this.form.submit()">
+			<option value="">Min & Max</option>
+			<option value="Less than Rs 20" <%= min_max === 'Less than Rs 20' ? 'selected' : '' %>>Less than Rs 20</option>
+			<option value="Rs 21 to Rs 50" <%= min_max === 'Rs 21 to Rs 50' ? 'selected' : '' %>>Rs 21 to Rs 50</option>
+			<option value="Rs 51 to Rs 100" <%= min_max === 'Rs 51 to Rs 100' ? 'selected' : '' %>>Rs 51 to Rs 100</option>
+			<option value="Rs 101 to Rs 200" <%= min_max === 'Rs 101 to Rs 200' ? 'selected' : '' %>>Rs 101 to Rs 200</option>
+			<option value="Rs 201 to Rs 500" <%= min_max === 'Rs 201 to Rs 500' ? 'selected' : '' %>>Rs 201 to Rs 500</option>
+			<option value="More than Rs 500" <%= min_max === 'More than Rs 500' ? 'selected' : '' %>>More than Rs 500</option>
+		 </select>
+
+		 <!-- offers -->
+		  <!-- <select name="offer" class="custom-select-box" onchange="this.form.submit()">
+			<option value="">Offers</option>
+			<option value="5% - 10%" <%= min_max === '5% - 10%' ? 'selected' : '' %>>5% - 10%</option>
+			<option value="10% - 20%" <%= min_max === '10% - 20%' ? 'selected' : '' %>>10% - 20%</option>
+			<option value="20% - 30%" <%= min_max === '20% - 30%' ? 'selected' : '' %>>20% - 30%</option>
+			<option value="30% - 40%" <%= min_max === '30% - 40%' ? 'selected' : '' %>>30% - 40%</option>
+			<option value="More than 40%" <%= min_max === 'More than 40%' ? 'selected' : '' %>>More than 40%</option>
+			
+		 </select> -->
+      </form>
 	  </div>
     </div>
   </div>
@@ -280,9 +290,16 @@
 				<div class="col-lg-4 col-md-6 text-center strawberry">
 					<div class="single-product-item">
 						<!-- Wishlist Button -->
-						<button class="wishlist-btn">
-						<i class="fas fa-heart"></i>
+						<form
+						action="/wishlist/add?page=<%= currentPage %>&category=<%= category %>&availability=<%= availability %>&sort=<%= sort %>&min_max=<%= min_max %>&offer=<%= offer %>"
+						method="POST"
+						style="display:inline;"
+						>
+						<input type="hidden" name="productId" value="<%= product._id %>">
+						<button type="submit" class="wishlist-btn" style="background:none; border:none;">
+							<i class="fas fa-heart"></i>
 						</button>
+						</form>
 
 						<!-- Product Image -->
 						<div class="product-image">
@@ -309,7 +326,7 @@
 
 						<!-- Add to Cart Button -->
 						<!-- <a href="/cart" class="cart-btn"><i class="fas fa-shopping-cart"></i> Add to Cart</a> -->
-						 <form action="/shop?page=<%= currentPage %>" method="POST">
+						 <form  action="/shop?page=<%= currentPage %>&category=<%= category %>&availability=<%= availability %>&sort=<%= sort %>&min_max=<%= min_max %>&offer=<%= offer %>" method="POST">
 							<input type="hidden" name="productId" value="<%= product._id %>">
 							<input type="hidden" name="page" value="<%= currentPage %>">
 							<button type="submit" class="cart-btn-custom">
@@ -360,55 +377,6 @@
 
 	<!-- end products -->
 
-	
-	<!-- Filter Modal -->
-	<div class="modal fade" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true">
-	<div class="modal-dialog modal-dialog-centered">
-	<div class="modal-content">
-	<div class="modal-header" style="background-color:#F28123;">
-	<h5 class="modal-title text-white" id="filterModalLabel">Advanced Filters</h5>
-	<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-	</div>
-	<div class="modal-body">
-	<!-- Price Range -->
-	<div class="mb-4">
-	  <label class="fw-bold d-block mb-2" style="color:#F28123;">Price Range:</label>
-	  <div class="d-flex gap-2">
-		<input type="number" class="form-control border border-warning" placeholder="Min">
-		<input type="number" class="form-control border border-warning" placeholder="Max">
-	  </div>
-	</div>
-	
-	<!-- Customer Ratings -->
-	<div class="mb-4">
-	  <label class="fw-bold d-block mb-2" style="color:#F28123;">Customer Ratings:</label>
-	  <div>
-		<div class="form-check">
-		  <input class="form-check-input" type="checkbox" id="rating5">
-		  <label class="form-check-label" for="rating5">⭐⭐⭐⭐⭐ & up</label>
-		</div>
-		<div class="form-check">
-		  <input class="form-check-input" type="checkbox" id="rating4">
-		  <label class="form-check-label" for="rating4">⭐⭐⭐⭐ & up</label>
-		</div>
-		<div class="form-check">
-		  <input class="form-check-input" type="checkbox" id="rating3">
-		  <label class="form-check-label" for="rating3">⭐⭐⭐ & up</label>
-		</div>
-		<div class="form-check">
-		  <input class="form-check-input" type="checkbox" id="rating2">
-		  <label class="form-check-label" for="rating2">⭐⭐ & up</label>
-		</div>
-	  </div>
-	</div>
-	</div>
-	<div class="modal-footer">
-	<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-	<button type="button" class="btn text-white" style="background-color:#F28123;">Apply Filters</button>
-	</div>
-	</div>
-	</div>
-	</div>
 	<% } else { %>
   <div class="container text-center my-5">
     <div class="alert alert-warning shadow-sm p-4" role="alert" style="font-size: 1.2rem;">
