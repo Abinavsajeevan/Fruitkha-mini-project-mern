@@ -14,6 +14,7 @@ async function shopFilter(query) {
     if (category) filter.category = category;
     if (availability === 'In Stock') filter.stock = { $gt: 0 };
     if (availability === 'Out of Stock') filter.stock = { $lte: 0 };
+    if (availability === 'Low Stock') filter.stock = {$gt: 0, $lt: 15}
 
     // Price range filter
     if (min_max === 'Less than Rs 20') filter.price = { $lt: 20 };

@@ -514,13 +514,14 @@ const wishlistAdd = async (req, res) => {
     try {
         const userId = req.user._id;
         const { productId } = req.body;
+        //its already do 
         
          const { page, filter, sortOption, category, availability, sort, min_max, offer } = await shopFilter(req.query);
           const { getProducts, totalPages } = await paginationShop(page, filter, sortOption);
 
         const product = await Product.findById(productId);
         if(!product) return res.redirect('/shop');
-
+        //wishlist check and no created
         let wishlist = await Wishlist.findOne({user: userId});
         if(!wishlist) wishlist = new Wishlist({
             user: userId,
@@ -564,6 +565,148 @@ const wishlistAdd = async (req, res) => {
         console.log('error occured in wishlist adding ', err)
     }
 }
+
+//wishlist view METHOE = GET
+const getWishlist = async (req, res) => {
+    try {
+        const userId = req.user._id;//taking user id
+
+        const wishlist = await Wishlist.findOne({user: userId}).populate('products');
+        
+        if(!wishlist) return res.render('user/wishlist', {user: req.user, wishlist:null, products: null, currentPage: null, totalPages: null, msg: null,path:null})
+
+            //for pagination  
+        const page = parseInt(req.query.page) || 1
+        const limit = 6;
+        const skip = ( page - 1) * limit;
+        const totalProduct = wishlist.products.length
+        const productPage = wishlist.products.slice(skip, skip + limit)
+        const totalPages = Math.ceil(totalProduct/limit)        
+        if(wishlist.products.length > 0) {
+            
+         return res.render('user/wishlist', {user: req.user, wishlist, products: productPage, currentPage: page, totalPages, msg: null,path:null});
+        }
+        else {
+            return res.render('user/wishlist', {user: req.user, wishlist, products: [], currentPage: page, totalPages, msg: null, path:null});//no product case
+        }
+        
+
+    }catch (err) {
+        console.log('error occured in getwishlist', err)
+    }
+}
+
+//wishlist remove 
+const remeoveWishlist = async (req, res) => {
+    try {
+        const userId = req.user._id;
+        const { productId } = req.body;
+
+        let wishlist = await Wishlist.findOne({user: userId}).populate('products');
+        if(!wishlist) return res.render('user/wishlist', {user: req.user, wishlist:null, products: [], currentPage: null, totalPages: null, msg: null, path: null})
+
+        if(wishlist.products.length === 0) return res.render('user/wishlist', {user: req.user, wishlist, products: [], currentPage: null, totalPages:null,msg:null, path: null});//no product case 
+
+        wishlist.products = wishlist.products.filter(item => item._id.toString() !==  productId.toString())
+        await wishlist.save();
+        wishlist = await Wishlist.findOne({user: userId}).populate('products');
+                       //for pagination  
+        const page = parseInt(req.query.page) || 1
+        const totalProduct = wishlist.products.length
+        const limit = 6;
+         if(page > 1 && totalProduct > 0 && totalProduct == 6 * (page-1)) page--;//if above page product no product it will decreased       
+
+        const skip = ( page - 1) * limit;
+        const productPage = wishlist.products.slice(skip, skip + limit)
+        const totalPages = Math.ceil(totalProduct/limit);
+        
+        return res.render('user/wishlist', {user: req.user, wishlist, products: productPage, currentPage: page, totalPages, msg:'product removed successfully❌', path:null});
+
+
+    }catch(err) {
+        console.log('error occured in removing wishlist', err)
+    }
+}
+
+//add to cart METHOD = POST
+const addTowishlist = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const { productId } = req.body;
+
+    const wishlist = await Wishlist.findOne({user: userId}).populate('products')
+    if(!wishlist) return res.render('user/wishlist', {user: req.user, wishlist:null, products: [], currentPage: null, totalPages: null, msg: null, path: null})
+    // ---------- Pagination ----------
+        const page = parseInt(req.query.page) || 1
+        const totalProduct = wishlist.products.length
+        const limit = 6;
+         if(page > 1 && totalProduct > 0 && totalProduct == 6 * (page-1)) page--;//if above page product no product it will decreased       
+
+        const skip = ( page - 1) * limit;
+        const productPage = wishlist.products.slice(skip, skip + limit)
+        const totalPages = Math.ceil(totalProduct/limit);
+
+    const product = await Product.findById(productId);
+    if (!product) return res.redirect('/wishlist');
+
+
+    let cart = await Cart.findOne({ user: userId });
+    if (!cart) {
+      cart = new Cart({
+        user: userId,
+        products: [],
+        subTotal: 0,
+        shipping: 0,
+        total: 0
+      });
+      await cart.save();
+    }
+
+    const existingProduct = cart.products.find(item => item.product.equals(productId));
+    if (existingProduct) {
+      return res.render('user/wishlist', {     
+        user: req.user,
+        wishlist,
+        products: productPage,
+        currentPage: page,
+        totalPages,
+        msg: 'Product already added to cart ⚠️',
+        path: 'error'
+      });
+    } else {
+      cart.products.push({
+        product: productId,
+        price: product.price,
+        totalPrice: product.price,
+      });
+    }
+
+    // ---------- Update Totals ----------
+    cart.subTotal = cart.products.reduce((sum, item) => sum + item.totalPrice, 0);
+    cart.shipping = 45;
+    cart.total = cart.subTotal + cart.shipping;
+    await cart.save();
+
+    // wishlist.products = wishlist.products.filter(item => item._id.toString() !== productId.toString())
+    // await wishlist.save()
+    // -----/if i want to delete a product from wishlist when added to cart ( but there is so many criteria are there)
+
+    // ---------- Render Shop Page ----------
+    return res.render('user/wishlist', {
+      user: req.user,
+      wishlist,
+      products: productPage,
+      currentPage: page,
+      totalPages,
+      msg: 'Product added to cart ✅',
+      path: 'success'
+    });
+
+  } catch (err) {
+    console.log('Error occurred in adding to cart:', err);
+    res.redirect('/wishlist');
+  }
+}
 module.exports = {
     registerUser,
     loginUser,
@@ -582,5 +725,8 @@ module.exports = {
     getCart,
     updateCart,
     removeCart,
-    wishlistAdd
+    wishlistAdd,
+    getWishlist,
+    remeoveWishlist,
+    addTowishlist
 }

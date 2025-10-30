@@ -32,7 +32,18 @@
 	<link rel="stylesheet" href="/user/assets/css/responsive.css">
 	<!-- bootsrap icon cdn link -->
 	 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+<style>
+	.wishlist-btn:hover {
+  background: transparent; /* prevent white/gray background */
+  color: transparent !important; /* orange heart color */
+  transform: scale(1.1);
+}
 
+/* Optional: when clicked/active */
+.wishlist-btn:active {
+  transform: scale(0.95);
+}
+</style>
 </head>
 <body>
 	
@@ -79,61 +90,114 @@
 	</div>
 	<!-- end breadcrumb section -->
 
+	<!-- Flash Message -->
+<% if (msg && !path) { %>
+  <div id="flash-message" class="text-center shadow-sm p-3 rounded  alert alert-success mt-3">
+		<%= msg %>
+	</div>
+<% } %>
+<% if (msg && path) { %>
+  <div id="flash-message" class="text-center shadow-sm p-3 rounded 
+       <%= path === 'success' ? 'alert alert-success' : 'alert alert-warning' %> mt-3">
+    <% if (path === 'success') { %>
+      <i class="bi bi-check-circle-fill me-2"></i>
+    <% } else { %>
+      <i class="bi bi-exclamation-circle-fill me-2"></i>
+    <% } %>
+	<%= msg %>
+	</div>
+<% } %>
+
 	<!-- headers -->
-	
+	<% if (wishlist && products.length > 0) { %>
 	<!-- products -->
 	<div class="product-section mt-100 mb-150">
 		<div class="container">
 
 			<div class="row product-lists">
-				<div class="col-lg-4 col-md-6 text-center strawberry">
-  <div class="single-product-item">
-    <!-- Wishlist Button -->
-    <button class="wishlist-btn wishlist-add">
-      <i class="fas fa-heart"></i>
-    </button>
+				<% products.forEach(product => { %>
+				<div class="col-lg-4 col-md-6 text-center">
+					<div class="single-product-item">
+						<!-- Wishlist Button -->
+						 <form action="/wishlist/remove?page=<%= currentPage %>" method="POST" style="display:inline;">
+							<input type="hidden" name="productId" value="<%= product._id %>">
+							<button type="submit" class="wishlist-btn wishlist-add">
+							<i class="fas fa-heart"></i>
+							</button>
+						 </form>
 
-    <!-- Product Image -->
-    <div class="product-image">
-      <a href="single-product.html">
-        <img src="/user/assets/img/products/product-img-1.jpg" alt="">
-      </a>
-    </div>
+						<!-- Product Image -->
+						<div class="product-image">
+						<a href="single-product.html">
+							<img src="<%= product.image %>" alt="<%= product.name %> image">
+						</a>
+						</div>
 
-    <!-- Product Name -->
-    <h3>Strawberrys</h3>
+						<!-- Product Name -->
+						<h3><%= product.name %></h3>
 
-    <!-- Customer Rating -->
-    <div class="product-rating mb-2">
-      <i class="fas fa-star" style="color: #F28123;"></i>
-      <i class="fas fa-star" style="color: #F28123;"></i>
-      <i class="fas fa-star" style="color: #F28123;"></i>
-      <i class="fas fa-star" style="color: #F28123;"></i>
-      <i class="far fa-star" style="color: #F28123;"></i>
-      <span class="ms-2">(4.0)</span>
-    </div>
+						<!-- Customer Rating -->
+						<div class="product-rating mb-2">
+						<i class="fas fa-star" style="color: #F28123;"></i>
+						<i class="fas fa-star" style="color: #F28123;"></i>
+						<i class="fas fa-star" style="color: #F28123;"></i>
+						<i class="fas fa-star" style="color: #F28123;"></i>
+						<i class="far fa-star" style="color: #F28123;"></i>
+						<span class="ms-2">(4.0)</span>
+						</div>
 
-    <!-- Product Price -->
-    <p class="product-price"><span>Per Kg</span> 85$</p>
+						<!-- Product Price -->
+						<p class="product-price"><span>Per Kg</span> ₹<%= product.price %></p>
 
-    <!-- Add to Cart Button -->
-    <a href="cart.html" class="cart-btn"><i class="fas fa-shopping-cart"></i> Add to Cart</a>
-  </div>
-</div>
-
-			
-				
+						<!-- Add to Cart Button -->
+						 <form  action="/wishlist?page=<%= currentPage %>%>" method="POST">
+							<input type="hidden" name="productId" value="<%= product._id %>">
+							<input type="hidden" name="page" value="<%= currentPage %>">
+							<% if(product.status == 'Out Of Stock') { %>
+							<button type="submit" class="cart-btn-customs" disabled>
+								<i class="fas fa-shopping-cart"></i> Add to Cart
+							</button>
+							<p class="text-danger fw-bolder pb-0 mb-0 pt-2" style="font-weight: 900;">Out of stock</p>
+							<% } else { %>
+							<button type="submit" class="cart-btn-custom">
+								<i class="fas fa-shopping-cart"></i> Add to Cart
+							</button>
+							<p class="<%= product.status == 'Low Stock'? 'text-warning': 'text-success' %> fw-bolder pb-0 mb-0 pt-2" style="font-weight: 900;"><%- product.status == 'Low Stock'? `Only <span class="fw-bolder fs-5  mb-0">${product.stock}</span>Kg left`: product.status %></p>
+							
+							<% } %>
+						</form>
+					</div>
+				</div>
+				<%  }) %>
 			</div>
 
 			<div class="row">
 				<div class="col-lg-12 text-center">
 					<div class="pagination-wrap">
+												<%
+  const pagesPerGroup = 3;
+  const currentGroup = Math.ceil(currentPage / pagesPerGroup);
+  const startPage = (currentGroup - 1) * pagesPerGroup + 1;
+  const endPage = Math.min(startPage + pagesPerGroup - 1, totalPages);
+%>
 						<ul>
-							<li><a href="#">Prev</a></li>
-							<li><a href="#">1</a></li>
-							<li><a class="active" href="#">2</a></li>
-							<li><a href="#">3</a></li>
-							<li><a href="#">Next</a></li>
+							<% if (currentPage > 1) { %>
+							<li><a href="/shop?page=<%= currentPage - 1 %>">Prev</a></li>
+							<% } %>
+
+							  <% for (let i = startPage; i <= endPage; i++) { %>
+							<li>
+								<a href="/wishlist?page=<%= i %> || '' %>"
+								class="<%= i === currentPage ? 'active' : '' %>">
+								<%= i %>
+								</a>
+
+							</li>
+							<% } %>
+
+							<% if (currentPage < totalPages) { %>
+							<li><a href="/wishlist?page=<%= currentPage + 1 %>">Next</a></li>
+							<% } %>
 						</ul>
 					</div>
 				</div>
@@ -141,7 +205,14 @@
 		</div>
 	</div>
 	<!-- end products -->
-
+	<% } else { %>
+	<div class="container text-center mt-100 mb-150">
+		<div class="alert alert-warning shadow-sm p-4" role="alert" style="font-size: 1.2rem;">
+		<i class="bi bi-exclamation-circle-fill text-warning me-2"></i>
+		No Wishlist available at the moment. Please add any wislist! 😊
+		</div>
+	</div>
+	<% } %>
 	
 
 <%- include('partials/footer') %>
@@ -170,7 +241,21 @@
 	<!-- main js -->
 	<script src="/user/assets/js/main.js"></script>
 
+<script>
+			//  const flashMsg = document.getElementById('flash-message'); 
 
+		window.addEventListener('DOMContentLoaded', () => {
+			 const flashMsg = document.getElementById('flash-message'); 
+			//  const scrollPlace = document.getElementById('scrollPlace'); 
+			 if(flashMsg) { // Scroll to the message smoothly 
+			 flashMsg.scrollIntoView({ behavior: 'smooth', block: 'center' });
+			
+				setTimeout(() => {
+				flashMsg.style.display = 'none';
+			}, 3000);
+    	}
+		})
+	  </script>
 
 </body>
 </html>

@@ -235,6 +235,7 @@
         <select class="custom-select-box" name="availability" onchange="this.form.submit()">
           <option value="">All Availability</option>
           <option value="In Stock" <%= availability === 'In Stock' ? 'selected' : '' %>>In Stock</option>
+          <option value="Low Stock" <%= availability === 'Low Stock' ? 'selected' : '' %>>Low Stock</option>
           <option value="Out of Stock" <%= availability === 'Out of Stock' ? 'selected' : '' %>>Out of Stock</option>
         </select>
 
@@ -329,9 +330,18 @@
 						 <form  action="/shop?page=<%= currentPage %>&category=<%= category %>&availability=<%= availability %>&sort=<%= sort %>&min_max=<%= min_max %>&offer=<%= offer %>" method="POST">
 							<input type="hidden" name="productId" value="<%= product._id %>">
 							<input type="hidden" name="page" value="<%= currentPage %>">
+							<% if(product.status == 'Out Of Stock') { %>
+							<button type="submit" class="cart-btn-customs" disabled>
+								<i class="fas fa-shopping-cart"></i> Add to Cart
+							</button>
+							<p class="text-danger fw-bolder pb-0 mb-0 pt-2" style="font-weight: 900;">Out of stock</p>
+							<% } else { %>
 							<button type="submit" class="cart-btn-custom">
 								<i class="fas fa-shopping-cart"></i> Add to Cart
 							</button>
+							<p class="<%= product.status == 'Low Stock'? 'text-warning': 'text-success' %> fw-bolder pb-0 mb-0 pt-2" style="font-weight: 900;"><%- product.status == 'Low Stock'? `Only <span class="fw-bolder fs-5  mb-0">${product.stock}</span>Kg left`: product.status %></p>
+							
+							<% } %>
 						</form>
 
 					</div>
@@ -424,7 +434,7 @@
 			
 				setTimeout(() => {
 				flashMsg.style.display = 'none';
-			}, 10000);
+			}, 3000);
     	}
 		})
 	  </script>

@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const passport = require('passport');
 const {verifyToken, verifyTokenIndex} = require('../middleware/authMiddleware');
-const { googleLogin, resendOtp, logout, deleteAccount, getShop, getCart } = require('../controller/userAuthController');
+const { googleLogin, resendOtp, logout, deleteAccount, getShop, getCart, getWishlist } = require('../controller/userAuthController');
 const { adminVerifyToken } = require('../middleware/adminAuthMiddleware');
 const Admin = require('../models/Admin');
 const { logoutAdmin } = require('../controller/adminAuthController');
@@ -57,6 +57,20 @@ router.get("/resend-otp", resendOtp);
 
 ///=======================================================
 
+//---------------about  page----------------------
+
+router.get('/about', verifyTokenIndex, async (req, res) => { 
+    req.session.email = null;    
+    res.render('user/about', {user: req.user, });
+})
+//------------contact page----------
+router.get('/contact', verifyTokenIndex, async (req, res) => { 
+    req.session.email = null;
+    res.render('user/contact', {user: req.user});
+})
+
+///=======================================================
+
 //---------------profile page----------------------
 
 //profile info
@@ -102,12 +116,16 @@ router.get('/logout', verifyToken, logout)
 
 ///=======================================================
 
-//---------------cart page----------------------
+//---------------wishlist page----------------------
 
- router.get('/wishlist', verifyToken, (req, res) => {
-    res.render('user/wishlist', {user:req.user})
- })
+ router.get('/wishlist', verifyToken, getWishlist)
 
+///=======================================================
+
+//---------------checkout page----------------------
+router.get('/checkout', verifyToken, (req,res) => {
+  res.render('user/checkout', {user: req.user})
+})
 
 
 ///=======================================================

@@ -1345,6 +1345,7 @@ ul.product-share li:hover a {
   outline: none !important;
   border: none !important;
   box-shadow: none !important;
+  transform: scale(0.95);
 }
 
 
@@ -2805,6 +2806,15 @@ table.order-details tbody td {
   transition: 0.3s;     /* Smooth effect on hover */
 }
 
+.wishlist-add i:hover {
+  color: wheat;
+
+}
+
+.wishlist-btn i:active {
+  transform: scale(0.95);
+}
+
 /* for login  */
 
   /* Form container with light transparent background */
@@ -2892,3 +2902,29 @@ table.order-details tbody td {
   color: #F28123;
 }
 
+.cart-btn-customs {
+  font-family: 'Poppins', sans-serif;
+  display: inline-block;
+  background-color: #F28123;
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 50px;
+  font-weight: 500;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  border: none;
+  cursor: pointer;
+}
+
+.cart-btn-customs i {
+  margin-right: 8px;
+}
+
+/* 🔸 Disabled state */
+.cart-btn-customs:disabled,
+.cart-btn-customs.disabled {
+  background-color: #F28123; /* keep same color */
+  opacity: 0.6;              /* make slightly faded */
+  cursor: not-allowed;       /* show disabled cursor */
+  pointer-events: none;      /* block all clicks */
+}
