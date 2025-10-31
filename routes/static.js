@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const passport = require('passport');
 const {verifyToken, verifyTokenIndex} = require('../middleware/authMiddleware');
-const { googleLogin, resendOtp, logout, deleteAccount, getShop, getCart, getWishlist } = require('../controller/userAuthController');
+const { googleLogin, resendOtp, logout, deleteAccount, getShop, getCart, getWishlist, getCheckout, addressProfile } = require('../controller/userAuthController');
 const { adminVerifyToken } = require('../middleware/adminAuthMiddleware');
 const Admin = require('../models/Admin');
 const { logoutAdmin } = require('../controller/adminAuthController');
@@ -86,9 +86,7 @@ router.get('/profileOrder', verifyToken, (req, res) => {
 })
 
 //profile address
-router.get('/profileAddress', verifyToken, (req, res) => {
-  res.render('user/profileAddress', {user: req.user})
-})
+router.get('/profileAddress', verifyToken, addressProfile)
 
 //profile setting
 router.get('/profileSetting', verifyToken, (req, res) => {
@@ -123,9 +121,7 @@ router.get('/logout', verifyToken, logout)
 ///=======================================================
 
 //---------------checkout page----------------------
-router.get('/checkout', verifyToken, (req,res) => {
-  res.render('user/checkout', {user: req.user})
-})
+router.get('/checkout', verifyToken, getCheckout)
 
 
 ///=======================================================

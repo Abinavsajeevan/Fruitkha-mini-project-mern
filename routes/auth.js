@@ -1,6 +1,6 @@
 const express = require('express');
-const { registerUser, loginUser, forgotPassword, otpVerify, resetPassword, deleteAccount, forgotProfile, changePassword, updateProfile, addToCart, updateCart, removeCart, wishlistAdd, remeoveWishlist, addTowishlist } = require('../controller/userAuthController');
-const { signupValidation, loginValidation, forgotValidation, resetPasswordValidation, updateProfileValidation } = require('../middleware/userValidator');
+const { registerUser, loginUser, forgotPassword, otpVerify, resetPassword, deleteAccount, forgotProfile, changePassword, updateProfile, addToCart, updateCart, removeCart, wishlistAdd, remeoveWishlist, addTowishlist, addAddress } = require('../controller/userAuthController');
+const { signupValidation, loginValidation, forgotValidation, resetPasswordValidation, updateProfileValidation, addressValidation } = require('../middleware/userValidator');
 const { verifyToken } = require('../middleware/authMiddleware');
 const createMulter = require('../middleware/profilePhotoUpload');
 const { loginAdmin, settings, addProduct, editProduct, deleteProduct } = require('../controller/adminAuthController');
@@ -24,7 +24,7 @@ router.post('/forgotProfile',verifyToken, forgotProfile)//forgot password
 router.post('/profileChangePassword',verifyToken, changePassword)//update password
 const profileUpload = createMulter('profile')
 router.post('/updateProfile', verifyToken, profileUpload.single('profilePhoto'), updateProfile)//update profile details
-
+router.post('/addAddress', verifyToken, addressValidation, addAddress)//address add 
 
 // ----------------------------------------------
 //  --------CART SECTIONS------------------

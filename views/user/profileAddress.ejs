@@ -36,72 +36,95 @@
 	<!-- bootsrap icon cdn link -->
 	 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
-  <style>
-    body { background-color:#f8f9fa; }
-    h3 { color:#F28123; font-weight:bold; }
+   <style>
+    body {
+      background-color: #f8f9fa;
+      color: #051922;
+      font-family: "Poppins", sans-serif;
+    }
+
     .btn-orange {
-      background-color:#F28123; color:#fff; border:none; border-radius:20px;
-      padding:6px 16px; transition:.3s;
+      background-color: #F28123;
+      color: #fff;
+      border: none;
+      transition: 0.3s ease;
     }
-    .btn-orange:hover { background-color:#d46d1d; }
-    .address-card {
-      border:2px solid #F28123; border-radius:8px; background:#fff;
-      padding:1rem; margin-bottom:1rem;
+
+    .btn-orange:hover {
+      background-color: #051922;
+      color: #F28123;
     }
-    .address-actions button { margin-right: .5rem; }
-    .empty-state {
-      display:flex; flex-direction:column; align-items:center;
-      justify-content:center; height:60vh; color:#6c757d;
+
+    .page-header {
+      color: #051922;
+      font-weight: bold;
+      border-bottom: 3px solid #F28123;
+      display: inline-block;
+      margin-bottom: 25px;
     }
 
     .address-card {
-  position: relative;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 1rem;
-  background: #fff;
-}
-.default-ribbon {
-  position: absolute;
-  top: 0;
-  right: 0;
-  background-color: #051922;
-  color: #F28123;
-  padding: 0.3rem 0.6rem;
-  font-size: 0.75rem;
-  font-weight: bold;
-  border-bottom-left-radius: 6px;
-  border-top-right-radius: 8px;
-}
-.address-card {
-  position: relative;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 1rem;
-  background: #fff;
-}
+      border: 2px solid #F28123;
+      border-radius: 10px;
+      padding: 15px 20px;
+      background: #fff;
+      margin-bottom: 20px;
+      transition: all 0.3s ease;
+    }
 
-.set-default-btn {
-  position: absolute;
-  top: 0.5rem;
-  right: 0.5rem;
-  background-color: hash;
-  color: #F28123;
-  border: none;
-  border-radius: 4px;
-  padding: 0.3rem 0.6rem;
-  font-size: 0.8rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
+    .address-card:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
 
-.set-default-btn:hover {
-  background-color: rgb(179, 178, 178); /* Slightly lighter hover shade */
-}
+    .address-card h5 {
+      color: #051922;
+      font-weight: 600;
+    }
+
+    .address-card p {
+      margin-bottom: 5px;
+    }
+
+    .edit-btn {
+      background-color: #051922;
+      color: #F28123;
+      border: 1px solid #F28123;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 14px;
+      transition: 0.3s;
+    }
+
+    .edit-btn:hover {
+      background-color: #F28123;
+      color: #fff;
+    }
+
+    .modal-header {
+      background-color: #051922;
+      color: #F28123;
+      border-bottom: 2px solid #F28123;
+    }
+
+    .modal-footer {
+      border-top: 2px solid #F28123;
+    }
+
+    .form-label {
+      color: #F28123;
+      font-weight: 600;
+    }
+
+    .btn-close-white {
+      filter: invert(1);
+    }
+
+    @media (max-width: 576px) {
+      .address-card {
+        padding: 12px;
+      }
+    }
   </style>
-
-
 
 
 </head>
@@ -164,132 +187,119 @@
       </a>
     </li>
   </ul>
+  <div class="container py-5">
+    <h2 class="page-header">Manage Addresses</h2>
 
-<div class="container my-5">
-  <h3 class="mb-4">My Addresses</h3>
-
-  <!-- Uncomment ONE of the following blocks depending on whether addresses exist -->
-
-  <!-- === Empty State: No Address Added === -->
-  <!-- <div class="empty-state" id="emptyState">
-    <i class="bi bi-geo-alt-fill" style="font-size:3rem; color:#F28123;"></i>
-    <p class="mt-3 fs-5">No address added yet.</p>
-    <button class="btn-orange mt-3" id="addAddressBtn">
-      <i class="bi bi-plus-circle"></i> Add Address
-    </button>
-  </div> -->
-
-  <!-- === Address List: When Addresses Exist === -->
-  <div id="addressList" class="">      <!--give d none to class -->
-    <div class="d-flex justify-content-end mb-3">
-      <button class="btn-orange" id="addAddressBtn2">
-        <i class="bi bi-plus-circle"></i> Add Address
+    <!-- Add Address Button -->
+    <div class="mb-4">
+      <button class="btn btn-orange" data-bs-toggle="modal" data-bs-target="#addAddressModal">
+        <i class="fas fa-plus me-1"></i> Add Address
       </button>
     </div>
 
-    <!-- Example Address Card -->
-<!-- Default Address -->
-<div class="address-card shadow-sm mb-3">
-  <div class="default-ribbon">Default</div>
-  <h5 class="fw-bold" style="color:#F28123;">Home</h5>
-  <p class="mb-1">123 Green Street, Kochi, Kerala, 682001</p>
-  <p class="mb-1">Phone: +91 9876543210</p>
-  <div class="address-actions mt-2 d-flex gap-2">
-   
-    <button class="btn-orange btn-sm edit-address">
-      <i class="bi bi-pencil"></i> Edit
-    </button>
-    <button class="btn btn-outline-danger btn-sm delete-address">
-      <i class="bi bi-trash"></i> Delete
-    </button>
-  </div>
-</div>
+    <!-- Address Cards -->
 
-<!-- Non-Default Address -->
-<div class="address-card shadow-sm">
-  <button class="set-default-btn">
-    <i class="bi bi-check2-circle"></i> Set as Default
-  </button>
-  
-  <h5 class="fw-bold" style="color:#F28123;">Office</h5>
-  <p class="mb-1">45 Market Road, Ernakulam, Kerala, 682011</p>
-  <p class="mb-1">Phone: +91 9876500000</p>
-  
-  <div class="address-actions mt-2 d-flex gap-2">
-    <button class="btn-orange btn-sm edit-address">
-      <i class="bi bi-pencil"></i> Edit
-    </button>
-    <button class="btn btn-outline-danger btn-sm delete-address">
-      <i class="bi bi-trash"></i> Delete
-    </button>
-  </div>
-</div>
+      <div class="address-card">
+        <div class="d-flex justify-content-between align-items-start">
+          <div>
+            <h5>label </h5>
+            <p>street</p>
+            <p>city , .district</p>
+            <p> country - pin </p>
+            <p>Phone: phone </p>
+          </div>
+          <div>
+            <button class="edit-btn" data-bs-toggle="modal" data-bs-target="#editAddressModal">
+              <i class="fas fa-edit me-1"></i>Edit
+            </button>
+          </div>
+        </div>
+      </div>
+
 
   </div>
-</div>
 
-<!-- === Add/Edit Address Modal === -->
-<div class="modal fade" id="addressModal" tabindex="-1" aria-hidden="true">
+  <!-- Add Address Modal -->
+<!-- Add Address Modal -->
+<div class="modal fade <%= showAddAddressModal ? 'show' : '' %>" 
+     id="addAddressModal" 
+     tabindex="-1" 
+     aria-hidden="true"
+     style="<%= showAddAddressModal ? 'display:block;' : '' %>">
   <div class="modal-dialog">
     <div class="modal-content">
-      <div class="modal-header" style="background-color:#051922; color:#F28123; border-bottom:2px solid #F28123;">
-        <h5 class="modal-title fw-bold" id="addressModalTitle">Add Address</h5>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      <div class="modal-header">
+        <h5 class="modal-title fw-bold">Add Address</h5>
+        <a href="/profileAddress">
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </a>
       </div>
-      <div class="modal-body">
-        <form id="addressForm">
-          <div class="mb-3">
-            <label class="form-label fw-semibold" style="color:#F28123;">Label</label>
-            <input type="text" id="addressLabel" class="form-control" required>
-          </div>
-          <div class="mb-3">
-            <label class="form-label fw-semibold" style="color:#F28123;">Address</label>
-            <textarea id="addressText" class="form-control" rows="3" required></textarea>
-          </div>
-          <div class="mb-3">
-            <label class="form-label fw-semibold" style="color:#F28123;">Phone</label>
-            <input type="text" id="addressPhone" class="form-control" required>
-          </div>
-        </form>
-      </div>
-      <div class="modal-footer" style="border-top:2px solid #F28123;">
-        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-        <button class="btn-orange" id="saveAddress">Save</button>
-      </div>
+      <form action="/addAddress" method="POST">
+        <div class="modal-body">
+          <% if (errors && errors.length) { 
+              const error = errors.find(err => 
+                ['label', 'street', 'city', 'district', 'country', 'pincode', 'phone', 'success'].includes(err.path)
+              );
+              if (error && error.path === 'success') { %>
+                <div id="addAddressMsg" class="alert alert-success text-center"><%= error.msg %></div>
+              <% } else if (error) { %>
+                <div id="addAddressMsg" class="alert alert-danger text-center"><%= error.msg %></div>
+          <% } } %>
+
+          <div class="mb-3"><label class="form-label">Label</label><input type="text" name="label" class="form-control"></div>
+          <div class="mb-3"><label class="form-label">Street</label><input type="text" name="street" class="form-control"></div>
+          <div class="mb-3"><label class="form-label">City</label><input type="text" name="city" class="form-control"></div>
+          <div class="mb-3"><label class="form-label">District</label><input type="text" name="district" class="form-control"></div>
+          <div class="mb-3"><label class="form-label">Country</label><input type="text" name="country" class="form-control"></div>
+          <div class="mb-3"><label class="form-label">Pincode</label><input type="text" name="pincode" class="form-control"></div>
+          <div class="mb-3"><label class="form-label">Phone</label><input type="text" name="phone" class="form-control"></div>
+        </div>
+        <div class="modal-footer">
+          <a href="/profileAddress">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          </a>
+          <button type="submit" class="btn btn-orange">Save</button>
+        </div>
+      </form>
     </div>
   </div>
 </div>
 
-</div>
+
+
+  <div class="modal fade" id="editAddressModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title fw-bold">Edit Address</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form>
+            <div class="mb-3"><label class="form-label">Label</label><input type="text" class="form-control" value="Home"></div>
+            <div class="mb-3"><label class="form-label">Street</label><input type="text" class="form-control" value="123, MG Road"></div>
+            <div class="mb-3"><label class="form-label">City</label><input type="text" class="form-control" value="Chennai"></div>
+            <div class="mb-3"><label class="form-label">District</label><input type="text" class="form-control" value="Tamil Nadu"></div>
+            <div class="mb-3"><label class="form-label">Country</label><input type="text" class="form-control" value="India"></div>
+            <div class="mb-3"><label class="form-label">Pincode</label><input type="text" class="form-control" value="600001"></div>
+            <div class="mb-3"><label class="form-label">Phone</label><input type="text" class="form-control" value="+91 9876543210"></div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button class="btn btn-orange">Update</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
 
 	<!-- footer -->
 		<%- include('partials/footer') %>
 	<!-- end footer -->
 	
-	<!-- copyright -->
-	<div class="copyright">
-		<div class="container">
-			<div class="row">
-				<div class="col-lg-6 col-md-12">
-					<p>Copyrights &copy; 2019 - <a href="https://imransdesign.com/">Imran Hossain</a>,  All Rights Reserved.<br>
-						Distributed By - <a href="https://themewagon.com/">Themewagon</a>
-					</p>
-				</div>
-				<div class="col-lg-6 text-right col-md-12">
-					<div class="social-icons">
-						<ul>
-							<li><a href="#" target="_blank"><i class="fab fa-facebook-f"></i></a></li>
-							<li><a href="#" target="_blank"><i class="fab fa-twitter"></i></a></li>
-							<li><a href="#" target="_blank"><i class="fab fa-instagram"></i></a></li>
-							<li><a href="#" target="_blank"><i class="fab fa-linkedin"></i></a></li>
-							<li><a href="#" target="_blank"><i class="fab fa-dribbble"></i></a></li>
-						</ul>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-	<!-- end copyright -->
+
 	
 	<!-- jquery -->
 	<script src="user/assets/js/jquery-1.11.3.min.js"></script>
@@ -313,93 +323,45 @@
 	<script src="user/assets/js/main.js"></script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  <% if (showAddAddressModal) { %>
+    const addAddressModalEl = document.getElementById('addAddressModal');
+    const addAddressModal = new bootstrap.Modal(addAddressModalEl);
+    addAddressModal.show();
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    const msgDiv = document.getElementById('addAddressMsg');
+
+    addAddressModalEl.querySelectorAll('input').forEach(input => {
+      input.addEventListener('focus', () => {
+        if (msgDiv) msgDiv.style.display = 'none';
+      });
+    });
+
+    addAddressModalEl.addEventListener('hidden.bs.modal', () => {
+      if (msgDiv) msgDiv.style.display = 'none';
+      addAddressModalEl.querySelectorAll('input[type=text]').forEach(i => i.value = '');
+    });
+  <% } %>
+</script>
 
 <script>
-  const addressModal = new bootstrap.Modal(document.getElementById('addressModal'));
-  const addressModalTitle = document.getElementById('addressModalTitle');
-  const addressLabel = document.getElementById('addressLabel');
-  const addressText = document.getElementById('addressText');
-  const addressPhone = document.getElementById('addressPhone');
-  const saveAddress = document.getElementById('saveAddress');
-  const addressList = document.getElementById('addressList');
-
-  let currentCard = null; // Track card for edit
-
-  // Open modal for Add
-  document.querySelectorAll('#addAddressBtn, #addAddressBtn2').forEach(btn => {
-    btn.addEventListener('click', () => {
-      currentCard = null;
-      addressModalTitle.textContent = 'Add Address';
-      addressLabel.value = '';
-      addressText.value = '';
-      addressPhone.value = '';
-      addressModal.show();
-    });
+  // 🧠 Save scroll position before the page unloads
+  window.addEventListener("beforeunload", () => {
+    localStorage.setItem("scrollPos", window.scrollY);
   });
 
-  // Open modal for Edit
-  document.querySelectorAll('.edit-address').forEach(btn => {
-    btn.addEventListener('click', e => {
-      const card = e.target.closest('.address-card');
-      currentCard = card;
-      addressModalTitle.textContent = 'Edit Address';
-      addressLabel.value = card.querySelector('h5').textContent;
-      addressText.value = card.querySelectorAll('p')[0].textContent;
-      addressPhone.value = card.querySelectorAll('p')[1].textContent.replace('Phone: ', '');
-      addressModal.show();
-    });
-  });
-
-  // Save Add/Edit
-  saveAddress.addEventListener('click', () => {
-    if (!addressLabel.value || !addressText.value || !addressPhone.value) return alert('All fields are required!');
-    
-    if (currentCard) {
-      // Edit existing card
-      currentCard.querySelector('h5').textContent = addressLabel.value;
-      const paragraphs = currentCard.querySelectorAll('p');
-      paragraphs[0].textContent = addressText.value;
-      paragraphs[1].textContent = `Phone: ${addressPhone.value}`;
-    } else {
-      // Add new card
-      const card = document.createElement('div');
-      card.className = 'address-card shadow-sm';
-      card.innerHTML = `
-        <h5 class="fw-bold" style="color:#F28123;">${addressLabel.value}</h5>
-        <p class="mb-1">${addressText.value}</p>
-        <p class="mb-1">Phone: ${addressPhone.value}</p>
-        <div class="address-actions mt-2">
-          <button class="btn-orange btn-sm edit-address">
-            <i class="bi bi-pencil"></i> Edit
-          </button>
-          <button class="btn btn-outline-danger btn-sm delete-address">
-            <i class="bi bi-trash"></i> Delete
-          </button>
-        </div>`;
-      addressList.appendChild(card);
-
-      // Add event listeners to new card buttons
-      card.querySelector('.edit-address').addEventListener('click', e => {
-        currentCard = card;
-        addressModalTitle.textContent = 'Edit Address';
-        addressLabel.value = card.querySelector('h5').textContent;
-        addressText.value = card.querySelectorAll('p')[0].textContent;
-        addressPhone.value = card.querySelectorAll('p')[1].textContent.replace('Phone: ', '');
-        addressModal.show();
-      });
-      card.querySelector('.delete-address').addEventListener('click', () => card.remove());
+  // 🧠 Restore scroll position after reload
+  window.addEventListener("load", () => {
+    const scrollPos = localStorage.getItem("scrollPos");
+    if (scrollPos) {
+      window.scrollTo(0, parseInt(scrollPos));
+      localStorage.removeItem("scrollPos");
     }
-
-    addressModal.hide();
-  });
-
-  // Optional: Delete existing cards
-  document.querySelectorAll('.delete-address').forEach(btn => {
-    btn.addEventListener('click', e => e.target.closest('.address-card').remove());
   });
 </script>
+
+
+
 </body>
 </html>
 

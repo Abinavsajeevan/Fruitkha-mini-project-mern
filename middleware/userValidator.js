@@ -1,4 +1,4 @@
-const { body } = require('express-validator');
+const { body, validationResult } = require('express-validator');
 
 const signupValidation = [
   body('name')
@@ -54,11 +54,53 @@ const resetPasswordValidation = [
     .isLength({ min: 6, max: 15 }).withMessage('Password must be between 6 and 15 characters')
 ]
 
+const addressValidation = [
+  body('label')
+    .trim()
+    .notEmpty().withMessage('Label is required')
+    .isLength({ min: 3 }).withMessage('Label must be at least 3 characters'),
+
+  body('street')
+    .trim()
+    .notEmpty().withMessage('Street is required'),
+
+  body('city')
+    .trim()
+    .notEmpty().withMessage('City is required'),
+
+  body('district')
+    .trim()
+    .notEmpty().withMessage('District is required'),
+
+  body('country')
+    .trim()
+    .notEmpty().withMessage('Country is required'),
+
+  body('pincode')
+    .trim()
+    .notEmpty().withMessage('Pincode is required')
+    .isPostalCode('IN').withMessage('Invalid Indian pincode'),
+
+  body('phone')
+    .trim()
+    .notEmpty().withMessage('Phone number is required')
+    .matches(/^[6-9]\d{9}$/).withMessage('Invalid Indian phone number'),
+
+    async (req, res, next) => {
+      const errors = validationResult(req);
+      if(!errors.isEmpty()) {
+        return res.render('user/profileAddress', {errors: errors.array(), user: req.user, showAddAddressModal: true})
+      }
+      next()
+    }
+];
+
 
 
 module.exports =  {
   signupValidation,
   loginValidation,
   forgotValidation,
-  resetPasswordValidation
+  resetPasswordValidation,
+  addressValidation
 } ;

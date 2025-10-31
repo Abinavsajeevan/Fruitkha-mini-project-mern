@@ -9,6 +9,7 @@ const Cart = require('../models/Cart');
 const paginationShop = require('../utils/paginateShop');
 const shopFilter = require('../utils/shopFilterQuery');
 const Wishlist = require('../models/Wishlist');
+const Address = require('../models/Address');
 
 
 // registration 
@@ -361,6 +362,53 @@ const updateProfile = async (req, res) => {
         })
     }
 }
+//profile get address 
+const addressProfile = async (req, res) => {
+  try {
+    return res.render('user/profileAddress', {user: req.user, errors:[], showAddAddressModal:false})
+  }catch(err) {
+    console.log('error occured in address page', err)
+  }
+}
+
+//profile add address
+const addAddress = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const {label, street, city, district, country, pincode, phone} = req.body;
+    
+    const existingAddress = await Address.findOne({
+     userId,
+     street: street.trim(),
+     city: city.trim(),
+     district: district.trim(),
+     country: country.trim(),
+     pincode: pincode.trim(),
+     phone: phone.trim(),
+   });
+  
+  
+  
+   if(existingAddress) return res.render('user/profileAddress', {user: req.user, errors:[{msg: 'Address Already Exists!', path: 'label'}], showAddAddressModal: true});
+
+
+  const address = new Address({
+        userId,
+        label,
+        street,
+        city,
+        district,
+        country,
+        pincode,
+        phone
+       })
+       await address.save();
+    res.render('user/profileAddress', {user: req.user, errors: [{msg:  'Address Added Successfully✅', path: 'success'}],showAddAddressModal: true})
+
+  } catch(err) {
+    console.log('error occured in addaddress', err)
+  }
+}
 
 //shop page METHOD = GET
 const getShop = async (req, res) => {
@@ -707,6 +755,23 @@ const addTowishlist = async (req, res) => {
     res.redirect('/wishlist');
   }
 }
+
+//checkout get page
+const getCheckout = async (req, res) => {
+  try {
+    const userId = req.user._id;
+
+    //checking cart if not dont come back to this page
+    const cart = await Cart.findOne({user: userId}).populate('products.product');
+    if(!cart || !cart.products.length > 0) return res.redirect('/shop');
+
+    return res.render('user/checkout', {user: req.user, products: cart.products, cart})
+
+  }catch (err) {
+    console.log('error occured in getcheckout page', err)
+  }
+}
+
 module.exports = {
     registerUser,
     loginUser,
@@ -720,6 +785,8 @@ module.exports = {
     forgotProfile,
     changePassword,
     updateProfile,
+    addressProfile,
+    addAddress,
     getShop,
     addToCart,
     getCart,
@@ -728,5 +795,6 @@ module.exports = {
     wishlistAdd,
     getWishlist,
     remeoveWishlist,
-    addTowishlist
+    addTowishlist,
+    getCheckout
 }

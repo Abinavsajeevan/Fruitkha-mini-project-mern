@@ -32,7 +32,186 @@
 	<link rel="stylesheet" href="/user/assets/css/responsive.css">
 		<!-- bootsrap icon cdn link -->
 	 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+<style>
+ /* ================================
+   Checkout Page Full CSS
+================================ */
 
+.checkout-section {
+  background-color: #f8f9fa;
+  min-height: 100vh;
+  padding: 3rem 0;
+}
+
+.checkout-form,
+.order-summary {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.checkout-form h4,
+.order-summary h4 {
+  font-weight: 700;
+  color: #051922;
+}
+
+.form-label {
+  color: #333;
+  font-size: 0.95rem;
+}
+
+select.form-select,
+input.form-control,
+textarea.form-control {
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  padding: 0.75rem;
+  font-size: 1rem;
+  transition: all 0.2s ease-in-out;
+}
+
+select.form-select:focus,
+input.form-control:focus,
+textarea.form-control:focus {
+  border-color: #F28123;
+  box-shadow: 0 0 0 0.2rem rgba(242, 129, 35, 0.2);
+}
+
+.btn-outline-dark {
+  border-radius: 6px;
+  font-weight: 500;
+  transition: 0.3s ease;
+}
+
+.btn-outline-dark:hover {
+  background-color: #051922;
+  color: #fff;
+}
+
+/* Main Checkout Button */
+.btn-checkout {
+  background-color: #F28123;
+  color: #fff;
+  font-weight: bold;
+  border: none;
+  padding: 12px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  width: 100%;
+}
+
+.btn-checkout:hover {
+  background-color: #051922;
+}
+
+/* Responsive Select Box (for Address Dropdown) */
+.responsive-select {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.responsive-select select {
+  width: 100%;
+  min-width: 200px;
+  max-width: 100%;
+  white-space: normal;
+  word-wrap: break-word;
+}
+
+/* ================================
+   Order Summary (Right Section)
+================================ */
+.order-summary {
+  padding: 2rem;
+}
+
+.order-summary .product-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 1rem;
+}
+
+.order-summary .product-name {
+  font-weight: 500;
+  color: #333;
+}
+
+.order-summary .product-price {
+  color: #F28123;
+  font-weight: 600;
+}
+
+.order-summary .summary-total {
+  border-top: 2px solid #ddd;
+  padding-top: 1rem;
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #051922;
+}
+
+/* ================================
+   Responsive Styling
+================================ */
+@media (max-width: 992px) {
+  .checkout-section {
+    padding: 2rem 1.5rem;
+  }
+
+  .checkout-form {
+    padding: 1.5rem;
+  }
+
+  .order-summary {
+    margin-top: 2rem;
+  }
+
+  .btn-checkout {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .checkout-form,
+  .order-summary {
+    padding: 1.5rem;
+  }
+
+  select.form-select,
+  input.form-control,
+  textarea.form-control {
+    font-size: 0.9rem;
+  }
+
+  .checkout-section {
+    padding: 1.5rem 0.75rem;
+  }
+
+  h4 {
+    font-size: 1.2rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .checkout-form,
+  .order-summary {
+    padding: 1rem;
+  }
+
+  .btn-checkout {
+    padding: 10px;
+    font-size: 0.9rem;
+  }
+
+  .responsive-select {
+    overflow-x: visible;
+  }
+}
+
+</style>
 </head>
 <body>
 	
@@ -83,123 +262,115 @@
 	<!-- end breadcrumb section -->
 
 	<!-- check out section -->
-	<div class="checkout-section mt-150 mb-150">
-		<div class="container">
-			<div class="row">
-				<div class="col-lg-8">
-					<div class="checkout-accordion-wrap">
-						<div class="accordion" id="accordionExample">
-						  <div class="card single-accordion">
-						    <div class="card-header" id="headingOne">
-						      <h5 class="mb-0">
-						        <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-						          Billing Address
-						        </button>
-						      </h5>
-						    </div>
+<div class="checkout-section py-5">
+  <div class="container">
+    <div class="row gy-4">
 
-						    <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordionExample">
-						      <div class="card-body">
-						        <div class="billing-address-form">
-						        	<form action="index.html">
-						        		<p><input type="text" placeholder="Name"></p>
-						        		<p><input type="email" placeholder="Email"></p>
-						        		<p><input type="text" placeholder="Address"></p>
-						        		<p><input type="tel" placeholder="Phone"></p>
-						        		<p><textarea name="bill" id="bill" cols="30" rows="10" placeholder="Say Something"></textarea></p>
-						        	</form>
-						        </div>
-						      </div>
-						    </div>
-						  </div>
-						  <div class="card single-accordion">
-						    <div class="card-header" id="headingTwo">
-						      <h5 class="mb-0">
-						        <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-						          Shipping Address
-						        </button>
-						      </h5>
-						    </div>
-						    <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionExample">
-						      <div class="card-body">
-						        <div class="shipping-address-form">
-						        	<p>Your shipping address form is here.</p>
-						        </div>
-						      </div>
-						    </div>
-						  </div>
-						  <div class="card single-accordion">
-						    <div class="card-header" id="headingThree">
-						      <h5 class="mb-0">
-						        <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-						          Card Details
-						        </button>
-						      </h5>
-						    </div>
-						    <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordionExample">
-						      <div class="card-body">
-						        <div class="card-details">
-						        	<p>Your card details goes here.</p>
-						        </div>
-						      </div>
-						    </div>
-						  </div>
-						</div>
+      <!-- Left: Address + Checkout Form -->
+      <div class="col-lg-7">
+        <div class="checkout-form shadow p-4 rounded-3 bg-white">
+          <h4 class="mb-4 text-dark fw-bold">Delivery Address</h4>
 
-					</div>
-				</div>
+          <!-- Address Dropdown -->
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Select Saved Address</label>
+            <div class="responsive-select">
+              <select class="form-select">
+                <option selected>123, MG Road, Chennai, Tamil Nadu - 600001</option>
+                <option>Flat 4B, Skyline Apartments, Kochi, Kerala - 682016</option>
+                <option>21, Anna Nagar, Madurai, Tamil Nadu - 625020</option>
+              </select>
+            </div>
+          </div>
 
-				<div class="col-lg-4">
-					<div class="order-details-wrap">
-						<table class="order-details">
-							<thead>
-								<tr>
-									<th>Your order Details</th>
-									<th>Price</th>
-								</tr>
-							</thead>
-							<tbody class="order-details-body">
-								<tr>
-									<td>Product</td>
-									<td>Total</td>
-								</tr>
-								<tr>
-									<td>Strawberry</td>
-									<td>$85.00</td>
-								</tr>
-								<tr>
-									<td>Berry</td>
-									<td>$70.00</td>
-								</tr>
-								<tr>
-									<td>Lemon</td>
-									<td>$35.00</td>
-								</tr>
-							</tbody>
-							<tbody class="checkout-details">
-								<tr>
-									<td>Subtotal</td>
-									<td>$190</td>
-								</tr>
-								<tr>
-									<td>Shipping</td>
-									<td>$50</td>
-								</tr>
-								<tr>
-									<td>Total</td>
-									<td>$240</td>
-								</tr>
-							</tbody>
-						</table>
-						<a href="#" class="boxed-btn">Place Order</a>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-	<!-- end check out section -->
+          <!-- Add/Edit Address Button -->
+          <div class="mb-4 text-end text-md-start">
+            <a href="/profile/address" class="btn btn-outline-dark btn-sm">
+              <i class="fas fa-edit me-1"></i> Add / Edit Addresses
+            </a>
+          </div>
+
+          <hr class="my-4">
+
+          <!-- Personal Details -->
+          <h4 class="mb-3 text-dark fw-bold">Contact Details</h4>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label fw-semibold">Full Name</label>
+              <input type="text" class="form-control" placeholder="Abinav Sajeevan">
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label fw-semibold">Email</label>
+              <input type="email" class="form-control" placeholder="abinav@email.com">
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label fw-semibold">Phone Number</label>
+              <input type="text" class="form-control" placeholder="+91 9876543210">
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label fw-semibold">Alternate Phone (Optional)</label>
+              <input type="text" class="form-control" placeholder="+91 9123456789">
+            </div>
+          </div>
+
+          <hr class="my-4">
+
+          <!-- Payment Section -->
+          <h4 class="mb-3 text-dark fw-bold">Payment Method</h4>
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Select Payment Method</label>
+            <select class="form-select">
+              <option selected>Cash on Delivery</option>
+              <option>Credit / Debit Card</option>
+              <option>UPI (Google Pay, PhonePe, Paytm)</option>
+              <option>Net Banking</option>
+            </select>
+          </div>
+
+          <!-- Delivery Instructions -->
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Delivery Instructions (optional)</label>
+            <textarea class="form-control" rows="3" placeholder="E.g. Leave package at the door"></textarea>
+          </div>
+
+          <button class="btn-checkout w-100 mt-3">Proceed to Payment</button>
+        </div>
+      </div>
 
 
+      <!-- Right: Order Summary -->
+      <div class="col-lg-5">
+        <div class="order-summary shadow p-4 rounded-3 bg-white">
+          <h4 class="mb-4 fw-bold text-dark">Order Summary</h4>
+
+          <div class="order-items">
+            <% products.forEach(item => { %>
+            <div class="d-flex justify-content-between border-bottom py-2">
+              <p class="mb-0"><%= item.product.name %> (x<%= item.quantity %>)</p>
+              <p class="mb-0">₹<%= item.totalPrice %></p>
+            </div>
+            <% }) %>
+          </div>
+
+          <div class="d-flex justify-content-between border-top pt-3 mt-3">
+            <h5 class="fw-bold">Subtotal</h5>
+            <h5 class="fw-bold">₹<%= cart.subTotal %></h5>
+          </div>
+
+          <div class="d-flex justify-content-between pt-2">
+            <p class="mb-0 text-muted">Delivery Charge</p>
+            <p class="mb-0 text-muted">₹<%= cart.shipping %></p>
+          </div>
+
+          <div class="d-flex justify-content-between border-top pt-3 mt-3">
+            <h4 class="fw-bold text-dark">Total</h4>
+            <h4 class="fw-bold text-dark">₹<%= cart.total %></h4>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
 	<!-- footer -->
 		<%- include('partials/footer') %>
