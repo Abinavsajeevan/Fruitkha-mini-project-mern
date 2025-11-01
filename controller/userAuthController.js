@@ -10,6 +10,7 @@ const paginationShop = require('../utils/paginateShop');
 const shopFilter = require('../utils/shopFilterQuery');
 const Wishlist = require('../models/Wishlist');
 const Address = require('../models/Address');
+const defaultAddress = require('../utils/defaultAddress');
 
 
 // registration 
@@ -365,7 +366,16 @@ const updateProfile = async (req, res) => {
 //profile get address 
 const addressProfile = async (req, res) => {
   try {
-    return res.render('user/profileAddress', {user: req.user, errors:[], showAddAddressModal:false})
+    const userId = req.user._id;
+    const isDefAddress = await Address.findOne({userId, isDefault: true});
+    const address = await Address.find(
+      {
+        userId,
+        _id:{ $ne: isDefAddress._id}
+      }
+    );
+
+    return res.render('user/profileAddress', {user: req.user, errors:[], showAddAddressModal:false, address, showEditAddressModal : false, data:null, def: isDefAddress})
   }catch(err) {
     console.log('error occured in address page', err)
   }
@@ -386,13 +396,20 @@ const addAddress = async (req, res) => {
      pincode: pincode.trim(),
      phone: phone.trim(),
    });
+
+      const isDefAddress = await Address.findOne({userId, isDefault: true});
+    const address = await Address.find(
+      {
+        userId,
+        _id:{ $ne: isDefAddress._id}
+      }
+    );
+
   
-  
-  
-   if(existingAddress) return res.render('user/profileAddress', {user: req.user, errors:[{msg: 'Address Already Exists!', path: 'label'}], showAddAddressModal: true});
+   if(existingAddress) return res.render('user/profileAddress', {user: req.user, errors:[{msg: 'Address Already Exists!', path: 'label'}], showAddAddressModal: true, address, showEditAddressModal: false, data:'',def: isDefAddress});
 
 
-  const address = new Address({
+     const addresses = new Address({
         userId,
         label,
         street,
@@ -402,11 +419,100 @@ const addAddress = async (req, res) => {
         pincode,
         phone
        })
-       await address.save();
-    res.render('user/profileAddress', {user: req.user, errors: [{msg:  'Address Added Successfully✅', path: 'success'}],showAddAddressModal: true})
+       await addresses.save();
+
+       defaultAddress()
+    return res.render('user/profileAddress', {user: req.user, errors: [{msg:  'Address Added Successfully✅', path: 'success'}],showAddAddressModal: true, address, showEditAddressModal: false, data:'', def: isDefAddress})
 
   } catch(err) {
     console.log('error occured in addaddress', err)
+  }
+}
+
+//profile edit address
+const editAddress = async (req, res) => { 
+  try {
+    const userId = req.user._id
+    const {id, label, street, city, district, country, pincode, phone} = req.body;
+    console.log(id, label, street, city, district, country, pincode, phone)
+    const existingAddress = await Address.findOne({userId, label, street, city, district, country, pincode, phone});
+    console.log(id)
+
+//for passing data 
+ let isDefAddress = await Address.findOne({userId, isDefault: true});
+    const address = await Address.find(
+      {
+        userId,
+        _id:{ $ne: isDefAddress._id}
+      }
+    );
+    //existing error message
+    if(existingAddress) return res.render('user/profileAddress', {user: req.user, errors:[{msg: 'No Updation Found!', path: 'label'}], showAddAddressModal: false, address, showEditAddressModal: true, data:existingAddress, def:isDefAddress});
+
+//updating database documents
+   await Address.findOneAndUpdate(
+      {_id:id, userId},
+      {
+        label,
+        street,
+        city,
+        district,
+        country,
+        pincode,
+        phone
+      }  ,{ new: true }
+    )
+
+    //updated data
+     isDefAddress = await Address.findOne({userId, isDefault: true});
+    const updatedAddress = await Address.find(
+      {
+        userId,
+        _id:{ $ne: isDefAddress._id}
+      }
+    );
+    const newData = await Address.findOne({userId, _id: id})
+    
+    return res.render('user/profileAddress', {user: req.user, errors:[{msg: 'Updated Successfully', path: 'success'}], showAddAddressModal: false, address: updatedAddress, showEditAddressModal: true, data:newData, def: isDefAddress});
+
+
+  } catch(err) {
+    console.log('error occured in editing address', err);
+  }
+}
+
+//profile delete address
+const deleteAddress = async (req, res) => {
+  try {
+    const id = req.params.id;
+    await Address.findByIdAndDelete(id)
+    defaultAddress()
+    res.redirect('/profileAddress')
+  } catch(err) {
+    console.log('error occured in delete account', err)
+  }
+}
+
+//profile default address 
+const setDefaultAddress = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const _id = req.params.id;
+
+    //change exist default to normal
+    const existDefault = await Address.findOne({isDefault: true})
+    existDefault.isDefault = false;
+    await existDefault.save()
+
+    //new default set
+    const address = await Address.findById(_id);
+    address.isDefault = true;
+    await address.save()
+    res.redirect('/profileAddress')
+
+
+  }catch (err)  {
+    console.log('error occured in default address set', err)
   }
 }
 
@@ -760,15 +866,78 @@ const addTowishlist = async (req, res) => {
 const getCheckout = async (req, res) => {
   try {
     const userId = req.user._id;
-
+//-----------ORDER SUMMARY ----------------
     //checking cart if not dont come back to this page
     const cart = await Cart.findOne({user: userId}).populate('products.product');
     if(!cart || !cart.products.length > 0) return res.redirect('/shop');
 
-    return res.render('user/checkout', {user: req.user, products: cart.products, cart})
+    //-------CHECKOUT PAGE ------------------
+    //-------Addresses ------------------
+    const address = await Address.find({
+      userId, 
+      isDefault: {$ne: true}
+    });
+    const isDef = await Address.findOne({userId, isDefault: true})//address contains default address
+
+    //-------contact form ------------------
+    const user = await User.findById(userId)
+
+    return res.render('user/checkout', {user: req.user, products: cart.products, cart, address, isDef, user})
 
   }catch (err) {
     console.log('error occured in getcheckout page', err)
+  }
+}
+
+//checkout post page 
+const postCheckout = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const { selectedAddressId, paymentMethod, fullName, email, phone, alternatePhone, instructions } = req.body;
+
+    const address = await Address.findById(selectedAddressId)
+    const cart = await Cart.findOne({userId}).populate('products.product')
+   //order creation
+   const order = await Order.create({
+    userId,
+    address: {
+      phone: address.phone,
+      alternatePhone: alternatePhone || '',
+      street: address.street,
+      city: address.city,
+      district: address.district,
+      pincode: address.pincode,
+      country: address.country,
+      label: address.label
+    },
+    items: cart.products.map(product => ({
+
+      ///need to workout here
+    //       name: item.productId.name,
+    //     quantity: item.quantity,
+    //     price: item.productId.price,
+    //     total: item.quantity * item.productId.price
+    //   })),
+    //   totalAmount: cart.total,
+    //   paymentMethod,
+    //   deliveryInstructions: instructions || '',
+    //   status: paymentMethod === 'cod' ? 'Pending' : 'Payment Pending'
+    // });
+
+    // Empty cart after placing order
+    await Cart.findOneAndUpdate({ userId }, { items: [], total: 0 });
+
+    // Handle payment next step
+    if (paymentMethod === 'cod') {
+      return res.redirect(`/order/success/${order._id}`);
+    } else {
+      return res.redirect(`/payment/${order._id}`);
+    }
+
+   })
+
+  }catch(err) {
+    console.log('error occured in post checkout', err);
   }
 }
 
@@ -787,6 +956,9 @@ module.exports = {
     updateProfile,
     addressProfile,
     addAddress,
+    editAddress,
+    deleteAddress,
+    setDefaultAddress,
     getShop,
     addToCart,
     getCart,
@@ -796,5 +968,6 @@ module.exports = {
     getWishlist,
     remeoveWishlist,
     addTowishlist,
-    getCheckout
+    getCheckout,
+    postCheckout
 }

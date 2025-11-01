@@ -1,4 +1,5 @@
 const { body, validationResult } = require('express-validator');
+const Address = require('../models/Address');
 
 const signupValidation = [
   body('name')
@@ -88,8 +89,68 @@ const addressValidation = [
 
     async (req, res, next) => {
       const errors = validationResult(req);
+      const userId = req.user._id
+ const isDefAddress = await Address.findOne({userId, isDefault: true});
+    const address = await Address.find(
+      {
+        userId,
+        _id:{ $ne: isDefAddress._id}
+      }
+    );
       if(!errors.isEmpty()) {
-        return res.render('user/profileAddress', {errors: errors.array(), user: req.user, showAddAddressModal: true})
+           return res.render('user/profileAddress', {errors: errors.array(), user: req.user, showAddAddressModal: true, showEditAddressModal: false, address, data:null, def: isDefAddress})
+
+      }
+      next()
+    }
+];
+const addressEditValidation = [
+  body('label')
+    .trim()
+    .notEmpty().withMessage('Label is required')
+    .isLength({ min: 3 }).withMessage('Label must be at least 3 characters'),
+
+  body('street')
+    .trim()
+    .notEmpty().withMessage('Street is required'),
+
+  body('city')
+    .trim()
+    .notEmpty().withMessage('City is required'),
+
+  body('district')
+    .trim()
+    .notEmpty().withMessage('District is required'),
+
+  body('country')
+    .trim()
+    .notEmpty().withMessage('Country is required'),
+
+  body('pincode')
+    .trim()
+    .notEmpty().withMessage('Pincode is required')
+    .isPostalCode('IN').withMessage('Invalid Indian pincode'),
+
+  body('phone')
+    .trim()
+    .notEmpty().withMessage('Phone number is required')
+    .matches(/^[6-9]\d{9}$/).withMessage('Invalid Indian phone number'),
+
+    async (req, res, next) => {
+      const errors = validationResult(req);
+      const userId = req.user._id
+ const isDefAddress = await Address.findOne({userId, isDefault: true});
+    const address = await Address.find(
+      {
+        userId,
+        _id:{ $ne: isDefAddress._id}
+      }
+    );
+
+      const existingAddress = await Address.findOne({userId})
+      if(!errors.isEmpty()) {
+           return res.render('user/profileAddress', {errors: errors.array(), user: req.user, showAddAddressModal:false, showEditAddressModal: true, address, data: existingAddress, def: isDefAddress})
+
       }
       next()
     }
@@ -102,5 +163,6 @@ module.exports =  {
   loginValidation,
   forgotValidation,
   resetPasswordValidation,
-  addressValidation
+  addressValidation,
+  addressEditValidation
 } ;

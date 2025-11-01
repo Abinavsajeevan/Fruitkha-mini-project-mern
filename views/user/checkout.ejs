@@ -266,76 +266,105 @@ textarea.form-control:focus {
   <div class="container">
     <div class="row gy-4">
 
-      <!-- Left: Address + Checkout Form -->
-      <div class="col-lg-7">
-        <div class="checkout-form shadow p-4 rounded-3 bg-white">
-          <h4 class="mb-4 text-dark fw-bold">Delivery Address</h4>
+<!-- Left: Address + Checkout Form -->
+<div class="col-lg-7">
+  <form action="/checkout" method="POST" class="checkout-form shadow p-4 rounded-3 bg-white">
+    <h4 class="mb-4 text-dark fw-bold">Delivery Address</h4>
+    <% if(address && address.length > 0) { %>
+    <!-- Address Dropdown -->
 
-          <!-- Address Dropdown -->
-          <div class="mb-3">
-            <label class="form-label fw-semibold">Select Saved Address</label>
-            <div class="responsive-select">
-              <select class="form-select">
-                <option selected>123, MG Road, Chennai, Tamil Nadu - 600001</option>
-                <option>Flat 4B, Skyline Apartments, Kochi, Kerala - 682016</option>
-                <option>21, Anna Nagar, Madurai, Tamil Nadu - 625020</option>
-              </select>
-            </div>
-          </div>
 
-          <!-- Add/Edit Address Button -->
-          <div class="mb-4 text-end text-md-start">
-            <a href="/profile/address" class="btn btn-outline-dark btn-sm">
-              <i class="fas fa-edit me-1"></i> Add / Edit Addresses
-            </a>
-          </div>
+    <div class="mb-3">
+      <label class="form-label fw-semibold">Select Saved Address</label>
+      <div class="responsive-select">
+        <select class="form-select" name="selectedAddressId" required>
+            <% if(isDef) { %> 
+                  <option value="<%= isDef._id %>">
+              <%= isDef.label %>  - <%= isDef.street %> , <%= isDef.city %> ,  <%= isDef.district %> ,  <%= isDef.pincode %> 
+            </option>
+             <% } %>
 
-          <hr class="my-4">
-
-          <!-- Personal Details -->
-          <h4 class="mb-3 text-dark fw-bold">Contact Details</h4>
-          <div class="row">
-            <div class="col-md-6 mb-3">
-              <label class="form-label fw-semibold">Full Name</label>
-              <input type="text" class="form-control" placeholder="Abinav Sajeevan">
-            </div>
-            <div class="col-md-6 mb-3">
-              <label class="form-label fw-semibold">Email</label>
-              <input type="email" class="form-control" placeholder="abinav@email.com">
-            </div>
-            <div class="col-md-6 mb-3">
-              <label class="form-label fw-semibold">Phone Number</label>
-              <input type="text" class="form-control" placeholder="+91 9876543210">
-            </div>
-            <div class="col-md-6 mb-3">
-              <label class="form-label fw-semibold">Alternate Phone (Optional)</label>
-              <input type="text" class="form-control" placeholder="+91 9123456789">
-            </div>
-          </div>
-
-          <hr class="my-4">
-
-          <!-- Payment Section -->
-          <h4 class="mb-3 text-dark fw-bold">Payment Method</h4>
-          <div class="mb-3">
-            <label class="form-label fw-semibold">Select Payment Method</label>
-            <select class="form-select">
-              <option selected>Cash on Delivery</option>
-              <option>Credit / Debit Card</option>
-              <option>UPI (Google Pay, PhonePe, Paytm)</option>
-              <option>Net Banking</option>
-            </select>
-          </div>
-
-          <!-- Delivery Instructions -->
-          <div class="mb-3">
-            <label class="form-label fw-semibold">Delivery Instructions (optional)</label>
-            <textarea class="form-control" rows="3" placeholder="E.g. Leave package at the door"></textarea>
-          </div>
-
-          <button class="btn-checkout w-100 mt-3">Proceed to Payment</button>
-        </div>
+           <% address.forEach(addr => { %>
+           
+            <option value="<%= addr._id %>">
+              <%= addr.label %>  - <%= addr.street %> , <%= addr.city %> ,  <%= addr.district %> ,  <%= addr.pincode %> 
+            </option>
+             <% }) %>
+            
+        </select>
       </div>
+    </div>
+
+    <!-- Add/Edit Address Button -->
+    <div class="mb-4 text-end text-md-start">
+      <a href="/profileAddress" class="btn btn-outline-dark btn-sm">
+        <i class="fas fa-edit me-1"></i> Add / Edit Addresses
+      </a>
+    </div>
+
+    <% } else { %>
+  <!-- No Address Found -->
+      <div class="text-center my-4">
+        <p class="text-muted mb-3">No saved addresses found.</p>
+        <a href="/profileAddress" 
+          class="btn text-white" 
+          style="background-color: #F28123; border-radius: 8px; padding: 8px 20px;">
+          <i class="fas fa-plus me-1"></i> Add Address
+        </a>
+      </div>
+      <% } %>
+
+    <hr class="my-4">
+
+    <!-- Personal Details -->
+    <h4 class="mb-3 text-dark fw-bold">Contact Details</h4>
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        <label class="form-label fw-semibold">Full Name</label>
+        <input type="text" name="fullName" value="<%= user.name %>" class="form-control" required>
+      </div>
+      <div class="col-md-6 mb-3">
+        <label class="form-label fw-semibold">Email</label>
+        <input type="email" name="email" value="<%= user.email %>" class="form-control" required>
+      </div>
+      <div class="col-md-6 mb-3">
+        <label class="form-label fw-semibold">Phone Number</label>
+        <input type="text" name="phone" value="<%= user.mobile %>" class="form-control" required>
+      </div>
+      <div class="col-md-6 mb-3">
+        <label class="form-label fw-semibold">Alternate Phone (Optional)</label>
+        <input type="text" name="alternatePhone" class="form-control">
+      </div>
+    </div>
+
+    <hr class="my-4">
+
+    <!-- Payment Section -->
+    <h4 class="mb-3 text-dark fw-bold">Payment Method</h4>
+    <div class="mb-3">
+      <label class="form-label fw-semibold">Select Payment Method</label>
+      <select class="form-select" name="paymentMethod" required>
+        <option value="cod">Cash on Delivery</option>
+        <option value="card">Credit / Debit Card</option>
+        <option value="upi">UPI (Google Pay, PhonePe, Paytm)</option>
+        <option value="netbanking">Net Banking</option>
+      </select>
+    </div>
+
+    <!-- Delivery Instructions -->
+    <div class="mb-3">
+      <label class="form-label fw-semibold">Delivery Instructions (optional)</label>
+      <textarea name="instructions" class="form-control" rows="3" placeholder="E.g. Leave package at the door"></textarea>
+    </div>
+
+    <!-- Hidden Inputs for Backend -->
+    <input type="hidden" name="cartId" value=" cart._id">
+    <input type="hidden" name="totalAmount" value="cart.total">
+
+    <button type="submit" class="btn btn-warning w-100 fw-bold mt-3">Proceed to Payment</button>
+  </form>
+</div>
+
 
 
       <!-- Right: Order Summary -->

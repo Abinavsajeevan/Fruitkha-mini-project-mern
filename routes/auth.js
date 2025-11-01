@@ -1,6 +1,6 @@
 const express = require('express');
-const { registerUser, loginUser, forgotPassword, otpVerify, resetPassword, deleteAccount, forgotProfile, changePassword, updateProfile, addToCart, updateCart, removeCart, wishlistAdd, remeoveWishlist, addTowishlist, addAddress } = require('../controller/userAuthController');
-const { signupValidation, loginValidation, forgotValidation, resetPasswordValidation, updateProfileValidation, addressValidation } = require('../middleware/userValidator');
+const { registerUser, loginUser, forgotPassword, otpVerify, resetPassword, deleteAccount, forgotProfile, changePassword, updateProfile, addToCart, updateCart, removeCart, wishlistAdd, remeoveWishlist, addTowishlist, addAddress, editAddress, deleteAddress, setDefaultAddress, postCheckout } = require('../controller/userAuthController');
+const { signupValidation, loginValidation, forgotValidation, resetPasswordValidation, updateProfileValidation, addressValidation, addressEditValidation } = require('../middleware/userValidator');
 const { verifyToken } = require('../middleware/authMiddleware');
 const createMulter = require('../middleware/profilePhotoUpload');
 const { loginAdmin, settings, addProduct, editProduct, deleteProduct } = require('../controller/adminAuthController');
@@ -25,6 +25,9 @@ router.post('/profileChangePassword',verifyToken, changePassword)//update passwo
 const profileUpload = createMulter('profile')
 router.post('/updateProfile', verifyToken, profileUpload.single('profilePhoto'), updateProfile)//update profile details
 router.post('/addAddress', verifyToken, addressValidation, addAddress)//address add 
+router.post('/editAddress', verifyToken,addressEditValidation, editAddress)//edit address
+router.post('/deleteAddress/:id', verifyToken, deleteAddress)//delete address
+router.post('/setDefaultAddress/:id', verifyToken, setDefaultAddress)//default address
 
 // ----------------------------------------------
 //  --------CART SECTIONS------------------
@@ -41,6 +44,15 @@ router.post('/cart/remove', verifyToken, removeCart)//removing cart
 router.post('/wishlist/add', verifyToken, wishlistAdd)//add wishlist to items
 router.post('/wishlist/remove', verifyToken, remeoveWishlist)
 router.post('/wishlist', verifyToken, addTowishlist)
+
+
+// ----------------------------------------------
+//  -------- CHECKOUT SECTIONS------------------
+// ------------------------------------------------
+router.post('/checkout', verifyToken, postCheckout)
+
+
+
 
 //=====================================================================================
 

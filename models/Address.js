@@ -43,6 +43,10 @@ const addressSchema = new Schema(
       type: String,
       required: true,
       match: [/^[0-9]{10}$/, 'Please enter a valid 10-digit phone number']
+    },
+    isDefault: {
+    type: Boolean,
+    default: false
     }
   },
   { timestamps: true }

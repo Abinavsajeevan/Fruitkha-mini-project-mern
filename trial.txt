@@ -14,3 +14,28 @@
   });
 </script>
  scroll position regain
+
+ 
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+        <div class="text-center py-4">
+    <p class="text-muted mb-2">No addresses found.</p>
+    <button 
+      class="btn btn-success"
+      data-bs-toggle="modal"
+      data-bs-target="#addAddressModal">
+      <i class="fas fa-plus-circle me-1"></i> Add New Address
+    </button>
+  </div>
