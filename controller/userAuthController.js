@@ -11,6 +11,8 @@ const shopFilter = require('../utils/shopFilterQuery');
 const Wishlist = require('../models/Wishlist');
 const Address = require('../models/Address');
 const defaultAddress = require('../utils/defaultAddress');
+const Order = require('../models/Order');
+const sendOrderPDFEmail = require('../utils/sendOrderPDFEmail');
 
 
 // registration 
@@ -894,14 +896,22 @@ const postCheckout = async (req, res) => {
   try {
     const userId = req.user._id;
     const { selectedAddressId, paymentMethod, fullName, email, phone, alternatePhone, instructions } = req.body;
+    const orderDate = new Date().toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+    console.log(orderDate)
 
     const address = await Address.findById(selectedAddressId)
-    const cart = await Cart.findOne({userId}).populate('products.product')
+    const cart = await Cart.findOne({user:userId}).populate('products.product')
    //order creation
    const order = await Order.create({
     userId,
     address: {
-      phone: address.phone,
+      fullName,
+      email,
+      phone,
       alternatePhone: alternatePhone || '',
       street: address.street,
       city: address.city,
@@ -910,36 +920,53 @@ const postCheckout = async (req, res) => {
       country: address.country,
       label: address.label
     },
-    items: cart.products.map(product => ({
+    items: cart.products.map(item => ({
+      productId: item.product._id,
+      name: item.product.name,
+      quantity: item.quantity,
+      price: item.price,
+      total: item.quantity * item.price
+      })),
+      totalAmount: cart.total,
+      paymentMethod,
+      paymentStatus: 'pending',
+      orderStatus: 'pending',
+      deliveryInstruction: instructions || '',
+      orderDate
 
-      ///need to workout here
-    //       name: item.productId.name,
-    //     quantity: item.quantity,
-    //     price: item.productId.price,
-    //     total: item.quantity * item.productId.price
-    //   })),
-    //   totalAmount: cart.total,
-    //   paymentMethod,
-    //   deliveryInstructions: instructions || '',
-    //   status: paymentMethod === 'cod' ? 'Pending' : 'Payment Pending'
-    // });
+    });
 
-    // Empty cart after placing order
-    await Cart.findOneAndUpdate({ userId }, { items: [], total: 0 });
-
-    // Handle payment next step
-    if (paymentMethod === 'cod') {
+    if (paymentMethod == 'cod') {
       return res.redirect(`/order/success/${order._id}`);
     } else {
       return res.redirect(`/payment/${order._id}`);
     }
 
-   })
-
   }catch(err) {
     console.log('error occured in post checkout', err);
   }
 }
+
+//order COD 
+const orderCOD = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const {orderId} = req.params
+    const order = await Order.findOne({userId, _id:orderId})
+
+    //cart data will be empty
+    await Cart.findOneAndUpdate({user:userId }, { $set: { products: [] } })
+    if(order.address.email) {
+      await sendOrderPDFEmail(order, order.address.email)
+    }
+
+    return res.render('user/orderConfirmation',{order})
+
+  } catch(err) {
+    console.log('error occured in order cod', err)
+  }
+}
+
 
 module.exports = {
     registerUser,
@@ -969,5 +996,6 @@ module.exports = {
     remeoveWishlist,
     addTowishlist,
     getCheckout,
-    postCheckout
+    postCheckout,
+    orderCOD
 }

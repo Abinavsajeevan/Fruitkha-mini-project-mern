@@ -12,6 +12,7 @@ const orderSchema = new Schema(
         //it store if any changes in future for order or edit not change the original 
         address: {
             fullName: String,
+            email: String,
             phone: String,
            alternatePhone: String,
             street: String,
@@ -24,7 +25,7 @@ const orderSchema = new Schema(
 
         items: [
             {
-                ProductId: {
+                productId: {
                     type: mongoose.Schema.Types.ObjectId,
                     ref: 'Product',
                     required: true,
@@ -72,8 +73,18 @@ const orderSchema = new Schema(
             type: String,
             default: ''
         },
+         orderDate: {
+            type: String,
+            required: true
+        },
 
-        deliveredAt: Date
+        cancelDate: {
+            type: String
+        },
+
+        deliveredAt: { 
+            type: String
+        }
 
     }, {timestamps: true}
 );

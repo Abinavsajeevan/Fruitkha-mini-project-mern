@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const passport = require('passport');
 const {verifyToken, verifyTokenIndex} = require('../middleware/authMiddleware');
-const { googleLogin, resendOtp, logout, deleteAccount, getShop, getCart, getWishlist, getCheckout, addressProfile } = require('../controller/userAuthController');
+const { googleLogin, resendOtp, logout, deleteAccount, getShop, getCart, getWishlist, getCheckout, addressProfile, orderCOD } = require('../controller/userAuthController');
 const { adminVerifyToken } = require('../middleware/adminAuthMiddleware');
 const Admin = require('../models/Admin');
 const { logoutAdmin } = require('../controller/adminAuthController');
@@ -123,11 +123,21 @@ router.get('/logout', verifyToken, logout)
 //---------------checkout page----------------------
 router.get('/checkout', verifyToken, getCheckout)
 
+///=======================================================
+
+//---------------order COD ----------------------
+router.get('/order/success/:orderId', verifyToken, orderCOD)
+///=======================================================
+
+//---------------404 error ----------------------
+router.get('/error404', verifyToken, (req, res) => {
+  res.render('user/404', {user: req.user})
+})
 
 ///=======================================================
 
 //  ----------[passsport]-------------
-// it is for passport js
+// it is for passport js registration
 router.get('/auth/google/signup', passport.authenticate('google-signup', { scope: ['profile', 'email'] }));
 
 // callback route
