@@ -206,3 +206,52 @@ router.get('/admin/products/edit/:id', async(req, res) => {
 
 
 module.exports = router;
+
+//--------------------------------------
+//----------admin orders page -------------
+//---------------------------------------
+router.get('/admin/orders', async(req, res) => {
+  res.render('admin/orders')
+})
+
+//--------------------------------------
+//----------admin customers page -------------
+//---------------------------------------
+router.get('/admin/customers', async(req, res) => {
+  res.render('admin/customers')
+})
+
+//--------------------------------------
+//----------admin analytics page -------------
+//---------------------------------------
+router.get('/admin/analytics', async(req, res) => {
+  res.render('admin/analytics')
+})
+
+//--------------------------------------
+//----------admin coupons page -------------
+//---------------------------------------
+router.get('/admin/coupons', async(req, res) => {
+  res.render('admin/coupons')
+})
+
+//--------------------------------------
+//----------admin support page -------------
+//---------------------------------------
+router.get('/admin/support', async(req, res) => {
+  res.render('admin/support')
+})
+
+//--------------------------------------
+//----------admin logs page -------------
+//---------------------------------------
+router.get('/admin/logs', async(req, res) => {
+  res.render('admin/logs')
+})
+
+//--------------------------------------
+//----------admin profile page -------------
+//---------------------------------------
+router.get('/admin/profile', async(req, res) => {
+  res.render('admin/profile')
+})

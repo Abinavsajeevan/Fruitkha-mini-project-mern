@@ -3,9 +3,10 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Settings</title>
+  <title>Analytics - My Admin</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
- <style>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
     /* Sidebar container */
     .sidebar {
       width: 150px;
@@ -150,9 +151,9 @@
       <a href="/admin/orders" class="list-group-item list-group-item-action">Orders</a>
       <a href="/admin/products" class="list-group-item list-group-item-action ">Products</a>
       <a href="/admin/customers" class="list-group-item list-group-item-action">Customers</a>
-      <a href="/admin/analytics" class="list-group-item list-group-item-action">Analytics</a>
+      <a href="/admin/analytics" class="list-group-item list-group-item-action active">Analytics</a>
       <a href="/admin/coupons" class="list-group-item list-group-item-action">Coupons</a>
-      <a href="/admin/settings" class="list-group-item list-group-item-action active">Settings</a>
+      <a href="/admin/settings" class="list-group-item list-group-item-action">Settings</a>
       <a href="/admin/support" class="list-group-item list-group-item-action">Support</a>
       <a href="/admin/logs" class="list-group-item list-group-item-action">Logs</a>
       <a href="/admin/profile" class="list-group-item list-group-item-action">Profile</a>
@@ -161,104 +162,127 @@
 
     <!-- Main Content -->
     <main class="flex-fill p-4" style="background-color:#e27a25; color:#000; min-height:100vh;">
-
-      <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
-    <h3 class="mb-4">Settings</h3>
-    </div>
-
-    <!-- Admin Account Card -->
-    <div class="card shadow-sm mb-4">
-      <div class="card-header bg-dark text-white">
-        Admin Account
-      </div>
-      <div class="card-body">
-           <% if(errors && errors.length) {
-								const error = errors.find(err => err.path === 'exist');
-								if( error ) { %>
-									<div class="text-danger " style="text-shadow: 0px 4px 6px rgb(0 0 0);background-color: black;border: 1px solid black;border-radius: 26px 0px;text-align: center;font-size: 13px;font-weight: bold;"><%= error.msg %></div>
-									<% }
-								} %>
-                <% if(errors && errors.length) {
-								const error = errors.find(err => err.path === 'true');
-								if( error ) { %>
-									<div class="text-success " style="text-shadow: 0px 4px 6px rgb(0 0 0);background-color: black;border: 1px solid black;border-radius: 26px 0px;text-align: center;font-size: 13px;font-weight: bold;"><%= error.msg %></div>
-									<% }
-								} %>
-        <form action="/admin/settings" method="POST">
-          <!-- Name Field -->
-           <% if(errors && errors.length) {
-								const error = errors.find(err => err.path === 'name');
-								if( error ) { %>
-									<div class="text-danger " style="text-shadow: 0px 4px 6px rgb(0 0 0);background-color: black;border: 1px solid black;border-radius: 26px 0px;text-align: center;font-size: 13px;font-weight: bold;"><%= error.msg %></div>
-									<% }
-								} %>
-          <div class="mb-3">
-            <label for="adminName" class="form-label text-dark fw-bold">Name</label>
-            <input type="text" id="adminName" name="name" class="form-control" required value = "<%=admin?admin.name:'' %>"      placeholder="Enter admin name">
-          </div>
-
-          <!-- Email Field -->
-          <% if(errors && errors.length) {
-								const error = errors.find(err => err.path === 'email');
-								if( error ) { %>
-									<div class="text-danger " style="text-shadow: 0px 4px 6px rgb(0 0 0);background-color: black;border: 1px solid black;border-radius: 26px 0px;text-align: center;font-size: 13px;font-weight: bold;"><%= error.msg %></div>
-									<% }
-								} %>
-          <div class="mb-3">
-            <label for="adminEmail" class="form-label text-dark fw-bold">Email</label>
-            <input type="email" id="adminEmail" name="email" class="form-control" required value = "<%=admin?admin.email:'' %>" placeholder="Enter email address">
-          </div>
-
-          <!-- Password Field -->
-          <% if(errors && errors.length) {
-								const error = errors.find(err => err.path === 'password');
-								if( error ) { %>
-									<div class="text-danger " style="text-shadow: 0px 4px 6px rgb(0 0 0);background-color: black;border: 1px solid black;border-radius: 26px 0px;text-align: center;font-size: 13px;font-weight: bold;"><%= error.msg %></div>
-									<% }
-								} %>
-          <div class="mb-3">
-            <label for="adminPassword" class="form-label text-dark fw-bold">Password</label>
-            <input type="password" id="adminPassword" name="password" class="form-control" value= "<%=admin?admin.password:'' %>"  placeholder="enter new password">
-          </div>
-
-          <!-- Submit Button -->
-          <button type="submit" class="btn btn-dark">Update Profile</button>
-        </form>
+      <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <h3 class="mb-0 text-dark fw-bold">Sales Analytics 🍇</h3>
       </div>
 
-    </div>
-
-    <!-- Logout Card -->
-    <div class="card shadow-sm">
-      <div class="card-body text-center">
-        <a href="/admin/logout" class="btn btn-danger">Logout</a>
+      <!-- Quick Stats -->
+      <div class="row g-4 mb-4">
+        <div class="col-sm-6 col-lg-3">
+          <div class="card stat-card shadow-sm text-center p-3">
+            <h5 class="text-success">Total Revenue</h5>
+            <h3>₹1,25,600</h3>
+            <p class="text-muted mb-0">+12% vs last month</p>
+          </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+          <div class="card stat-card shadow-sm text-center p-3">
+            <h5 class="text-primary">Orders</h5>
+            <h3>480</h3>
+            <p class="text-muted mb-0">+18 new today</p>
+          </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+          <div class="card stat-card shadow-sm text-center p-3">
+            <h5 class="text-warning">Customers</h5>
+            <h3>1,260</h3>
+            <p class="text-muted mb-0">+5% growth</p>
+          </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+          <div class="card stat-card shadow-sm text-center p-3">
+            <h5 class="text-danger">Refunds</h5>
+            <h3>₹2,450</h3>
+            <p class="text-muted mb-0">2.1% of total</p>
+          </div>
+        </div>
       </div>
-    </div>
 
-  </main>
-</div>
+      <!-- Charts -->
+      <div class="row g-4">
+        <!-- Pie Chart -->
+        <div class="col-md-6">
+          <div class="card shadow-sm">
+            <div class="card-header bg-dark text-white">Category Wise Sales</div>
+            <div class="card-body chart-container">
+              <canvas id="pieChart"></canvas>
+            </div>
+          </div>
+        </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-  const inputField = document.getElementsByTagName("input");
-  for(field of inputField) {
-    field.addEventListener('focus', ()=> {
-      const errors = document.querySelectorAll('.text-danger');
-      const errors1 = document.querySelector('.text-success')
-      errors1.style.display = 'none'
-      errors.forEach(err => err.style.display = 'none')
-    })
-  }
-  </script>
-    <script>
+        <!-- Line Chart -->
+        <div class="col-md-6">
+          <div class="card shadow-sm">
+            <div class="card-header bg-dark text-white">Monthly Revenue Growth</div>
+            <div class="card-body chart-container">
+              <canvas id="lineChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Top Products -->
+      <div class="card mt-5 shadow-sm">
+        <div class="card-header bg-dark text-white">Top Selling Fruits 🍉</div>
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            Mangoes <span class="badge bg-success rounded-pill">₹42,000</span>
+          </li>
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            Apples <span class="badge bg-primary rounded-pill">₹38,000</span>
+          </li>
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            Bananas <span class="badge bg-warning text-dark rounded-pill">₹25,000</span>
+          </li>
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            Grapes <span class="badge bg-info text-dark rounded-pill">₹18,500</span>
+          </li>
+        </ul>
+      </div>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
     const toggleBtn = document.getElementById('menu-toggle');
     const sidebar = document.getElementById('sidebar');
-
     toggleBtn.addEventListener('click', () => {
       sidebar.classList.toggle('show');
       toggleBtn.classList.toggle('active');
     });
-  </script>
 
+    // Pie Chart
+    new Chart(document.getElementById('pieChart'), {
+      type: 'pie',
+      data: {
+        labels: ['Mangoes', 'Apples', 'Bananas', 'Grapes', 'Oranges'],
+        datasets: [{
+          data: [40, 30, 15, 10, 5],
+          backgroundColor: ['#F7B801', '#FF6363', '#FFD166', '#06D6A0', '#118AB2']
+        }]
+      }
+    });
+
+    // Line Chart
+    new Chart(document.getElementById('lineChart'), {
+      type: 'line',
+      data: {
+        labels: ['May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct'],
+        datasets: [{
+          label: 'Revenue (₹)',
+          data: [20000, 30000, 45000, 50000, 60000, 65000],
+          borderColor: '#051922',
+          backgroundColor: 'rgba(242,129,35,0.2)',
+          fill: true,
+          tension: 0.4
+        }]
+      },
+      options: {
+        scales: {
+          y: { beginAtZero: true }
+        }
+      }
+    });
+  </script>
 </body>
 </html>

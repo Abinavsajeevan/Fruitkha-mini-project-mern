@@ -147,8 +147,8 @@
     <aside class="sidebar border-end" id="sidebar">
       <h5 class="p-3 border-bottom d-none d-md-block">My Admin</h5>
     <nav class="list-group list-group-flush">
-      <a href="/admin" class="list-group-item list-group-item-action active">Dashboard</a>
-      <a href="/admin/orders" class="list-group-item list-group-item-action">Orders</a>
+      <a href="/admin" class="list-group-item list-group-item-action ">Dashboard</a>
+      <a href="/admin/orders" class="list-group-item list-group-item-action active">Orders</a>
       <a href="/admin/products" class="list-group-item list-group-item-action ">Products</a>
       <a href="/admin/customers" class="list-group-item list-group-item-action">Customers</a>
       <a href="/admin/analytics" class="list-group-item list-group-item-action">Analytics</a>
@@ -164,102 +164,109 @@
     <main class="flex-fill p-4" style="background-color:#e27a25; color:#000; min-height:100vh;">
 
       <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
-        <h3 class="mb-0">Dashboard</h3>
-      </div>
+        <h3 class="mb-0">Orders</h3>
 
-      <!-- Summary Cards -->
-      <div class="row g-4">
-        <div class="col-sm-6 col-lg-3">
-          <div class="card shadow-sm text-center p-3">
-            <h5 class="text-success">Total Sales</h5>
-            <h3>₹45,200</h3>
-            <p class="text-muted mb-0">This Month</p>
-          </div>
-        </div>
-        <div class="col-sm-6 col-lg-3">
-          <div class="card shadow-sm text-center p-3">
-            <h5 class="text-warning">Orders</h5>
-            <h3>320</h3>
-            <p class="text-muted mb-0">Pending: 12</p>
-          </div>
-        </div>
-        <div class="col-sm-6 col-lg-3">
-          <div class="card shadow-sm text-center p-3">
-            <h5 class="text-primary">Products</h5>
-            <h3>68</h3>
-            <p class="text-muted mb-0">In Stock</p>
-          </div>
-        </div>
-        <div class="col-sm-6 col-lg-3">
-          <div class="card shadow-sm text-center p-3">
-            <h5 class="text-danger">Customers</h5>
-            <h3>1,245</h3>
-            <p class="text-muted mb-0">New: 24</p>
-          </div>
+        <!-- Search and Sort -->
+        <div class="d-flex flex-wrap gap-2">
+          <input type="text" id="searchInput" class="form-control" placeholder="Search by user or order ID" style="max-width: 250px;">
+          <select id="sortSelect" class="form-select" style="max-width: 180px;">
+            <option value="">Sort by Status</option>
+            <option value="pending">Pending</option>
+            <option value="processing">Processing</option>
+            <option value="shipped">Shipped</option>
+            <option value="delivered">Delivered</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
         </div>
       </div>
 
-      <!-- Recent Orders Table -->
-      <div class="card mt-5 shadow-sm">
-        <div class="card-header bg-dark text-white">
-          Recent Orders
+      <!-- Orders Table -->
+      <div class="card shadow-sm">
+        <div class="card-header bg-dark text-white border-bottom">
+          All Orders
         </div>
         <div class="table-responsive">
-          <table class="table mb-0 table-striped align-middle">
-            <thead>
+          <table class="table table-striped align-middle mb-0" id="ordersTable">
+            <thead class="table-dark">
               <tr>
                 <th>#</th>
-                <th>Customer</th>
-                <th>Product</th>
-                <th>Quantity</th>
-                <th>Status</th>
+                <th>User</th>
                 <th>Total</th>
+                <th>Payment</th>
+                <th>Status</th>
+                <th>Order Date</th>
+                <th>Delivered</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td>101</td>
-                <td>Aarav</td>
-                <td>Mangoes</td>
-                <td>10 kg</td>
-                <td><span class="badge bg-success">Delivered</span></td>
-                <td>₹1,500</td>
+                <td>OR12345</td>
+                <td>Aarav Sharma</td>
+                <td>₹1,200</td>
+                <td><span class="badge bg-success">Paid (Card)</span></td>
+                <td>
+                  <span class="badge badge-shipped">Shipped</span><br>
+                  <select class="status-select">
+                    <option>Pending</option>
+                    <option>Processing</option>
+                    <option selected>Shipped</option>
+                    <option>Delivered</option>
+                    <option>Cancelled</option>
+                  </select>
+                </td>
+                <td>2025-11-02</td>
+                <td>—</td>
               </tr>
               <tr>
-                <td>102</td>
-                <td>Sneha</td>
-                <td>Apples</td>
-                <td>5 kg</td>
-                <td><span class="badge bg-warning text-dark">Pending</span></td>
+                <td>OR12346</td>
+                <td>Sneha Iyer</td>
                 <td>₹750</td>
+                <td><span class="badge bg-warning text-dark">Pending (COD)</span></td>
+                <td>
+                  <span class="badge badge-processing">Processing</span><br>
+                  <select class="status-select">
+                    <option>Pending</option>
+                    <option selected>Processing</option>
+                    <option>Shipped</option>
+                    <option>Delivered</option>
+                    <option>Cancelled</option>
+                  </select>
+                </td>
+                <td>2025-11-01</td>
+                <td>—</td>
               </tr>
               <tr>
-                <td>103</td>
-                <td>Rahul</td>
-                <td>Bananas</td>
-                <td>12 kg</td>
-                <td><span class="badge bg-danger">Cancelled</span></td>
-                <td>₹600</td>
+                <td>OR12348</td>
+                <td>Kavya Nair</td>
+                <td>₹900</td>
+                <td><span class="badge bg-success">Paid (Card)</span></td>
+                <td>
+                  <span class="badge badge-delivered">Delivered</span><br>
+                  <select class="status-select">
+                    <option>Pending</option>
+                    <option>Shipped</option>
+                    <option>Delivered</option>
+                    <option>Cancelled</option>
+                  </select>
+                </td>
+                <td>2025-10-25</td>
+                <td>2025-10-28</td>
               </tr>
             </tbody>
           </table>
         </div>
       </div>
 
-      <!-- Low Stock Products -->
-      <div class="card mt-5 shadow-sm">
-        <div class="card-header bg-dark text-white">
-          Low Stock Products
-        </div>
-        <ul class="list-group list-group-flush">
-          <li class="list-group-item d-flex justify-content-between">
-            <span>Kiwi</span> <span class="text-danger">3 left</span>
-          </li>
-          <li class="list-group-item d-flex justify-content-between">
-            <span>Oranges</span> <span class="text-danger">5 left</span>
-          </li>
+      <!-- Pagination (static for now, backend-ready) -->
+      <nav aria-label="Page navigation" class="mt-4">
+        <ul class="pagination">
+          <li class="page-item disabled"><a class="page-link" href="#">Previous</a></li>
+          <li class="page-item active"><a class="page-link" href="#">1</a></li>
+          <li class="page-item"><a class="page-link" href="#">2</a></li>
+          <li class="page-item"><a class="page-link" href="#">3</a></li>
+          <li class="page-item"><a class="page-link" href="#">Next</a></li>
         </ul>
-      </div>
+      </nav>
 
     </main>
   </div>
@@ -268,12 +275,38 @@
   <script>
     const toggleBtn = document.getElementById('menu-toggle');
     const sidebar = document.getElementById('sidebar');
-
     toggleBtn.addEventListener('click', () => {
       sidebar.classList.toggle('show');
       toggleBtn.classList.toggle('active');
     });
-  </script>
 
+    // Search
+    document.getElementById('searchInput').addEventListener('keyup', function() {
+      const filter = this.value.toLowerCase();
+      document.querySelectorAll('#ordersTable tbody tr').forEach(row => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(filter) ? '' : 'none';
+      });
+    });
+
+    // Sort by status
+    document.getElementById('sortSelect').addEventListener('change', function() {
+      const selected = this.value.toLowerCase();
+      document.querySelectorAll('#ordersTable tbody tr').forEach(row => {
+        const badge = row.querySelector('td:nth-child(5) span');
+        const status = badge ? badge.innerText.toLowerCase() : '';
+        row.style.display = selected === '' || status === selected ? '' : 'none';
+      });
+    });
+
+    // Update status visually
+    document.querySelectorAll('.status-select').forEach(select => {
+      select.addEventListener('change', function() {
+        const badge = this.previousElementSibling;
+        badge.textContent = this.value;
+        badge.className = 'badge badge-' + this.value.toLowerCase();
+      });
+    });
+  </script>
 </body>
 </html>
