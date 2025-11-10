@@ -77,7 +77,10 @@ const loginUser = async (req, res) => {
         const user = userEmail || userMobile;
         // if not registered yet 
         if(!user) return res.render('user/login', {errors: [{msg:'user not registered yet, please sign in', path: 'no_user'}], user: null});
-
+        
+        //if user blocked 
+        if(user.isBlocked) return res.render('user/login', {errors: [{msg:'You are blocked, please contact the owner', path: 'no_user'}], user: null});
+        
         // if registered only through google
         if(user.password === null) return res.render('user/login', {errors: [{msg:'reset password or login with google', path: 'google'}], user: null});
 
@@ -105,6 +108,7 @@ const loginUser = async (req, res) => {
 // login using google
 const googleLogin = async (req, res) => {
     console.log('creating token for google')
+    
     // create jwt 
     const token = jwt.sign({tokenId: req.user._id}, process.env.JWT_SECRET_KEY, {expiresIn: '20d'});
 
@@ -518,6 +522,34 @@ const setDefaultAddress = async (req, res) => {
   }
 }
 
+//profile add orders method = GET
+const getProfileOrder = async (req, res) => {
+  try {
+    const orders = await Order.find({userId: req.user._id}).sort({ createdAt: -1 })
+    res.render('user/profileOrder', {user: req.user, orders})
+  } catch(err) {
+    console.log('error occured in order profile', err);
+  }
+}
+
+//profile cancel order METHOD = PUT
+const cancelOrder = async (req, res) => {
+  try {
+    const orderId = req.params.id;
+
+    const updatedOrder = await Order.findByIdAndUpdate(orderId, 
+      {orderStatus: 'cancelled'},
+      {new: true}
+    );
+    if(!updatedOrder) return res.status(404).json({message: 'Order not found'});
+
+    res.json({message: 'order cancelled successfully', order: updatedOrder})
+
+  }catch(err) {
+    console.log('error occured in cancelorder', err)
+  }
+}
+
 //shop page METHOD = GET
 const getShop = async (req, res) => {
   try {
@@ -629,6 +661,8 @@ const updateCart = async (req, res) => {
         const userId = req.user._id;
         const { productId, quantity } = req.body;
         const cart = await Cart.findOne({ user: userId }).populate('products.product');
+        
+        // if(cart.products.product.stock < quantity) return res.redirect('/cart')
         const productItem = cart.products.find(item => item.product._id.equals(productId));//take the exact of product item
         productItem.quantity = parseInt(quantity);
         productItem.totalPrice = productItem.quantity * productItem.price;
@@ -932,11 +966,20 @@ const postCheckout = async (req, res) => {
       paymentStatus: 'pending',
       orderStatus: 'pending',
       deliveryInstruction: instructions || '',
-      orderDate
+      orderDate,
+      deliveredAt:'',
+      cancelDate: ''
 
     });
 
     if (paymentMethod == 'cod') {
+      for(const item of cart.products) {
+        await Product.findByIdAndUpdate(
+          item.product._id,
+          {$inc: {stock: -item.quantity}}
+        );
+      }
+
       return res.redirect(`/order/success/${order._id}`);
     } else {
       return res.redirect(`/payment/${order._id}`);
@@ -968,6 +1011,8 @@ const orderCOD = async (req, res) => {
 }
 
 
+
+
 module.exports = {
     registerUser,
     loginUser,
@@ -986,6 +1031,8 @@ module.exports = {
     editAddress,
     deleteAddress,
     setDefaultAddress,
+    getProfileOrder,
+    cancelOrder,
     getShop,
     addToCart,
     getCart,

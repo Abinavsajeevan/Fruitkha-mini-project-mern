@@ -155,13 +155,13 @@
       <a href="/admin/coupons" class="list-group-item list-group-item-action">Coupons</a>
       <a href="/admin/settings" class="list-group-item list-group-item-action">Settings</a>
       <a href="/admin/support" class="list-group-item list-group-item-action">Support</a>
-      <a href="/admin/logs" class="list-group-item list-group-item-action">Logs</a>
       <a href="/admin/profile" class="list-group-item list-group-item-action">Profile</a>
     </nav>
     </aside>
 
     <!-- Main Content -->
     <main class="flex-fill p-4" style="background-color:#e27a25; color:#000; min-height:100vh;">
+      <% if(users && users.length > 0) { %>
       <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
         <h3 class="mb-0">Customers</h3>
       </div>
@@ -169,11 +169,6 @@
       <!-- Search and Sort -->
       <div class="d-flex flex-wrap gap-2 mb-4">
         <input type="text" class="form-control" placeholder="Search by name or email..." style="max-width:250px;">
-        <select class="form-select" style="max-width:200px;">
-          <option value="">Sort by Total Spent</option>
-          <option>Low → High</option>
-          <option>High → Low</option>
-        </select>
       </div>
 
       <!-- Customers Table -->
@@ -186,136 +181,118 @@
             <thead class="table-dark">
               <tr>
                 <th>#</th>
-                <th>Profile</th>
                 <th>Name</th>
                 <th>Email</th>
                 <th>Mobile</th>
-                <th>Total Spent (₹)</th>
                 <th>Status</th>
                 <th>Joined</th>
                 <th>Action</th>
               </tr>
             </thead>
             <tbody>
-              <!-- Customer 1 -->
+              <% users.forEach((user, index) => { %>
               <tr>
-                <td>1</td>
-                <td><img src="https://i.pravatar.cc/40?img=3" class="profile-img"></td>
-                <td>Aarav Sharma</td>
-                <td>aarav@example.com</td>
-                <td>+91 9876543210</td>
-                <td>5600</td>
-                <td><span class="badge bg-success">Active</span></td>
-                <td>Jan 2024</td>
+                <td><%= (currentPage - 1) * 10 + index + 1  %></td>
+                <td><%= user.name %></td>
+                <td><%= user.email  %></td>
+                <td><%=user.mobile? user.mobile: 'not found'  %></td>
+                <td><span class="badge <%= user.isBlocked? 'bg-danger': 'bg-success'%>"><%= user.isBlocked? 'Blocked': 'Active'%></span></td>
+                <td><%= new Date(user.createdAt).toDateString().slice(4) %></td>
                 <td>
-                  <button class="btn btn-sm btn-outline-dark" data-bs-toggle="modal" data-bs-target="#user1">View</button>
-                  <button class="btn btn-sm btn-outline-danger">Block</button>
-                </td>
-              </tr>
+                  <button 
+                    class="btn btn-sm btn-outline-dark view-btn"
+                    data-bs-toggle="modal"
+                    data-bs-target="#userModal"
+                    data-name="<%= user.name %>"
+                    data-email="<%= user.email %>"
+                    data-phone="<%= user.mobile || 'Not found' %>"
+                    data-status="<%= user.isBlocked ? 'Blocked' : 'Active' %>"
+                    data-joined="<%= new Date(user.createdAt).toDateString().slice(4) %>"
+                  >
+                    View
+                  </button>
 
-              <!-- Customer 2 -->
-              <tr>
-                <td>2</td>
-                <td><img src="https://i.pravatar.cc/40?img=5" class="profile-img"></td>
-                <td>Sneha Patel</td>
-                <td>sneha@gmail.com</td>
-                <td>+91 9988776655</td>
-                <td>12400</td>
-                <td><span class="badge bg-success">Active</span></td>
-                <td>Mar 2024</td>
-                <td>
-                  <button class="btn btn-sm btn-outline-dark" data-bs-toggle="modal" data-bs-target="#user2">View</button>
-                  <button class="btn btn-sm btn-outline-danger">Block</button>
+                   <button 
+                    class="btn btn-sm <%= user.isBlocked ? 'btn-outline-success':'btn-outline-danger' %>  block-btn"
+                    data-id="<%= user._id %>"
+                    data-blocked="<%= user.isBlocked %>"
+                  >
+                    <%= user.isBlocked ? 'Unblock' : 'Block' %>
+                  </button>
                 </td>
               </tr>
-
-              <!-- Customer 3 -->
-              <tr>
-                <td>3</td>
-                <td><img src="https://i.pravatar.cc/40?img=8" class="profile-img"></td>
-                <td>Rahul Verma</td>
-                <td>rahul@example.com</td>
-                <td>+91 9123456789</td>
-                <td>3500</td>
-                <td><span class="badge bg-danger">Blocked</span></td>
-                <td>Dec 2023</td>
-                <td>
-                  <button class="btn btn-sm btn-outline-dark" data-bs-toggle="modal" data-bs-target="#user3">View</button>
-                  <button class="btn btn-sm btn-outline-success">Unblock</button>
-                </td>
-              </tr>
+                  <% }) %>
+             
             </tbody>
           </table>
         </div>
       </div>
 
       <!-- Pagination -->
-      <nav class="mt-4">
-        <ul class="pagination justify-content-center">
-          <li class="page-item disabled"><a class="page-link" href="#">Previous</a></li>
-          <li class="page-item active"><a class="page-link" href="#">1</a></li>
-          <li class="page-item"><a class="page-link" href="#">2</a></li>
-          <li class="page-item"><a class="page-link" href="#">3</a></li>
-          <li class="page-item"><a class="page-link" href="#">Next</a></li>
-        </ul>
-      </nav>
+       
+        <nav aria-label="Page navigation">
+          <ul class="pagination justify-content-center mt-5">
+
+            <!-- Previous button -->
+            <% if (currentPage > 1) { %>
+              <li class="page-item">
+                <a class="page-link" href="?page=<%= currentPage - 1 %>">Previous</a>
+              </li>
+            <% } %>
+
+            <!-- Page numbers (show max 3 at a time) -->
+            <% 
+              let startPage = Math.max(1, currentPage - 1);
+              let endPage = Math.min(totalPages, startPage + 2);
+              if (endPage - startPage < 2) startPage = Math.max(1, endPage - 2);
+            %>
+
+            <% for (let i = startPage; i <= endPage; i++) { %>
+              <li class="page-item <%= i === currentPage ? 'active' : '' %>">
+                <a class="page-link" href="?page=<%= i %>"><%= i %></a>
+              </li>
+            <% } %>
+
+            <!-- Next button -->
+            <% if (currentPage < totalPages) { %>
+              <li class="page-item">
+                <a class="page-link" href="?page=<%= currentPage + 1 %>">Next</a>
+              </li>
+            <% } %>
+
+          </ul>
+        </nav>
+        
+   <% }else { %>
+          <div class="d-flex flex-column align-items-center justify-content-center text-center" style="height: 80vh;">
+
+              <h4 class="fw-semibold text-secondary">No Customers Yet</h4>
+              <p class="text-muted">Looks like no user was registered.</p>
+
+            </div>
+<% } %>
     </main>
   </div>
 
   <!-- Modals -->
-  <div class="modal fade" id="user1" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header bg-dark text-white">
-          <h5 class="modal-title">Aarav Sharma</h5>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-        </div>
-        <div class="modal-body">
-          <p><strong>Email:</strong> aarav@example.com</p>
-          <p><strong>Phone:</strong> +91 9876543210</p>
-          <p><strong>Total Spent:</strong> ₹5600</p>
-          <p><strong>Status:</strong> Active</p>
-          <p><strong>Joined:</strong> Jan 2024</p>
-        </div>
+ <div class="modal fade" id="userModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-dark text-white">
+        <h5 class="modal-title" id="modalName"></h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p><strong>Email:</strong> <span id="modalEmail"></span></p>
+        <p><strong>Phone:</strong> <span id="modalPhone"></span></p>
+        <p><strong>Status:</strong> <span id="modalStatus"></span></p>
+        <p><strong>Joined:</strong> <span id="modalJoined"></span></p>
       </div>
     </div>
   </div>
+</div>
 
-  <div class="modal fade" id="user2" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header bg-dark text-white">
-          <h5 class="modal-title">Sneha Patel</h5>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-        </div>
-        <div class="modal-body">
-          <p><strong>Email:</strong> sneha@gmail.com</p>
-          <p><strong>Phone:</strong> +91 9988776655</p>
-          <p><strong>Total Spent:</strong> ₹12400</p>
-          <p><strong>Status:</strong> Active</p>
-          <p><strong>Joined:</strong> Mar 2024</p>
-        </div>
-      </div>
-    </div>
-  </div>
 
-  <div class="modal fade" id="user3" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header bg-dark text-white">
-          <h5 class="modal-title">Rahul Verma</h5>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-        </div>
-        <div class="modal-body">
-          <p><strong>Email:</strong> rahul@example.com</p>
-          <p><strong>Phone:</strong> +91 9123456789</p>
-          <p><strong>Total Spent:</strong> ₹3500</p>
-          <p><strong>Status:</strong> Blocked</p>
-          <p><strong>Joined:</strong> Dec 2023</p>
-        </div>
-      </div>
-    </div>
-  </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   <script>
@@ -326,5 +303,109 @@
       toggleBtn.classList.toggle('active');
     });
   </script>
+  <script>
+  const searchInput = document.querySelector('input[placeholder="Search by name or email..."]');
+  const tableRows = document.querySelectorAll('tbody tr');
+
+  searchInput.addEventListener('keyup', () => {
+    const searchValue = searchInput.value.toLowerCase().trim();
+
+    tableRows.forEach(row => {
+      const name = row.children[1].textContent.toLowerCase();
+      const email = row.children[2].textContent.toLowerCase();
+
+      if (name.includes(searchValue) || email.includes(searchValue)) {
+        row.style.display = '';
+      } else {
+        row.style.display = 'none';
+      }
+    });
+  });
+  
+</script>
+<script>
+  const sortSelect = document.querySelector('select');
+  const tbody = document.querySelector('tbody');
+
+  sortSelect.addEventListener('change', () => {
+    const rows = Array.from(tbody.querySelectorAll('tr'));
+
+    if (sortSelect.value === "Low → High") {
+      rows.sort((a, b) => {
+        const totalA = parseFloat(a.children[4].textContent.trim());
+        const totalB = parseFloat(b.children[4].textContent.trim());
+        return totalA - totalB;
+      });
+    } else if (sortSelect.value === "High → Low") {
+      rows.sort((a, b) => {
+        const totalA = parseFloat(a.children[4].textContent.trim());
+        const totalB = parseFloat(b.children[4].textContent.trim());
+        return totalB - totalA;
+      });
+    } else {
+      return; // If no sorting selected, do nothing
+    }
+
+    // Re-append sorted rows to the table
+    rows.forEach(row => tbody.appendChild(row));
+  });
+</script>
+<script>
+  const userModal = document.getElementById('userModal');
+userModal.addEventListener('show.bs.modal', event => {
+  const button = event.relatedTarget; // Button that triggered the modal
+
+  // Extract data from attributes
+  const name = button.getAttribute('data-name');
+  const email = button.getAttribute('data-email');
+  const phone = button.getAttribute('data-phone');
+  const status = button.getAttribute('data-status');
+  const joined = button.getAttribute('data-joined');
+
+  // Update modal content
+  document.getElementById('modalName').textContent = name;
+  document.getElementById('modalEmail').textContent = email;
+  document.getElementById('modalPhone').textContent = phone;
+  document.getElementById('modalStatus').textContent = status;
+  document.getElementById('modalJoined').textContent = joined;
+});
+
+</script>
+
+
+<script>
+  //ajax method
+document.querySelectorAll('.block-btn').forEach(button => {
+  button.addEventListener('click', async () => {
+    const userId = button.getAttribute('data-id');
+    const isBlocked = button.getAttribute('data-blocked') === 'true';
+
+    try {
+      const res = await fetch(`/admin/users/${userId}/block`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ block: !isBlocked })
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        // Update button and status badge dynamically
+        button.textContent = data.isBlocked ? 'Unblock' : 'Block';
+        button.setAttribute('data-blocked', data.isBlocked);
+
+        const statusBadge = button.closest('tr').querySelector('.badge');
+        statusBadge.textContent = data.isBlocked ? 'Blocked' : 'Active';
+        statusBadge.className = `badge ${data.isBlocked ? 'bg-danger' : 'bg-success'}`;
+      } else {
+        alert(data.message || 'Failed to update user');
+      }
+    } catch (err) {
+      console.error('Error:', err);
+    }
+  });
+});
+</script>
+
 </body>
 </html>

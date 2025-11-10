@@ -3,6 +3,10 @@ const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken');
 const Product = require("../models/Product");
 const { findById } = require("../models/User");
+const Order = require("../models/Order");
+const getPaginatedOrders = require("../utils/paginationAdminOrder");
+const getPaginatedCustomers = require("../utils/paginationCustomers");
+const User = require("../models/User");
 
 const loginAdmin = async(req, res) => {
     try {
@@ -73,7 +77,7 @@ const addProduct = async(req, res) => {
         const getProducts = await Product.find();
         console.log(existingProduct)
         //if product exists
-        if(existingProduct) return res.render('admin/products', {errors: [{msg:`${name} is already exists`, path: 'name'}], showAddProductModal: true, products: getProducts, showEditProductModal: false, prod: false})
+        if(existingProduct) return res.render('admin/products', {errors: [{msg:`${name} is already exists`, path: 'name'}], showAddProductModal: true, products: getProducts, showEditProductModal: false, prod: false, admin: req.admin})
             if(stock > 15) {
                 status = 'In Stock'
             }else if(stock == 0) {
@@ -92,7 +96,7 @@ const addProduct = async(req, res) => {
         })
         await newProduct.save();
         console.log('product added')
-        return res.render('admin/products', {errors: [{msg:`${name} updated successfully`, path: 'success'}], showAddProductModal: true, products: getProducts, showEditProductModal: false, prod: false})
+        return res.render('admin/products', {errors: [{msg:`${name} updated successfully`, path: 'success'}], showAddProductModal: true, products: getProducts, showEditProductModal: false, prod: false, admin: req.admin})
 
     } catch(err) {
         console.log('error occured in add product', err)
@@ -106,7 +110,7 @@ const editProduct = async(req, res) => {
         const getProducts = await Product.find();
         const product = await Product.findById(id);
         console.log('work')
-        if(product.name == name && product.category == category && product.price == price && product.stock == stock && !req.file) return res.render('admin/products', {errors: [{msg:`already exists`, path: 'name'}], showAddProductModal: false, products: getProducts, showEditProductModal: true, prod: product});
+        if(product.name == name && product.category == category && product.price == price && product.stock == stock && !req.file) return res.render('admin/products', {errors: [{msg:`already exists`, path: 'name'}], showAddProductModal: false, products: getProducts, showEditProductModal: true, prod: product, admin: req.admin});
 
          if(stock > 15) {
                 status = 'In Stock'
@@ -127,7 +131,7 @@ const editProduct = async(req, res) => {
         await product.save();
         const getNewProducts = await Product.find();
         const newProduct = await Product.findById(id);
-        return res.render('admin/products', {errors: [{msg:`updated successfully`, path: 'success'}], showAddProductModal: false, products: getNewProducts, showEditProductModal: true, prod: newProduct});
+        return res.render('admin/products', {errors: [{msg:`updated successfully`, path: 'success'}], showAddProductModal: false, products: getNewProducts, showEditProductModal: true, prod: newProduct, admin: req.admin});
 
     }catch(err) {
         console.log('error occured in editproduct ', err)
@@ -144,11 +148,86 @@ const deleteProduct = async(req, res) => {
         console.log('error occured in delete product ', err)
     }
 }
+
+//orders
+// ----------------
+const showOrder = async(req, res) => {
+    try {
+        const pages = parseInt(req.query.page) || 1
+        const {orders, page, totalPages} = await getPaginatedOrders(pages)
+        return res.render('admin/orders', {admin: req.admin, orders, currentPage:page , totalPages})
+    }catch(err) {
+        console.log('error occured in order show page', err);
+    }
+}
+
+//method post order update
+const updateOrderStatus = async(req, res) => {
+    try {
+        const id = req.params.id;
+        const { status } = req.body;
+        
+        const order = await Order.findOne({_id: id})
+        if(status == 'delivered') {
+            const deliveryDate = new Date().toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+                });
+            order.deliveredAt = deliveryDate
+            await order.save()
+        }
+        await Order.findByIdAndUpdate(id, { orderStatus: status })
+        return res.redirect('/admin/orders')
+    }catch(err) {
+        console.log('error occured in updateorder status', err);
+        
+    }
+}
+
+//customers
+//------------------
+const showCustomer = async(req, res) => {
+    try {
+        const pages = parseInt(req.query.page) || 1;
+        const {users, page, totalPages} = await getPaginatedCustomers(pages);
+        return res.render('admin/customers', {admin: req.admin, users, currentPage:page, totalPages})
+
+    }catch(err) {
+        console.log('error occured in  show customers', err)
+    }
+}
+
+//block customers put method ajax
+const blockUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { block } = req.body;
+
+    const user = await User.findByIdAndUpdate(
+      id,
+      { isBlocked: block },
+      { new: true }
+    );
+      res.json({
+      message: 'User updated successfully',
+      isBlocked: user.isBlocked
+    });
+
+  } catch (error) {
+    console.error('Error updating user block status:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
 module.exports = {
     loginAdmin,
     settings,
     logoutAdmin,
     addProduct,
     editProduct,
-    deleteProduct
+    deleteProduct,
+    showOrder,
+    updateOrderStatus,
+    showCustomer,
+    blockUser
 }

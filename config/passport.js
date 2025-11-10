@@ -73,6 +73,9 @@ passport.use('google-login', new GoogleStrategy({
         if(!user) {
             return done(null, false, {message: 'No account found, please register'})
         }
+        if(user.isBlocked) {
+            return done(null, false, {message: 'you are blocked by admin please contact us'})
+        }
 
         if(user.provider !== 'google') {
             return done(null, false, {message: 'This email is registered using a form. Please login with this form.'})

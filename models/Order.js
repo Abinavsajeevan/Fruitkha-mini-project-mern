@@ -65,7 +65,7 @@ const orderSchema = new Schema(
 
         orderStatus: {
             type: String,
-            enum: ['pending', 'processing', 'shipped', 'delivered', 'cancelled'],
+            enum: ['pending', 'shipped', 'delivered', 'cancelled'],
             default: 'pending'
         },
         
@@ -77,9 +77,9 @@ const orderSchema = new Schema(
             type: String,
             required: true
         },
-
-        cancelDate: {
-            type: String
+        cancel: {
+            type: Boolean,
+            default: false
         },
 
         deliveredAt: { 

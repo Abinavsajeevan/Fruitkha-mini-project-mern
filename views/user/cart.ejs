@@ -122,7 +122,7 @@
 									<td class="product-quantity">
 										<form action="/cart/update" method="POST">
 											<input type="hidden" name="productId" value="<%= item.product._id %>">
-											<input  class="input-quantity" type="number" name="quantity" min="1" onchange="this.form.submit()"  value="<%= item.quantity %>">
+											<input  class="input-quantity" type="number" name="quantity" min="1" max="<%=item.product.stock %>" onchange="this.form.submit()"  value="<%= item.quantity %>">
 										</form>
 									</td>
 									<td class="product-total">₹<%= item.totalPrice %></td>

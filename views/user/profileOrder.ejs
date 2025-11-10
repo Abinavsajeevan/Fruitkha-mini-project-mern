@@ -150,57 +150,26 @@
 <div class="container my-5">
   <h3 class="mb-4">My Orders</h3>
 
-  <!-- Order 1 -->
-  <div class="order-box shadow-sm">
-    <div class="order-header">
-      <span>Order #1023</span>
-      <span class="badge-custom">Shipped</span>
-    </div>
-    <p class="mb-1"><strong>Date:</strong> 15 Sept 2025</p>
-    <p class="mb-1"><strong>Total:</strong> ₹1,250</p>
-    <table class="table table-dark table-striped mt-3 mb-0">
-      <thead>
-        <tr>
-          <th>Product</th><th>Qty</th><th>Price</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr><td>Fresh Apples</td><td>2 kg</td><td>₹500</td></tr>
-        <tr><td>Mango Juice</td><td>1</td><td>₹250</td></tr>
-        <tr><td>Bananas</td><td>1 dozen</td><td>₹500</td></tr>
-      </tbody>
-    </table>
-  </div>
-
-  <!-- Order 2 -->
-  <div class="order-box shadow-sm">
-    <div class="order-header">
-      <span>Order #1022</span>
-      <span class="badge-custom">Delivered</span>
-    </div>
-    <p class="mb-1"><strong>Date:</strong> 10 Sept 2025</p>
-    <p class="mb-1"><strong>Total:</strong> ₹850</p>
-    <table class="table table-dark table-striped mt-3 mb-0">
-      <thead>
-        <tr>
-          <th>Product</th><th>Qty</th><th>Price</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr><td>Oranges</td><td>3 kg</td><td>₹600</td></tr>
-        <tr><td>Lemon Juice</td><td>1</td><td>₹250</td></tr>
-      </tbody>
-    </table>
-  </div>
-
   <!-- Order 3 with Cancel -->
+   <% orders.forEach(order => { %>
   <div class="order-box shadow-sm">
     <div class="order-header">
-      <span>Order #1024</span>
-      <span class="badge-custom">Pending</span>
+      <span>Order #<%= order.id %></span>
+      <span class="badge-custom"><%= order.orderStatus %></span>
     </div>
-    <p class="mb-1"><strong>Date:</strong> 16 Sept 2025</p>
-    <p class="mb-1"><strong>Total:</strong> ₹950</p>
+    <div class="d-flex flex-wrap justify-content-between">
+      <p class="mb-1"><strong>Order Date:</strong> <%= order.orderDate %></p>
+      <% if(order.deliveredAt) { %>
+        <p class="mb-1"><strong>Delivery Date:</strong> <%= order.deliveredAt %></p>
+      <%} %>
+    </div>
+
+    <div class="d-flex flex-wrap justify-content-between">
+      <p class="mb-1"><strong>Total:</strong> ₹<%= order.totalAmount %></p>
+      <p class="mb-1"><strong>Payment Mode:</strong> <%= order.paymentMethod %></p>
+    </div>
+
+
     <table class="table table-dark table-striped mt-3">
       <thead>
         <tr>
@@ -208,14 +177,20 @@
         </tr>
       </thead>
       <tbody>
-        <tr><td>Grapes</td><td>2 kg</td><td>₹450</td></tr>
-        <tr><td>Pineapple Juice</td><td>1</td><td>₹500</td></tr>
+        <% order.items.forEach(item => { %>
+        <tr><td><%= item.name %></td><td><%= item.quantity %> kg</td><td>₹<%= item.total %></td></tr>
+        <%}) %>
       </tbody>
     </table>
-    <button class="btn btn-cancel mt-2 cancel-order-btn">
-      <i class="bi bi-x-circle"></i> Cancel Order
-    </button>
+    <% if(order.orderStatus !== 'delivered' && order.orderStatus !== 'cancelled') { %>
+  <button 
+    class="btn btn-cancel mt-2 cancel-order-btn" 
+    data-id="<%= order._id %>">
+    <i class="bi bi-x-circle"></i> Cancel Order
+  </button>
+    <% } %>
   </div>
+  <%}) %>
 </div>
 
 </div>
@@ -242,53 +217,42 @@
 	<script src="user/assets/js/sticker.js"></script>
 	<!-- main js -->
 	<script src="user/assets/js/main.js"></script>
-	<script>
-  const editBtn = document.getElementById('editBtn');
-  const profilePhotoInput = document.getElementById('profilePhoto');
-  const previewImg = document.getElementById('previewImg');
 
-  // Show modal on edit button click
-  editBtn.addEventListener('click', () => {
-    const modal = new bootstrap.Modal(document.getElementById('editProfileModal'));
-    modal.show();
-  });
-
-  // Preview uploaded image
-  profilePhotoInput.addEventListener('change', (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        previewImg.src = event.target.result;
-      };
-      reader.readAsDataURL(file);
-    }
-  });
-
-  // Handle form submission
-  document.getElementById('editProfileForm').addEventListener('submit', (e) => {
-    e.preventDefault();
-    console.log({
-      name: document.getElementById('editName').value,
-      email: document.getElementById('editEmail').value,
-      phone: document.getElementById('editPhone').value,
-      photo: previewImg.src
-    });
-    // Close modal after save
-    bootstrap.Modal.getInstance(document.getElementById('editProfileModal')).hide();
-  });
-</script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+
 <script>
-  document.querySelectorAll('.cancel-order-btn').forEach(btn=>{
-    btn.addEventListener('click',()=>{
-      if(confirm('Cancel this order?')){
-        alert('Order cancelled!');
+  document.querySelectorAll('.cancel-order-btn').forEach(btn => {
+    btn.addEventListener('click', async() => {
+      const orderId = btn.getAttribute('data-id');
+
+      if(!confirm('Are you sure you want to cancel this order?')) return;
+
+      try {
+        const res = await fetch(`/cancel-order/${orderId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({status: 'cancelled'})
+        });
+
+        const data = await res.json();
+
+        if(res.ok) {
+          alert('Order cancelled successfully');
+          location.reload();//update status in ui
+        }else {
+          alert(data.message || 'failed to cancel order')
+        }
+      }catch (err) {
+        console.log(err);
+        alert('something went wrong')
       }
-    });
-  });
+    })
+  })
 </script>
 
 </body>

@@ -2,10 +2,10 @@ const express = require('express');
 const router = express.Router();
 const passport = require('passport');
 const {verifyToken, verifyTokenIndex} = require('../middleware/authMiddleware');
-const { googleLogin, resendOtp, logout, deleteAccount, getShop, getCart, getWishlist, getCheckout, addressProfile, orderCOD } = require('../controller/userAuthController');
+const { googleLogin, resendOtp, logout, deleteAccount, getShop, getCart, getWishlist, getCheckout, addressProfile, orderCOD, getProfileOrder } = require('../controller/userAuthController');
 const { adminVerifyToken } = require('../middleware/adminAuthMiddleware');
 const Admin = require('../models/Admin');
-const { logoutAdmin } = require('../controller/adminAuthController');
+const { logoutAdmin, showOrder, showCustomer } = require('../controller/adminAuthController');
 const Product = require('../models/Product');
 //=================================================
 
@@ -81,9 +81,7 @@ router.get('/profile',verifyToken, (req, res) => {
 })
 
 //profile order
-router.get('/profileOrder', verifyToken, (req, res) => {
-  res.render('user/profileOrder', {user: req.user})
-})
+router.get('/profileOrder', verifyToken, getProfileOrder)
 
 //profile address
 router.get('/profileAddress', verifyToken, addressProfile)
@@ -194,14 +192,14 @@ router.get('/admin/logout', adminVerifyToken, logoutAdmin)
 //---------------------------------------
 router.get('/admin/products', adminVerifyToken, async(req, res) => {
   const getProducts = await Product.find();
-  res.render('admin/products',  {showAddProductModal :false, products: getProducts, showEditProductModal : false, errors: [], prod: false})
+  res.render('admin/products',  {admin:req.admin,showAddProductModal :false, products: getProducts, showEditProductModal : false, errors: [], prod: false})
 })
 //edit button
-router.get('/admin/products/edit/:id', async(req, res) => {
+router.get('/admin/products/edit/:id',adminVerifyToken, async(req, res) => {
   const product = await Product.findById(req.params.id)
    const getProducts = await Product.find();
   if(!product) return res.redirect('/admin/products');
-  res.render('admin/products',  {showAddProductModal :false, products: getProducts, showEditProductModal : true, errors: [], prod: product})
+  res.render('admin/products',  {admin: req.admin, showAddProductModal :false, products: getProducts, showEditProductModal : true, errors: [], prod: product})
 })
 
 
@@ -210,16 +208,12 @@ module.exports = router;
 //--------------------------------------
 //----------admin orders page -------------
 //---------------------------------------
-router.get('/admin/orders', async(req, res) => {
-  res.render('admin/orders')
-})
+router.get('/admin/orders',adminVerifyToken, showOrder)
 
 //--------------------------------------
 //----------admin customers page -------------
 //---------------------------------------
-router.get('/admin/customers', async(req, res) => {
-  res.render('admin/customers')
-})
+router.get('/admin/customers', adminVerifyToken, showCustomer)
 
 //--------------------------------------
 //----------admin analytics page -------------

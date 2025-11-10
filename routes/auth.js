@@ -1,9 +1,9 @@
 const express = require('express');
-const { registerUser, loginUser, forgotPassword, otpVerify, resetPassword, deleteAccount, forgotProfile, changePassword, updateProfile, addToCart, updateCart, removeCart, wishlistAdd, remeoveWishlist, addTowishlist, addAddress, editAddress, deleteAddress, setDefaultAddress, postCheckout } = require('../controller/userAuthController');
+const { registerUser, loginUser, forgotPassword, otpVerify, resetPassword, deleteAccount, forgotProfile, changePassword, updateProfile, addToCart, updateCart, removeCart, wishlistAdd, remeoveWishlist, addTowishlist, addAddress, editAddress, deleteAddress, setDefaultAddress, postCheckout, cancelOrder } = require('../controller/userAuthController');
 const { signupValidation, loginValidation, forgotValidation, resetPasswordValidation, updateProfileValidation, addressValidation, addressEditValidation } = require('../middleware/userValidator');
 const { verifyToken } = require('../middleware/authMiddleware');
 const createMulter = require('../middleware/profilePhotoUpload');
-const { loginAdmin, settings, addProduct, editProduct, deleteProduct } = require('../controller/adminAuthController');
+const { loginAdmin, settings, addProduct, editProduct, deleteProduct, updateOrderStatus, blockUser } = require('../controller/adminAuthController');
 const { adminLoginValidation, adminSettingValidation, adminProductValidation } = require('../middleware/adminValidator');
 const { adminVerifyToken } = require('../middleware/adminAuthMiddleware');
 const router = express.Router();
@@ -28,6 +28,7 @@ router.post('/addAddress', verifyToken, addressValidation, addAddress)//address 
 router.post('/editAddress', verifyToken,addressEditValidation, editAddress)//edit address
 router.post('/deleteAddress/:id', verifyToken, deleteAddress)//delete address
 router.post('/setDefaultAddress/:id', verifyToken, setDefaultAddress)//default address
+router.put('/cancel-order/:id', verifyToken, cancelOrder)
 
 // ----------------------------------------------
 //  --------CART SECTIONS------------------
@@ -74,5 +75,12 @@ router.post('/admin/products/add', adminVerifyToken, productUpload.single('image
 router.post('/admin/products/edit', adminVerifyToken, productUpload.single('image'), adminProductValidation, editProduct);
 //delete button
 router.post('/admin/products/delete/:id', adminVerifyToken, deleteProduct)
+
+// ----------------------------------------------
+//  --------ORDER SECTIONS------------------
+// ------------------------------------------------
+
+router.post('/admin/orders/:id/status', adminVerifyToken, updateOrderStatus)
+router.put('/admin/users/:id/block', adminVerifyToken, blockUser)
 
 module.exports = router 
