@@ -150,22 +150,12 @@
 						<p class="product-price"><span>Per Kg</span> ₹<%= product.price %></p>
 
 						<!-- Add to Cart Button -->
-						 <form  action="/wishlist?page=<%= currentPage %>%>" method="POST">
-							<input type="hidden" name="productId" value="<%= product._id %>">
-							<input type="hidden" name="page" value="<%= currentPage %>">
-							<% if(product.status == 'Out Of Stock') { %>
-							<button type="submit" class="cart-btn-customs" disabled>
+						 <form class="wishlist-cart-form" data-product-id="<%= product._id %>" style="position:relative;">
+							<button type="button" class="cart-btn-custom">
 								<i class="fas fa-shopping-cart"></i> Add to Cart
 							</button>
-							<p class="text-danger fw-bolder pb-0 mb-0 pt-2" style="font-weight: 900;">Out of stock</p>
-							<% } else { %>
-							<button type="submit" class="cart-btn-custom">
-								<i class="fas fa-shopping-cart"></i> Add to Cart
-							</button>
-							<p class="<%= product.status == 'Low Stock'? 'text-warning': 'text-success' %> fw-bolder pb-0 mb-0 pt-2" style="font-weight: 900;"><%- product.status == 'Low Stock'? `Only <span class="fw-bolder fs-5  mb-0">${product.stock}</span>Kg left`: product.status %></p>
-							
-							<% } %>
-						</form>
+						 </form>
+
 					</div>
 				</div>
 				<%  }) %>
@@ -256,6 +246,59 @@
     	}
 		})
 	  </script>
+
+	  <script>
+document.addEventListener("DOMContentLoaded", () => {
+  const wishlistCartForms = document.querySelectorAll(".wishlist-cart-form");
+
+  wishlistCartForms.forEach(form => {
+    const button = form.querySelector(".cart-btn-custom");
+    const productId = form.dataset.productId;
+
+    button.addEventListener("click", async () => {
+      try {
+        const response = await fetch("/wishlist/add-to-cart", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ productId })
+        });
+
+        const result = await response.json();
+
+        const oldMsg = form.querySelector(".wishlist-flash");
+        if (oldMsg) oldMsg.remove();
+
+        // create new flash message
+        const flash = document.createElement("div");
+        flash.className = `wishlist-flash text-center px-3 py-1 rounded shadow-sm ${
+          result.success ? "bg-success" : "bg-warning"
+        }`;
+        flash.style.position = "absolute";
+        flash.style.bottom = "-35px";
+        flash.style.left = "50%";
+        flash.style.transform = "translateX(-50%)";
+        flash.style.color = "white";
+        flash.style.fontWeight = "600";
+        flash.style.fontSize = "0.9rem";
+        flash.style.zIndex = "50";
+        flash.innerHTML = `
+          <i class="bi ${
+            result.success
+              ? "bi-check-circle-fill"
+              : "bi-exclamation-circle-fill"
+          } me-1"></i> ${result.message}
+        `;
+        form.appendChild(flash);
+
+        setTimeout(() => flash.remove(), 2000);
+      } catch (err) {
+        console.error("Wishlist Add-to-Cart AJAX Error:", err);
+      }
+    });
+  });
+});
+</script>
+
 
 </body>
 </html>

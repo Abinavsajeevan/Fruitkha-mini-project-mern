@@ -33,7 +33,7 @@ router.put('/cancel-order/:id', verifyToken, cancelOrder)
 // ----------------------------------------------
 //  --------CART SECTIONS------------------
 // ------------------------------------------------
-router.post('/shop', verifyToken, addToCart)//adding to cart
+router.post('/shop/add-to-cart', verifyToken, addToCart)//adding to cart
 router.post('/cart/update', verifyToken, updateCart)//update cart
 router.post('/cart/remove', verifyToken, removeCart)//removing cart
 
@@ -44,7 +44,7 @@ router.post('/cart/remove', verifyToken, removeCart)//removing cart
 // ------------------------------------------------
 router.post('/wishlist/add', verifyToken, wishlistAdd)//add wishlist to items
 router.post('/wishlist/remove', verifyToken, remeoveWishlist)
-router.post('/wishlist', verifyToken, addTowishlist)
+router.post('/wishlist/add-to-cart', verifyToken, addTowishlist)
 
 
 // ----------------------------------------------

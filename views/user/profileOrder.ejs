@@ -196,6 +196,48 @@
 </div>
 
 	<%- include('partials/footer') %>
+
+  <!-- Cancel Order Modal -->
+<div class="modal fade" id="cancelModal" tabindex="-1" aria-labelledby="cancelModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-2 border-warning">
+      <div class="modal-header">
+        <h5 class="modal-title text-warning fw-bold" id="cancelModalLabel">Cancel Order</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p class="fw-semibold mb-2">Please select a reason for cancellation:</p>
+        <form id="cancelReasonForm">
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="reason" value="Ordered by mistake" id="reason1" required>
+            <label class="form-check-label" for="reason1">Ordered by mistake</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="reason" value="Found cheaper elsewhere" id="reason2">
+            <label class="form-check-label" for="reason2">Found cheaper elsewhere</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="reason" value="Delivery taking too long" id="reason3">
+            <label class="form-check-label" for="reason3">Delivery taking too long</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="reason" value="Changed my mind" id="reason4">
+            <label class="form-check-label" for="reason4">Changed my mind</label>
+          </div>
+          <div class="form-check mb-2">
+            <input class="form-check-input" type="radio" name="reason" value="Other" id="reason5">
+            <label class="form-check-label" for="reason5">Other</label>
+          </div>
+          <textarea class="form-control" id="otherReason" rows="2" placeholder="Please specify..." disabled></textarea>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-cancel" id="confirmCancelBtn">Confirm Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
 	
 	<!-- jquery -->
 	<script src="user/assets/js/jquery-1.11.3.min.js"></script>
@@ -222,38 +264,69 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-
 <script>
-  document.querySelectorAll('.cancel-order-btn').forEach(btn => {
-    btn.addEventListener('click', async() => {
-      const orderId = btn.getAttribute('data-id');
+  let selectedOrderId = null;
+  const cancelModal = new bootstrap.Modal(document.getElementById('cancelModal'));
+  const confirmCancelBtn = document.getElementById('confirmCancelBtn');
+  const otherReasonField = document.getElementById('otherReason');
 
-      if(!confirm('Are you sure you want to cancel this order?')) return;
-
-      try {
-        const res = await fetch(`/cancel-order/${orderId}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({status: 'cancelled'})
-        });
-
-        const data = await res.json();
-
-        if(res.ok) {
-          alert('Order cancelled successfully');
-          location.reload();//update status in ui
-        }else {
-          alert(data.message || 'failed to cancel order')
-        }
-      }catch (err) {
-        console.log(err);
-        alert('something went wrong')
+  // Enable textarea when "Other" is selected
+  document.querySelectorAll('input[name="reason"]').forEach(radio => {
+    radio.addEventListener('change', () => {
+      if (radio.value === 'Other') {
+        otherReasonField.disabled = false;
+        otherReasonField.focus();
+      } else {
+        otherReasonField.disabled = true;
+        otherReasonField.value = '';
       }
-    })
-  })
+    });
+  });
+
+  // Open modal when clicking cancel button
+  document.querySelectorAll('.cancel-order-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      selectedOrderId = btn.getAttribute('data-id');
+      cancelModal.show();
+    });
+  });
+
+  // Confirm cancellation
+  confirmCancelBtn.addEventListener('click', async () => {
+    const reasonInput = document.querySelector('input[name="reason"]:checked');
+    if (!reasonInput) {
+      alert('Please select a reason for cancellation.');
+      return;
+    }
+
+    const reason = reasonInput.value === 'Other' ? otherReasonField.value.trim() : reasonInput.value;
+    if (reasonInput.value === 'Other' && !reason) {
+      alert('Please specify your reason.');
+      return;
+    }
+
+    try {
+      const res = await fetch(`/cancel-order/${selectedOrderId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'cancelled', reason })
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        alert('Order cancelled successfully');
+        cancelModal.hide();
+        location.reload();
+      } else {
+        alert(data.message || 'Failed to cancel order');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Something went wrong');
+    }
+  });
 </script>
+
 
 </body>
 </html>

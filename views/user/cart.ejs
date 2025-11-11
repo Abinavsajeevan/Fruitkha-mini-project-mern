@@ -120,6 +120,9 @@
 									<td class="product-name"><%= item.product.name %></td>
 									<td class="product-price">₹<%= item.product.price %></td>
 									<td class="product-quantity">
+										<% if(msg && (prodId == item.product._id)) { %>
+											<p class="text-danger"><%= msg  %></p>
+											<% } %>
 										<form action="/cart/update" method="POST">
 											<input type="hidden" name="productId" value="<%= item.product._id %>">
 											<input  class="input-quantity" type="number" name="quantity" min="1" max="<%=item.product.stock %>" onchange="this.form.submit()"  value="<%= item.quantity %>">

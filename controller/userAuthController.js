@@ -536,9 +536,12 @@ const getProfileOrder = async (req, res) => {
 const cancelOrder = async (req, res) => {
   try {
     const orderId = req.params.id;
+    const {status, reason} = req.body;
 
     const updatedOrder = await Order.findByIdAndUpdate(orderId, 
-      {orderStatus: 'cancelled'},
+      {orderStatus: status,
+        deliveredAt: reason
+      },
       {new: true}
     );
     if(!updatedOrder) return res.status(404).json({message: 'Order not found'});
@@ -567,18 +570,12 @@ const getShop = async (req, res) => {
 //add to cart METHOD = POST
 const addToCart = async (req, res) => {
   try {
+    console.log('hwoo')
     const userId = req.user._id;
     const { productId } = req.body;
 
-    const { page, filter, sortOption, category, availability, sort, min_max, offer } = await shopFilter(req.query)
-
-    // ---------- Pagination ----------
-    const { getProducts, totalPages } = await paginationShop(page, filter, sortOption);
-
-    
     const product = await Product.findById(productId);
-    if (!product) return res.redirect('/shop');
-
+    if (!product) return res.status(404).json({ success: false, message:'Product not found' });
 
     let cart = await Cart.findOne({ user: userId });
     if (!cart) {
@@ -594,19 +591,7 @@ const addToCart = async (req, res) => {
 
     const existingProduct = cart.products.find(item => item.product.equals(productId));
     if (existingProduct) {
-      return res.render('user/shop', {
-        user: req.user,
-        products: getProducts,
-        currentPage: page,
-        totalPages,
-        category,
-        availability,
-        sort,
-        min_max,
-        offer,
-        msg: 'Product already added to cart ⚠️',
-        path: 'error'
-      });
+      return res.json({success: false, message: 'Product already added to cart ⚠️'})
     } else {
       cart.products.push({
         product: productId,
@@ -622,23 +607,11 @@ const addToCart = async (req, res) => {
     await cart.save();
 
     // ---------- Render Shop Page ----------
-    return res.render('user/shop', {
-      user: req.user,
-      products: getProducts,
-      currentPage: page,
-      totalPages,
-      category,
-      availability,
-      sort,
-      min_max,
-      offer,
-      msg: 'Product added to cart ✅',
-      path: 'success'
-    });
+    return res.json({ success: true, message: "Product added to cart ✅" });
 
   } catch (err) {
     console.log('Error occurred in adding to cart:', err);
-    res.redirect('/shop');
+        res.status(500).json({ success: false, message: "Internal server error" });
   }
 }
 
@@ -647,8 +620,10 @@ const addToCart = async (req, res) => {
 const getCart = async (req, res) => {
     try {
         const userId = req.user._id;
+        const msg = req.query.msg || '';
+        const prodId = req.query.id || '';
         const cart = await Cart.findOne({user: userId}).populate('products.product');
-        return res.render('user/cart', { cart, user: req.user });
+        return res.render('user/cart', { cart, user: req.user,msg,prodId });
         
     } catch (err) {
         console.log('error occured in getting cart', err)
@@ -661,9 +636,9 @@ const updateCart = async (req, res) => {
         const userId = req.user._id;
         const { productId, quantity } = req.body;
         const cart = await Cart.findOne({ user: userId }).populate('products.product');
-        
-        // if(cart.products.product.stock < quantity) return res.redirect('/cart')
+
         const productItem = cart.products.find(item => item.product._id.equals(productId));//take the exact of product item
+        if(quantity > productItem.product.stock) return res.redirect('/cart?msg=' + encodeURIComponent('Product limit exceeded')+'&id='+productItem.product._id)
         productItem.quantity = parseInt(quantity);
         productItem.totalPrice = productItem.quantity * productItem.price;
         //calculating sub total
@@ -705,12 +680,10 @@ const wishlistAdd = async (req, res) => {
         const userId = req.user._id;
         const { productId } = req.body;
         //its already do 
-        
-         const { page, filter, sortOption, category, availability, sort, min_max, offer } = await shopFilter(req.query);
-          const { getProducts, totalPages } = await paginationShop(page, filter, sortOption);
 
         const product = await Product.findById(productId);
-        if(!product) return res.redirect('/shop');
+         if (!product) return res.json({ success: false, message: "Product not found" });
+
         //wishlist check and no created
         let wishlist = await Wishlist.findOne({user: userId});
         if(!wishlist) wishlist = new Wishlist({
@@ -718,41 +691,17 @@ const wishlistAdd = async (req, res) => {
             products: []
         })
         const existProduct = wishlist.products.some(product => product.toString() === productId.toString()) //it checks only true or false not entire elements
-        if(existProduct) return res.render('user/shop', {
-      user: req.user,
-      products: getProducts,
-      currentPage: page,
-      totalPages,
-      category,
-      availability,
-      sort,
-      min_max,
-      offer,
-      msg: 'Product already in wishlist 🧡',
-      path: 'error',
-           }) 
+         if (existProduct) return res.json({ success: false, message: "Already in wishlist 🧡" });
 
             wishlist.products.push(productId);
             await wishlist.save();
 
 
-          return res.render('user/shop', {
-      user: req.user,
-      products: getProducts,
-      currentPage: page,
-      totalPages,
-      category,
-      availability,
-      sort,
-      min_max,
-      offer,
-      msg: 'Added to wishlist 🧡',
-      path: 'success',
-           })
-
+          return res.json({ success: true, message: "Added to wishlist 🧡" });
 
     }catch(err) {
-        console.log('error occured in wishlist adding ', err)
+        console.log('error occured in wishlist adding ', err);
+         return res.json({ success: false, message: "Error adding to wishlist" });
     }
 }
 
@@ -824,20 +773,8 @@ const addTowishlist = async (req, res) => {
     const userId = req.user._id;
     const { productId } = req.body;
 
-    const wishlist = await Wishlist.findOne({user: userId}).populate('products')
-    if(!wishlist) return res.render('user/wishlist', {user: req.user, wishlist:null, products: [], currentPage: null, totalPages: null, msg: null, path: null})
-    // ---------- Pagination ----------
-        const page = parseInt(req.query.page) || 1
-        const totalProduct = wishlist.products.length
-        const limit = 6;
-         if(page > 1 && totalProduct > 0 && totalProduct == 6 * (page-1)) page--;//if above page product no product it will decreased       
-
-        const skip = ( page - 1) * limit;
-        const productPage = wishlist.products.slice(skip, skip + limit)
-        const totalPages = Math.ceil(totalProduct/limit);
-
     const product = await Product.findById(productId);
-    if (!product) return res.redirect('/wishlist');
+    if (!product) return res.json({ success: false, message: "Product not found" });
 
 
     let cart = await Cart.findOne({ user: userId });
@@ -854,14 +791,9 @@ const addTowishlist = async (req, res) => {
 
     const existingProduct = cart.products.find(item => item.product.equals(productId));
     if (existingProduct) {
-      return res.render('user/wishlist', {     
-        user: req.user,
-        wishlist,
-        products: productPage,
-        currentPage: page,
-        totalPages,
-        msg: 'Product already added to cart ⚠️',
-        path: 'error'
+      return res.json({
+        success: false,
+        message: "Already in cart⚠️"
       });
     } else {
       cart.products.push({
@@ -882,19 +814,13 @@ const addTowishlist = async (req, res) => {
     // -----/if i want to delete a product from wishlist when added to cart ( but there is so many criteria are there)
 
     // ---------- Render Shop Page ----------
-    return res.render('user/wishlist', {
-      user: req.user,
-      wishlist,
-      products: productPage,
-      currentPage: page,
-      totalPages,
-      msg: 'Product added to cart ✅',
-      path: 'success'
+    return res.json({
+      success: true,
+      message: "Added to cart✅"
     });
-
   } catch (err) {
     console.log('Error occurred in adding to cart:', err);
-    res.redirect('/wishlist');
+    res.json({ success: false, message: "Server error" });
   }
 }
 

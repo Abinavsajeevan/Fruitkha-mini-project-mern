@@ -188,18 +188,6 @@
 	<!-- end breadcrumb section -->
 
 	<!-- headers -->
-	<!-- Flash Message -->
-<% if (msg && path) { %>
-  <div id="flash-message" class="text-center shadow-sm p-3 rounded 
-       <%= path === 'success' ? 'alert alert-success' : 'alert alert-warning' %> mt-3">
-    <% if (path === 'success') { %>
-      <i class="bi bi-check-circle-fill me-2"></i>
-    <% } else { %>
-      <i class="bi bi-exclamation-circle-fill me-2"></i>
-    <% } %>
-	<%= msg %>
-	</div>
-<% } %>
 	<!-- products -->
 	 <% if(products && products.length > 0  ||( category  || availability || sort || min_max)) { %>
 	<div class="product-section mt-100 mb-150">
@@ -291,16 +279,12 @@
 				<div class="col-lg-4 col-md-6 text-center strawberry">
 					<div class="single-product-item">
 						<!-- Wishlist Button -->
-						<form
-						action="/wishlist/add?page=<%= currentPage %>&category=<%= category %>&availability=<%= availability %>&sort=<%= sort %>&min_max=<%= min_max %>&offer=<%= offer %>"
-						method="POST"
-						style="display:inline;"
-						>
-						<input type="hidden" name="productId" value="<%= product._id %>">
-						<button type="submit" class="wishlist-btn" style="background:none; border:none;">
+						<form class="wishlist-form" data-product-id="<%= product._id %>">
+						<button type="button" class="wishlist-btn" style="background:none; border:none;">
 							<i class="fas fa-heart"></i>
 						</button>
 						</form>
+
 
 						<!-- Product Image -->
 						<div class="product-image">
@@ -327,22 +311,11 @@
 
 						<!-- Add to Cart Button -->
 						<!-- <a href="/cart" class="cart-btn"><i class="fas fa-shopping-cart"></i> Add to Cart</a> -->
-						 <form  action="/shop?page=<%= currentPage %>&category=<%= category %>&availability=<%= availability %>&sort=<%= sort %>&min_max=<%= min_max %>&offer=<%= offer %>" method="POST">
-							<input type="hidden" name="productId" value="<%= product._id %>">
-							<input type="hidden" name="page" value="<%= currentPage %>">
-							<% if(product.status == 'Out Of Stock') { %>
-							<button type="submit" class="cart-btn-customs" disabled>
-								<i class="fas fa-shopping-cart"></i> Add to Cart
-							</button>
-							<p class="text-danger fw-bolder pb-0 mb-0 pt-2" style="font-weight: 900;">Out of stock</p>
-							<% } else { %>
-							<button type="submit" class="cart-btn-custom">
-								<i class="fas fa-shopping-cart"></i> Add to Cart
-							</button>
-							<p class="<%= product.status == 'Low Stock'? 'text-warning': 'text-success' %> fw-bolder pb-0 mb-0 pt-2" style="font-weight: 900;"><%- product.status == 'Low Stock'? `Only <span class="fw-bolder fs-5  mb-0">${product.stock}</span>Kg left`: product.status %></p>
-							
-							<% } %>
-						</form>
+					<form class="add-to-cart-form" data-product-id="<%= product._id %>">
+					<button type="button" class="cart-btn-custom add-to-cart-btn">
+						<i class="fas fa-shopping-cart"></i> Add to Cart
+					</button>
+					</form>
 
 					</div>
 				</div>
@@ -423,21 +396,7 @@
 	<script src="/user/assets/js/sticker.js"></script>
 	<!-- main js -->
 	<script src="/user/assets/js/main.js"></script>
-	<script>
-			//  const flashMsg = document.getElementById('flash-message'); 
 
-		window.addEventListener('DOMContentLoaded', () => {
-			 const flashMsg = document.getElementById('flash-message'); 
-			//  const scrollPlace = document.getElementById('scrollPlace'); 
-			 if(flashMsg) { // Scroll to the message smoothly 
-			 flashMsg.scrollIntoView({ behavior: 'smooth', block: 'center' });
-			
-				setTimeout(() => {
-				flashMsg.style.display = 'none';
-			}, 3000);
-    	}
-		})
-	  </script>
 	  <script>
   document.addEventListener("DOMContentLoaded", () => {
     const toggleBtn = document.querySelector(".filter-toggle");
@@ -451,7 +410,122 @@
   });
 </script>
 
+<script>
+	//it ensure all html page is fully loaded after that other funcion will work 
+	document.addEventListener("DOMContentLoaded", () => {
+		const forms = document.querySelectorAll(".add-to-cart-form");
 
+		forms.forEach(form => {
+			const btn = form.querySelector(".add-to-cart-btn");
+
+			btn.addEventListener("click", async() => {
+				const productId = form.dataset.productId;
+
+				try {
+					const response = await fetch("/shop/add-to-cart", {
+						method: "POST",
+						headers: {
+							"Content-Type": "application/json"
+						},
+						body: JSON.stringify({ productId })
+					})
+
+					const result = await response.json();
+
+					const oldMsg = document.querySelector(".flash-message");
+					if(oldMsg) oldMsg.remove();
+
+					form.style.position = 'relative'
+
+					const flash = document.createElement("div");
+					flash.className = `flash-overlay text-center shadow-sm px-3 py-2 rounded ${
+					result.success ? "bg-success" : "bg-warning"
+					}`;
+					flash.style.position = "absolute";
+					flash.style.top = `${btn.offsetTop + btn.offsetHeight + 5}px`;
+					flash.style.left = "50%";
+					flash.style.transform = "translateX(-50%)";
+					flash.style.color = "white";
+					flash.style.fontWeight = "600";
+					flash.style.zIndex = "10";
+					flash.style.whiteSpace = "nowrap";
+					flash.style.opacity = "0.95";
+					flash.innerHTML = `
+					<i class="bi ${
+						result.success ? "bi-check-circle-fill" : "bi-exclamation-circle-fill"
+					} me-1"></i>
+					${result.message}
+					`;
+
+					form.appendChild(flash);
+										
+					setTimeout(() => {
+						
+						flash.remove()
+					}, 2000);
+       
+				}catch(err) {
+					console.error("Error:", err)
+				}
+			});
+		});
+	});
+</script>
+
+<script>
+	document.addEventListener("DOMContentLoaded", () => {
+		const wishlistForms = document.querySelectorAll(".wishlist-form");
+
+		wishlistForms.forEach(form => {
+			const btn = form.querySelector(".wishlist-btn");
+			const productId = form.dataset.productId;
+
+			btn.addEventListener('click', async() => {
+				try {
+					const response = await fetch("/wishlist/add", {
+						method: "POST",
+						headers: { "Content-Type": "application/json"},
+						body: JSON.stringify({productId})
+					});
+
+					const result = await response.json();
+
+					const oldMsg = document.querySelector(".wishlist-flash");
+					if(oldMsg) oldMsg.remove();
+
+					const flash = document.createElement("div");
+					flash.className = `wishlist-flash text-center shadow-sm px-3 py-2 rounded ${
+					result.success ? "bg-success" : "bg-warning"
+					}`;
+					flash.style.position = "absolute";
+					flash.style.top = `${btn.offsetTop + btn.offsetHeight + 5}px`;
+					flash.style.left = "50%";
+					flash.style.transform = "translateX(-50%)";
+					flash.style.color = "white";
+					flash.style.fontWeight = "600";
+					flash.style.zIndex = "10";
+					flash.style.whiteSpace = "nowrap";
+					flash.style.opacity = "0.95";
+					flash.innerHTML = `
+					<i class="bi ${
+						result.success
+						? "bi-check-circle-fill"
+						: "bi-exclamation-circle-fill"
+					} me-1"></i>
+					${result.message}
+					`;
+
+					form.style.position = 'relative';
+					form.appendChild(flash);
+
+					 setTimeout(() => flash.remove(), 2000);
+				}catch(err) {
+					console.error("Wishlist error:", err);
+				}
+			});
+		});
+	});
+</script>
 
 </body>
 </html>
