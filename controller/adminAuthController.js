@@ -223,9 +223,10 @@ const blockUser = async (req, res) => {
 
 //Index or Dashboard
 //------------------
-const getDashboard = async(req, res) => {
+//line chart 
+const getLineChart = async(req, res) => {
     try {
-       const range = req.query.range || 'week';
+       const range = req.query.range || 'month';
        const startDate = getRangeStart(range);
 
        const pipeline = [
@@ -274,6 +275,34 @@ const getDashboard = async(req, res) => {
     }
 }
 
+//pie chart
+const getPieChart = async (req, res) => {
+    try {
+        const range = req.query.range || 'month';
+        const startDate = getRangeStart(range);
+
+        const orders = await Order.find({
+             orderStatus: { $ne: 'cancelled' },
+             createdAt: { $gte: startDate }
+            }).populate('items.productId', 'category')//it only take category from products
+        
+        const categoryTotals = {};
+
+        orders.forEach(order => {
+            order.items.forEach(item => {
+                const category = item.productId.category;
+                if(categoryTotals[category]) {
+                    
+                }
+            })
+        })
+
+    }catch (err) {
+        console.log('error occured in piechart', err);
+    }
+}
+
+
 
 module.exports = {
     loginAdmin,
@@ -286,5 +315,6 @@ module.exports = {
     updateOrderStatus,
     showCustomer,
     blockUser,
-    getDashboard
+    getLineChart,
+    getPieChart
 }
