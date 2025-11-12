@@ -168,7 +168,10 @@ router.get('/admin/login', (req, res) => {
 })
 
 //admin dash or index page
-router.get('/admin', adminVerifyToken, getDashboard)
+router.get('/admin', adminVerifyToken, async(req, res) => {
+  return res.render('admin/index', {admin: req.admin})
+})
+router.get('/admin/revenue-data', adminVerifyToken, getDashboard)
 
 //--------------------------------------
 //----------admin setting page -------------

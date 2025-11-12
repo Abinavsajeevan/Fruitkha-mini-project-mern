@@ -181,26 +181,27 @@ canvas {
         <h3 class="fw-bold">Dashboard Overview</h3>
         <div class="d-flex gap-2">
           <select id="timeFilter" class="form-select">
-            <option value="weekly">Weekly</option>
-            <option value="monthly" selected>Monthly</option>
-            <option value="yearly">Yearly</option>
+            <option value="week">Weekly</option>
+            <option value="month" selected>Monthly</option>
+            <option value="year">Yearly</option>
           </select>
+
           <button id="downloadPDF" class="btn text-white" style="background-color:#F28123;">Download PDF</button>
         </div>
       </div>
 
       <!-- Revenue Growth Charts -->
-    <div class="container mt-4">
-  <div class="d-flex justify-content-between align-items-center">
-    <h5>Sales Overview</h5>
-    <select id="rangeSelect" class="form-select w-auto">
-      <option value="week">This Week</option>
-      <option value="month">This Month</option>
-      <option value="year">This Year</option>
-    </select>
-  </div>
-  <canvas id="salesChart" height="120"></canvas>
-</div>
+      <div class="row g-4">
+
+        <div class="col-md-6">
+          <div class="card shadow-sm">
+            <div class="card-header bg-dark text-white">Revenue Growth (Line Chart)</div>
+              <div class="card-body">
+                <canvas id="lineChart"></canvas>
+            </div>
+          </div>
+        </div>
+
 
         <div class="col-md-6">
           <div class="card shadow-sm">
@@ -211,174 +212,20 @@ canvas {
           </div>
         </div>
 
-        <div class="col-12">
+        <!-- <div class="col-12">
           <div class="card shadow-sm">
             <div class="card-header bg-dark text-white">Weekly/Monthly/Yearly Revenue (Bar Chart)</div>
             <div class="card-body">
               <canvas id="barChart"></canvas>
             </div>
           </div>
-        </div>
+        </div> -->
       </div>
     </main>
   </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
-<script>
-  // --- helper & state ---
-  const timeFilter = document.getElementById('timeFilter');
-  const downloadBtn = document.getElementById('downloadPDF');
-
-  let lineChart = null;
-  let barChart = null;
-  let pieChart = null;
-
-  // Map UI select value -> backend range param
-  const rangeMap = {
-    'weekly': 'week',
-    'monthly': 'month',
-    'yearly': 'year'
-  };
-
-  // Fallback sample data if backend fails (so charts still render)
-  const FALLBACK = {
-    weekly: { labels: ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"], data: [500,800,700,900,600,1100,950] },
-    monthly: { labels: ["Day 1","Day 2","Day 3","Day 4","Day 5","Day 6"], data: [4000,5200,4900,6100,7200,6700] },
-    yearly: { labels: ["2021","2022","2023","2024","2025"], data: [54000,58000,60000,75000,89000] }
-  };
-
-  // Fetch sales data from backend
-  async function fetchSales(rangeKey) {
-    const range = rangeMap[rangeKey] || 'week';
-    try {
-      const res = await fetch(`/admin?range=${range}`, { credentials: 'same-origin' });
-      if (!res.ok) throw new Error('fetch failed ' + res.status);
-      const json = await res.json();
-      // Expecting { labels: [...], data: [...] }
-      if (!json || !Array.isArray(json.labels) || !Array.isArray(json.data)) {
-        throw new Error('unexpected payload');
-      }
-      return json;
-    } catch (err) {
-      console.warn('fetchSales failed, using fallback:', err);
-      return FALLBACK[rangeKey] || FALLBACK.monthly;
-    }
-  }
-
-  // Create or update charts with given labels/data
-  function updateCharts(labels, data) {
-    const ctxLine = document.getElementById("lineChart").getContext("2d");
-    const ctxBar = document.getElementById("barChart").getContext("2d");
-    const ctxPie = document.getElementById("pieChart").getContext("2d");
-
-    // Destroy existing to avoid duplicates
-    if (lineChart) lineChart.destroy();
-    if (barChart) barChart.destroy();
-    if (pieChart) pieChart.destroy();
-
-    // Line Chart (Revenue)
-    lineChart = new Chart(ctxLine, {
-      type: "line",
-      data: {
-        labels,
-        datasets: [{
-          label: "Revenue (₹)",
-          data,
-          borderColor: "#F28123",
-          backgroundColor: "rgba(242,129,35,0.15)",
-          fill: true,
-          tension: 0.3,
-          pointRadius: 3,
-          pointHoverRadius: 6
-        }]
-      },
-      options: {
-        responsive: true,
-        interaction: { mode: 'index', intersect: false },
-        scales: {
-          y: {
-            beginAtZero: true,
-            ticks: { callback: v => '₹' + v }
-          }
-        },
-        plugins: {
-          tooltip: {
-            callbacks: {
-              label: ctx => `₹ ${ctx.parsed.y ?? ctx.parsed}`
-            }
-          }
-        }
-      }
-    });
-
-    // Bar Chart (same data)
-    barChart = new Chart(ctxBar, {
-      type: "bar",
-      data: {
-        labels,
-        datasets: [{
-          label: "Revenue (₹)",
-          data,
-          backgroundColor: "#F28893"
-        }]
-      },
-      options: { responsive: true, scales: { y: { beginAtZero: true } } }
-    });
-
-    // Pie Chart (static categories for now)
-    pieChart = new Chart(ctxPie, {
-      type: "pie",
-      data: {
-        labels: ["Apples", "Bananas", "Mangoes", "Oranges", "Grapes"],
-        datasets: [{
-          data: [25, 20, 15, 30, 10],
-          // Chart.js will pick default colors; explicit colors are optional
-        }]
-      },
-      options: { responsive: true }
-    });
-  }
-
-  // Load & render for the selected period
-  async function loadAndRender(periodKey) {
-    // show temporary "loading" state on button
-    downloadBtn.disabled = true;
-    downloadBtn.textContent = 'Loading...';
-
-    const payload = await fetchSales(periodKey);
-    updateCharts(payload.labels, payload.data);
-
-    // restore download button
-    downloadBtn.disabled = false;
-    downloadBtn.textContent = 'Download PDF';
-  }
-
-  // init
-  (function init() {
-    // initial render using the select default
-    loadAndRender(timeFilter.value || 'monthly');
-
-    // change listener
-    timeFilter.addEventListener('change', (e) => loadAndRender(e.target.value));
-  })();
-
-  // PDF download uses existing html2canvas + jsPDF code; keep it
-  document.getElementById("downloadPDF").addEventListener("click", async () => {
-    const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF("p", "mm", "a4");
-    const dashboard = document.querySelector("main");
-    const canvas = await html2canvas(dashboard, { scale: 1.5 });
-    const imgData = canvas.toDataURL("image/png");
-    const imgWidth = 190;
-    const imgHeight = (canvas.height * imgWidth) / canvas.width;
-    pdf.addImage(imgData, "PNG", 10, 10, imgWidth, imgHeight);
-    pdf.save(`Revenue_Report_${timeFilter.value}.pdf`);
-  });
-</script>
-
-
   <script>
   const toggleBtn = document.getElementById('menu-toggle');
   const sidebar = document.getElementById('sidebar');
@@ -388,48 +235,64 @@ canvas {
     toggleBtn.classList.toggle('active');
   });
 </script>
+
 <script>
-async function loadChart(range = 'week') {
-  const res = await fetch(`/admin?range=${range}`);
-  const { labels, data } = await res.json();
+document.addEventListener("DOMContentLoaded", () => {
+  const ctx = document.getElementById("lineChart").getContext("2d");
+  const timeFilter = document.getElementById("timeFilter");
 
-  if (window.salesChart) window.salesChart.destroy(); // destroy old instance
+  let chart;
 
-  const ctx = document.getElementById('salesChart').getContext('2d');
-  window.salesChart = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels,
-      datasets: [{
-        label: 'Total Sales (₹)',
-        data,
-        borderColor: 'rgba(75,192,192,1)',
-        backgroundColor: 'rgba(75,192,192,0.2)',
-        tension: 0.3,
-        fill: true,
-        borderWidth: 2,
-        pointRadius: 4
-      }]
-    },
-    options: {
-      responsive: true,
-      scales: {
-        y: {
-          beginAtZero: true,
-          ticks: {
-            callback: value => '₹' + value
+  async function fetchRevenueData(range = "month") {
+    const res = await fetch(`/admin/revenue-data?range=${range}`);
+    const data = await res.json();
+    return data;
+  }
+
+  async function renderChart(range = "month") {
+    const { labels, revenues } = await fetchRevenueData(range);
+
+    if (chart) chart.destroy(); // reset previous chart
+
+    chart = new Chart(ctx, {
+      type: "line",
+      data: {
+        labels: labels,
+        datasets: [{
+          label: "Total Revenue",
+          data: revenues,
+          borderColor: "#051922",
+          backgroundColor: "rgba(242,129,35,0.3)",
+          tension: 0.4,
+          fill: true,
+          pointBackgroundColor: "#F28123",
+          pointRadius: 5
+        }]
+      },
+      options: {
+        responsive: true,
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              callback: value => "₹" + value
+            }
           }
         }
       }
-    }
+    });
+  }
+
+  // Initial render
+  renderChart("month");
+
+  // Filter change
+  timeFilter.addEventListener("change", (e) => {
+    renderChart(e.target.value);
   });
-}
-
-document.getElementById('rangeSelect').addEventListener('change', e => {
-  loadChart(e.target.value);
 });
-
-loadChart(); // initial load
 </script>
+
+
 </body>
 </html>
