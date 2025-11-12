@@ -5,7 +5,7 @@ const {verifyToken, verifyTokenIndex} = require('../middleware/authMiddleware');
 const { googleLogin, resendOtp, logout, deleteAccount, getShop, getCart, getWishlist, getCheckout, addressProfile, orderCOD, getProfileOrder } = require('../controller/userAuthController');
 const { adminVerifyToken } = require('../middleware/adminAuthMiddleware');
 const Admin = require('../models/Admin');
-const { logoutAdmin, showOrder, showCustomer } = require('../controller/adminAuthController');
+const { logoutAdmin, showOrder, showCustomer, getDashboard } = require('../controller/adminAuthController');
 const Product = require('../models/Product');
 //=================================================
 
@@ -168,11 +168,7 @@ router.get('/admin/login', (req, res) => {
 })
 
 //admin dash or index page
-router.get('/admin', adminVerifyToken, (req, res) => {
-    console.log('dash ', req.session.email)
-    
-    res.render('admin/index',{admin: req.admin} )
-})
+router.get('/admin', adminVerifyToken, getDashboard)
 
 //--------------------------------------
 //----------admin setting page -------------

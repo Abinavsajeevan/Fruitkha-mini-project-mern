@@ -7,6 +7,7 @@ const Order = require("../models/Order");
 const getPaginatedOrders = require("../utils/paginationAdminOrder");
 const getPaginatedCustomers = require("../utils/paginationCustomers");
 const User = require("../models/User");
+const getRangeStart = require("../utils/admindashboardline");
 
 const loginAdmin = async(req, res) => {
     try {
@@ -219,6 +220,134 @@ const blockUser = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
+
+//Index or Dashboard
+//------------------
+const getDashboard = async(req, res) => {
+    try {
+        const range = req.query.range === 'year' ? 'year' : (req.query.range === 'month' ? 'month' : 'week');
+        const startDate = getRangeStart(range);
+
+        const pipeline = [
+            { $match: { orderStatus: { $ne: 'cancelled' }}},
+            {
+                $project: {
+                    totalAmount: 1,
+                    dateFromDelivered: {
+                        $dateFromString: {
+                            dateString: `$deliveredAt`,
+                            format: "%B %d, %Y",
+                            onError: null,
+                            onNull: null
+                        }
+                    },
+                    createdAt: 1
+                }
+            },
+
+            {
+                $addFields: {
+                    finalDate: {
+                        $ifNull: [`$dateFromDelivered`, `$createdAt`]
+                    }
+                }
+            },
+
+            {
+                $match: {
+                    finalDate: {$gte: startDate }
+                }
+            }
+        ];
+
+        if(range === 'week' || range === 'month') {
+            pipeline.push({
+                $group: {
+                    _id: {
+                        $dateToString: { format: "%Y-%m-%d", date: "$finalDate"}
+                    },
+                    total: {$sum: "$totalAmount"}
+                }
+            });
+
+            pipeline.push({$sort: {"_id": 1}});
+            const agg = await Order.aggregate(pipeline).exec();
+
+            const labels = [];
+            const dataMap = {};
+            agg.forEach(row => dataMap[row._id] = row.total);
+
+            const now = new Date();
+            let days = (range === 'week') ? 7 : 30;
+
+         for (let i = 0; i < days; i++) {
+        const d = new Date(startDate);
+        d.setDate(startDate.getDate() + i);
+        const key = d.toISOString().slice(0,10); // YYYY-MM-DD
+        // pretty label: for week show "Nov 10" etc, for month also
+        const pretty = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        labels.push(pretty);
+        dataMap[key] = dataMap[key] || 0;
+      }
+
+      // produce data array in the same order
+      const data = [];
+      for (let i = 0; i < labels.length; i++) {
+        const d = new Date(startDate);
+        d.setDate(startDate.getDate() + i);
+        const key = d.toISOString().slice(0,10);
+        data.push(dataMap[key] || 0);
+      }
+
+      return res.json({ labels, data });
+    }
+
+    // range === 'year' -> group by month (YYYY-MM)
+    pipeline.push({
+      $group: {
+        _id: {
+          year: { $year: "$finalDate" },
+          month: { $month: "$finalDate" }
+        },
+        total: { $sum: "$totalAmount" }
+      }
+    });
+
+    pipeline.push({ $sort: { "_id.year": 1, "_id.month": 1 } });
+
+    const aggYear = await Order.aggregate(pipeline).exec();
+    // Build labels for last 12 months (from startDate to now)
+    const labels = [];
+    const dataMap = {}; // "YYYY-MM" -> total
+    aggYear.forEach(r => {
+      const m = String(r._id.month).padStart(2, '0');
+      const key = `${r._id.year}-${m}`;
+      dataMap[key] = r.total;
+    });
+
+    const start = new Date(startDate.getFullYear(), startDate.getMonth(), 1);
+    for (let i = 0; i < 12; i++) {
+      const d = new Date(start.getFullYear(), start.getMonth() + i, 1);
+      const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+      labels.push(d.toLocaleString('en-US', { month: 'short', year: 'numeric' })); // "Nov 2025"
+      dataMap[key] = dataMap[key] || 0;
+    }
+
+    const data = [];
+    for (let i = 0; i < 12; i++) {
+      const d = new Date(start.getFullYear(), start.getMonth() + i, 1);
+      const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+      data.push(dataMap[key] || 0);
+    }
+
+    return res.json({ labels, data });
+
+    }catch (err) {
+        console.log('error occured in index page of admin panel', err)
+    }
+}
+
+
 module.exports = {
     loginAdmin,
     settings,
@@ -229,5 +358,6 @@ module.exports = {
     showOrder,
     updateOrderStatus,
     showCustomer,
-    blockUser
+    blockUser,
+    getDashboard
 }
