@@ -212,14 +212,14 @@ canvas {
           </div>
         </div>
 
-        <!-- <div class="col-12">
+        <div class="col-12">
           <div class="card shadow-sm">
-            <div class="card-header bg-dark text-white">Weekly/Monthly/Yearly Revenue (Bar Chart)</div>
+            <div class="card-header bg-dark text-white"> Revenue (Bar Chart)</div>
             <div class="card-body">
               <canvas id="barChart"></canvas>
             </div>
           </div>
-        </div> -->
+        </div> 
       </div>
     </main>
   </div>
@@ -291,6 +291,70 @@ document.addEventListener("DOMContentLoaded", () => {
     renderChart(e.target.value);
   });
 });
+</script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const pieCtx = document.getElementById("pieChart").getContext("2d");
+      const timeFilter = document.getElementById("timeFilter");
+
+    let pieChart;
+
+    async function fetchPieData(range = 'month') {
+      const res = await fetch(`/admin/pie-data?range=${range}`);
+      const data = await res.json();
+      return data;
+    }
+
+    async function renderPieChart(range) {
+      const { labels, data } = await fetchPieData(range);
+
+      if(pieChart) pieChart.destroy();
+
+      pieChart = new Chart(pieCtx, {
+      type: 'pie',
+      data: {
+        labels: labels,
+        datasets: [{
+          data: data,
+          backgroundColor: [
+            '#F28123',
+            '#051922',
+            '#FF6384',
+            '#36A2EB',
+            '#FFCE56',
+            '#8AFF33',
+            '#33FFF5',
+            '#FF33D1'
+          ]
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: { color: '#051922', font: { size: 14 } }
+          },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                return `${context.label}: ${context.raw} kg sold`;
+              }
+            }
+          }
+        }
+      }
+      })
+    }
+
+      renderPieChart("month");
+
+  // Filter change
+  timeFilter.addEventListener("change", (e) => {
+    renderPieChart(e.target.value);
+  });
+  })
 </script>
 
 

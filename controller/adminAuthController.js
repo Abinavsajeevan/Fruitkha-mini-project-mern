@@ -249,7 +249,7 @@ const getLineChart = async(req, res) => {
         },
         {
             $sort: {
-                "_id.year": 1, "_id:month": 1, "_id.day": 1
+                "_id.year": 1, "_id.month": 1, "_id.day": 1
             }
         }
        ];
@@ -292,10 +292,17 @@ const getPieChart = async (req, res) => {
             order.items.forEach(item => {
                 const category = item.productId.category;
                 if(categoryTotals[category]) {
-                    
+                    categoryTotals[category] += item.quantity;
+                }else {
+                    categoryTotals[category] = item.quantity;
                 }
-            })
-        })
+            });
+        });
+
+        const labels = Object.keys(categoryTotals);
+        const data = Object.values(categoryTotals);
+
+        res.json({labels, data})
 
     }catch (err) {
         console.log('error occured in piechart', err);
