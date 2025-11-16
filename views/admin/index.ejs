@@ -357,6 +357,82 @@ document.addEventListener("DOMContentLoaded", () => {
   })
 </script>
 
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const barCtx = document.getElementById("barChart").getContext("2d");
+    const timeFilter = document.getElementById("timeFilter");
+
+    let barChart;
+    async function fetchBarData(range = 'month') {
+      const res = await fetch(`/admin/bar-data?range=${range}`);
+      const data = await res.json();
+      return data;
+    }
+
+    async function renderBarChart(range = 'month') {
+      const { labels, revenues } = await fetchBarData(range);
+
+      if(barChart) barChart.destroy()
+      barChart = new Chart(barCtx, {
+      type: "bar",
+      data: {
+        labels: labels,
+        datasets: [{
+          label: "Revenue by Category",
+          data: revenues,
+          backgroundColor: [
+            "#F28123",
+            "#051922",
+            "#FF6384",
+            "#36A2EB",
+            "#FFCE56",
+            "#8AFF33",
+            "#33FFF5",
+            "#FF33D1"
+          ],
+          borderColor: "#051922",
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              callback: value => "₹" + value
+            }
+          },
+          x: {
+            ticks: {
+              color: "#051922",
+              font: { size: 13 }
+            }
+          }
+        },
+        plugins: {
+          legend: {
+            display: false
+          },
+          tooltip: {
+            callbacks: {
+              label: context => `Revenue: ₹${context.raw}`
+            }
+          }
+        }
+      }
+    });
+  }
+
+  renderBarChart("month");
+
+  // Re-render when filter changes
+  timeFilter.addEventListener("change", (e) => {
+    renderBarChart(e.target.value);
+  });
+  })
+</script>
+
 
 </body>
 </html>

@@ -319,18 +319,40 @@ const getBarChart = async (req, res) => {
                 }
             },
             {
-                $unwind: "items"
+                $unwind: "$items"
             }, 
             {
                 $lookup: {
                     from: "products",
-                    localField: "product_id"
+                    localField: "items.productId",
+                    foreignField: "_id",
+                    as: "product"
                 }
+            },
+            {
+                $unwind: "$product"
+            },
+            {
+                $group: {
+                    _id: "$product.category",
+                    totalRevenue: { $sum: "$items.total" }
+                }
+            },
+            {
+                $sort: { totalRevenue: -1 }
             }
-        ]
+        ];
+
+        const result = await Order.aggregate(pipeline);
+
+        const labels = result.map(item => item._id);
+        const revenues = result.map(item => item.totalRevenue);
+
+        return res.json({labels, revenues});
 
     } catch (err) {
         console.log('error occured in  getbar chart', err)
+    res.status(500).json({ message: "Error fetching bar chart data" })
     }
 }
 
