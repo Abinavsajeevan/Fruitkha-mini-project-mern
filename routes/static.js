@@ -5,7 +5,7 @@ const {verifyToken, verifyTokenIndex} = require('../middleware/authMiddleware');
 const { googleLogin, resendOtp, logout, deleteAccount, getShop, getCart, getWishlist, getCheckout, addressProfile, orderCOD, getProfileOrder } = require('../controller/userAuthController');
 const { adminVerifyToken } = require('../middleware/adminAuthMiddleware');
 const Admin = require('../models/Admin');
-const { logoutAdmin, showOrder, showCustomer, getDashboard, getLineChart, getPieChart } = require('../controller/adminAuthController');
+const { logoutAdmin, showOrder, showCustomer, getDashboard, getLineChart, getPieChart, getBarChart } = require('../controller/adminAuthController');
 const Product = require('../models/Product');
 //=================================================
 
@@ -174,6 +174,7 @@ router.get('/admin', adminVerifyToken, async(req, res) => {
 })
 router.get('/admin/revenue-data', adminVerifyToken, getLineChart)//line chart
 router.get('/admin/pie-data', adminVerifyToken, getPieChart)//pie chart
+router.get('/admin/bar-data', adminVerifyToken, getBarChart)//bar chart
 
 //--------------------------------------
 //----------admin setting page -------------

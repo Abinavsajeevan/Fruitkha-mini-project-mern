@@ -309,6 +309,30 @@ const getPieChart = async (req, res) => {
     }
 }
 
+//bar chart
+const getBarChart = async (req, res) => {
+    try {
+        const pipeline = [
+            {
+                $match: {
+                    orderStatus: { $ne: 'cancelled' }
+                }
+            },
+            {
+                $unwind: "items"
+            }, 
+            {
+                $lookup: {
+                    from: "products",
+                    localField: "product_id"
+                }
+            }
+        ]
+
+    } catch (err) {
+        console.log('error occured in  getbar chart', err)
+    }
+}
 
 
 module.exports = {
@@ -323,5 +347,6 @@ module.exports = {
     showCustomer,
     blockUser,
     getLineChart,
-    getPieChart
+    getPieChart,
+    getBarChart
 }
