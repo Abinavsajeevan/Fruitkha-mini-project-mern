@@ -190,6 +190,38 @@ canvas {
         </div>
       </div>
 
+            <!-- Quick Stats -->
+      <div class="row g-4 mb-4">
+        <div class="col-sm-6 col-lg-3">
+          <div class="card stat-card shadow-sm text-center p-3">
+            <h5 class="text-success">Total Revenue</h5>
+              <h3 id="totalRevenue">₹0</h3>
+            <p class="text-muted mb-0" id="totalCount">0+ orders placed</p>
+          </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+          <div class="card stat-card shadow-sm text-center p-3">
+            <h5 class="text-primary">Pending</h5>
+            <h3 id="pendingAmount">₹0</h3>
+            <p class="text-muted mb-0" id="pendingCount">0+ orders pending</p>
+          </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+          <div class="card stat-card shadow-sm text-center p-3">
+            <h5 class="text-warning">Recieved</h5>
+            <h3 id="receivedAmount">₹0</h3>
+            <p class="text-muted mb-0" id="receivedCount">0+ orders received</p>
+          </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+          <div class="card stat-card shadow-sm text-center p-3">
+            <h5 class="text-danger">Cancelled</h5>
+            <h3 id="cancelledAmount">₹0</h3>
+            <p class="text-muted mb-0" id="cancelCount">0+ orders cancelled</p>
+          </div>
+        </div>
+      </div>
+
       <!-- Revenue Growth Charts -->
       <div class="row g-4">
 
@@ -235,62 +267,106 @@ canvas {
     toggleBtn.classList.toggle('active');
   });
 </script>
-
+<!-- stats -->
 <script>
-document.addEventListener("DOMContentLoaded", () => {
-  const ctx = document.getElementById("lineChart").getContext("2d");
-  const timeFilter = document.getElementById("timeFilter");
+  document.addEventListener("DOMContentLoaded", () => {
+    const timeFilter = document.getElementById("timeFilter");
 
-  let chart;
+    async function fetchStats(range = 'month') {
+      const res = await fetch(`/admin/stats?range=${range}`, {
+        headers: { "Accept": 'application/json' }
+      });
 
-  async function fetchRevenueData(range = "month") {
-    const res = await fetch(`/admin/revenue-data?range=${range}`);
-    const data = await res.json();
-    return data;
-  }
+      if(!res.ok) {
+        console.error("Failed to fetch stats", res.status);
+        return null;
+      }
+      return res.json();
+    }
 
-  async function renderChart(range = "month") {
-    const { labels, revenues } = await fetchRevenueData(range);
+    function formatCurrency(x) {
+      if (x === null) return '₹0';
+      //it just make format only 
+      return '₹' + Number(x).toLocaleString("en-IN");
+    }
 
-    if (chart) chart.destroy(); // reset previous chart
+    async function  renderStats(range = 'month') {
+      const stats = await fetchStats(range);
+      if(!stats) return 
 
-    chart = new Chart(ctx, {
-      type: "line",
-      data: {
-        labels: labels,
-        datasets: [{
-          label: "Total Revenue",
-          data: revenues,
-          borderColor: "#051922",
-          backgroundColor: "rgba(242,129,35,0.3)",
-          tension: 0.4,
-          fill: true,
-          pointBackgroundColor: "#F28123",
-          pointRadius: 5
-        }]
-      },
-      options: {
-        responsive: true,
-        scales: {
-          y: {
-            beginAtZero: true,
-            ticks: {
-              callback: value => "₹" + value
+       document.getElementById("totalRevenue").textContent    = formatCurrency(stats.totalRevenue);
+    document.getElementById("pendingAmount").textContent   = formatCurrency(stats.pendingAmount);
+    document.getElementById("receivedAmount").textContent  = formatCurrency(stats.receivedAmount);
+    document.getElementById("cancelledAmount").textContent = formatCurrency(stats.cancelledAmount);
+     document.getElementById("totalCount").textContent    = stats.totalCount + '+ orders placed';
+    document.getElementById("pendingCount").textContent   = stats.pendingCount + '+ orders pending'
+    document.getElementById("receivedCount").textContent  = stats.receivedCount + '+ orders received'
+    document.getElementById("cancelCount").textContent = stats.cancelCount + '+ orders cancelled'
+    }
+
+    renderStats('month');
+  timeFilter.addEventListener("change", (e) => {
+      renderStats(e.target.value);
+    });
+  })
+</script>
+
+<!-- charts  -->
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const ctx = document.getElementById("lineChart").getContext("2d");
+    const timeFilter = document.getElementById("timeFilter");
+
+    let chart;
+
+    async function fetchRevenueData(range = "month") {
+      const res = await fetch(`/admin/revenue-data?range=${range}`);
+      const data = await res.json();
+      return data;
+    }
+
+    async function renderChart(range = "month") {
+      const { labels, revenues } = await fetchRevenueData(range);
+
+      if (chart) chart.destroy(); // reset previous chart
+
+      chart = new Chart(ctx, {
+        type: "line",
+        data: {
+          labels: labels,
+          datasets: [{
+            label: "Total Revenue",
+            data: revenues,
+            borderColor: "#051922",
+            backgroundColor: "rgba(242,129,35,0.3)",
+            tension: 0.4,
+            fill: true,
+            pointBackgroundColor: "#F28123",
+            pointRadius: 5
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                callback: value => "₹" + value
+              }
             }
           }
         }
-      }
+      });
+    }
+
+    // Initial render
+    renderChart("month");
+
+    // Filter change
+    timeFilter.addEventListener("change", (e) => {
+      renderChart(e.target.value);
     });
-  }
-
-  // Initial render
-  renderChart("month");
-
-  // Filter change
-  timeFilter.addEventListener("change", (e) => {
-    renderChart(e.target.value);
   });
-});
 </script>
 
 <script>

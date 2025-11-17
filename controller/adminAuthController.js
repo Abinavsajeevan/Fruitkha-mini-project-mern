@@ -223,6 +223,71 @@ const blockUser = async (req, res) => {
 
 //Index or Dashboard
 //------------------
+//dashboard stats
+const getDashboardStats = async (req, res) => {
+    try {
+        console.log('worked')
+        const range = req.query.range || "month";
+        const startDate = getRangeStart(range);
+
+        const pipeline = [
+            { $match:
+                { createdAt: { $gte: startDate } }
+            },
+            {
+                $group: {
+                    _id: "$orderStatus",
+                    count: { $sum: 1 },
+                    total: { $sum: "$totalAmount" }
+                }
+            }
+        ];
+
+        const grouped = await Order.aggregate(pipeline);
+
+        let receivedAmount = 0;
+        let pendingAmount = 0;
+        let cancelledAmount = 0;
+        let totalRevenue = 0;
+        let cancelCount = 0;
+        let pendingCount = 0;
+        let receivedCount = 0;
+        let totalCount = 0;
+
+        grouped.forEach(item => {
+            const status = item._id;
+            const sum = item.total || 0;
+            if(status == 'delivered') {
+                receivedAmount = sum;
+                receivedCount = item.count;
+            }else if(status == 'pending' || status == 'shipped') {
+                pendingAmount += sum;
+                pendingCount += item.count;
+            }else if (status == 'cancelled') {
+                cancelledAmount = sum;
+                cancelCount = item.count;
+            }
+        });
+
+        totalRevenue = pendingAmount + receivedAmount;
+        totalCount = pendingCount + receivedCount;
+        console.log('work' + totalRevenue, totalCount)
+
+        res.json({
+            totalRevenue, 
+            pendingAmount,
+            receivedAmount,
+            cancelledAmount,
+            cancelCount,
+            receivedCount,
+            pendingCount,
+            totalCount
+        })
+
+    }catch(err) {
+        console.log('erro occured in stat of dashboard', err)
+    }
+}
 //line chart 
 const getLineChart = async(req, res) => {
     try {
@@ -312,10 +377,13 @@ const getPieChart = async (req, res) => {
 //bar chart
 const getBarChart = async (req, res) => {
     try {
+        const range = req.query.range || 'month';
+        const startDate = getRangeStart(range);
         const pipeline = [
             {
                 $match: {
-                    orderStatus: { $ne: 'cancelled' }
+                    orderStatus: { $ne: 'cancelled' },
+                    createdAt: {$gte: startDate}
                 }
             },
             {
@@ -344,6 +412,10 @@ const getBarChart = async (req, res) => {
         ];
 
         const result = await Order.aggregate(pipeline);
+                // 👉 Handle empty result
+        if (!result || result.length === 0) {
+            return res.json({ labels: [], revenues: [] });
+        }
 
         const labels = result.map(item => item._id);
         const revenues = result.map(item => item.totalRevenue);
@@ -368,6 +440,7 @@ module.exports = {
     updateOrderStatus,
     showCustomer,
     blockUser,
+    getDashboardStats,
     getLineChart,
     getPieChart,
     getBarChart
