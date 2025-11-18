@@ -14,7 +14,8 @@
   });
 </script>
  scroll position regain
-
+stripe listen --forward-to localhost:3000/webhook
+this was each time webhook
  
 
 

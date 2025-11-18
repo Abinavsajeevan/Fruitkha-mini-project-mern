@@ -206,8 +206,6 @@ router.get('/admin/products/edit/:id',adminVerifyToken, async(req, res) => {
 })
 
 
-module.exports = router;
-
 //--------------------------------------
 //----------admin orders page -------------
 //---------------------------------------
@@ -252,3 +250,5 @@ router.get('/admin/logs', async(req, res) => {
 router.get('/admin/profile', async(req, res) => {
   res.render('admin/profile')
 })
+
+module.exports = router;

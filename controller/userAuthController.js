@@ -1,3 +1,6 @@
+require("dotenv").config();
+const Stripe = require("stripe");
+const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 const User = require('../models/User');
 const {validationResult} = require('express-validator');
 const bcrypt = require('bcrypt');
@@ -13,6 +16,7 @@ const Address = require('../models/Address');
 const defaultAddress = require('../utils/defaultAddress');
 const Order = require('../models/Order');
 const sendOrderPDFEmail = require('../utils/sendOrderPDFEmail');
+
 
 
 // registration 
@@ -889,7 +893,7 @@ const postCheckout = async (req, res) => {
       })),
       totalAmount: cart.total,
       paymentMethod,
-      paymentStatus: 'pending',
+      paymentStatus: paymentMethod =='cod'?'pending':'paid',
       orderStatus: 'pending',
       deliveryInstruction: instructions || '',
       orderDate,
@@ -936,7 +940,143 @@ const orderCOD = async (req, res) => {
   }
 }
 
+//stripe
+//-------------
+//get stripe
+const getStripe = async (req, res) => {
+  try {
+    const { orderId } = req.params;
+    const order = await Order.findById(orderId);
+    if(!order) return res.redirect('/checkout');
+    if(order.paymentMethod !== 'card') return res.render('/checkout');
 
+    const line_items = order.items.map(item => ({
+          price_data: {
+            currency: 'inr',                                 // use currency your store uses
+            product_data: { name: item.name },
+            unit_amount: Math.round(item.price * 100)       // convert rupees to paise
+          },
+          quantity: item.quantity
+        }));
+
+            const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      mode: 'payment',
+      line_items,
+      metadata: { orderId: order._id.toString(), userId: order.userId.toString() },
+      success_url: (process.env.STRIPE_SUCCESS_URL || `${req.protocol}://${req.get('host')}/order/success`) + '?session_id={CHECKOUT_SESSION_ID}',
+      cancel_url: process.env.STRIPE_CANCEL_URL || `${req.protocol}://${req.get('host')}/checkout`,
+    });
+
+        order.stripeSessionId = session.id;
+    if (session.payment_intent) order.stripePaymentIntentId = session.payment_intent;
+    await order.save();
+
+        return res.redirect(303, session.url);
+  }catch(err) {
+    console.log('error occured in getstripe controller', err);
+  }
+}
+
+//post stripe
+
+const postStripe =async (req, res) => {
+  console.log("Loaded Stripe key:", process.env.STRIPE_SECRET_KEY);
+  const sig = req.headers['stripe-signature'];
+  const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
+
+  let event;
+  try {
+    event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
+  } catch (err) {
+    console.error('Webhook signature verification failed:', err.message);
+    return res.status(400).send(`Webhook Error: ${err.message}`);
+  }
+
+  // Handle the event
+  try {
+    switch (event.type) {
+      case 'checkout.session.completed': {
+        const session = event.data.object;
+        const orderId = session.metadata && session.metadata.orderId;
+        // Mark order paid, decrement stock, clear cart
+        if (orderId) {
+          const order = await Order.findById(orderId);
+          if (order && order.paymentStatus !== 'paid') {
+            order.paymentStatus = 'paid';
+            order.stripePaymentIntentId = session.payment_intent || order.stripePaymentIntentId;
+            order.orderStatus = 'pending'; // or whatever next state
+            await order.save();
+
+            // decrement product stock
+            for (const item of order.items) {
+              await Product.findByIdAndUpdate(item.productId, { $inc: { stock: -item.quantity } });
+            }
+
+            // clear user's cart
+            await Cart.findOneAndDelete({ user: order.userId });
+          }
+        }
+        break;
+      }
+
+      case 'checkout.session.async_payment_failed':
+      case 'payment_intent.payment_failed': {
+        // Handle failure if you need: mark order paymentStatus = 'failed'
+        const session = event.data.object;
+        const orderId = session.metadata && session.metadata.orderId;
+        if (orderId) {
+          await Order.findByIdAndUpdate(orderId, { paymentStatus: 'failed' });
+        }
+        break;
+      }
+
+      // add other events if you need
+      default:
+        // console.log(`Unhandled event type ${event.type}`);
+    }
+  } catch (err) {
+    console.error('Error handling webhook event:', err);
+    // We should respond 200 so Stripe doesn't retry repeatedly? Best to return 500 if processing failed so Stripe retries.
+    return res.status(500).send();
+  }
+
+  // Return a 200 to acknowledge receipt of the event
+  res.json({ received: true });
+};
+
+//success stripe
+const stripeSuccess = async (req, res) => {
+    try {
+        const sessionId = req.params.sessionId;
+
+        // 1. Retrieve the Checkout Session
+        const session = await stripe.checkout.sessions.retrieve(sessionId);
+
+        // 2. Retrieve the PaymentIntent
+        const paymentIntent = await stripe.paymentIntents.retrieve(session.payment_intent);
+
+        // 3. Update the order in DB
+        await Order.findOneAndUpdate(
+            { stripeSessionId: sessionId },
+            {
+                paymentStatus: 'paid',
+                stripePaymentIntentId: session.payment_intent,
+                orderStatus: 'pending'
+            }
+        );
+
+        // 4. Show "payment successful" page
+        res.render('user/paymentSuccess', {
+            orderId: sessionId,
+            amount: session.amount_total / 100
+        });
+
+    } catch (err) {
+        console.error("Success route error:", err);
+        res.status(500).send("Payment success processing failed.");
+    }
+}
 
 
 module.exports = {
@@ -970,5 +1110,8 @@ module.exports = {
     addTowishlist,
     getCheckout,
     postCheckout,
-    orderCOD
+    orderCOD,
+    getStripe,
+    postStripe,
+    stripeSuccess
 }

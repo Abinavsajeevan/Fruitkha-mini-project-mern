@@ -84,8 +84,13 @@ const orderSchema = new Schema(
 
         deliveredAt: { 
             type: String
-        }
-
+        },
+        stripeSessionId: { 
+            type: String 
+        },       // Checkout Session ID
+        stripePaymentIntentId: { 
+            type: String 
+        }  // PaymentIntent ID (populated after checkout)
     }, {timestamps: true}
 );
 

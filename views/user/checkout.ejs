@@ -356,8 +356,8 @@ textarea.form-control:focus {
     </div>
 
     <!-- Hidden Inputs for Backend -->
-    <input type="hidden" name="cartId" value=" cart._id">
-    <input type="hidden" name="totalAmount" value="cart.total">
+<input type="hidden" name="cartId" value="<%= cart._id %>">
+<input type="hidden" name="totalAmount" value="<%= cart.total %>">
 
     <button type="submit" class="btn btn-warning w-100 fw-bold mt-3">Proceed to Payment</button>
   </form>
