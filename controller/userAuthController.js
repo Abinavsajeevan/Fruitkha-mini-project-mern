@@ -893,7 +893,7 @@ const postCheckout = async (req, res) => {
       })),
       totalAmount: cart.total,
       paymentMethod,
-      paymentStatus: paymentMethod =='cod'?'pending':'paid',
+      paymentStatus: 'pending',
       orderStatus: 'pending',
       deliveryInstruction: instructions || '',
       orderDate,
