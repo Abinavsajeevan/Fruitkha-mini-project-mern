@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const passport = require('passport');
 const {verifyToken, verifyTokenIndex} = require('../middleware/authMiddleware');
-const { googleLogin, resendOtp, logout, deleteAccount, getShop, getCart, getWishlist, getCheckout, addressProfile, orderCOD, getProfileOrder } = require('../controller/userAuthController');
+const { googleLogin, resendOtp, logout, deleteAccount, getShop, getCart, getWishlist, getCheckout, addressProfile, orderCOD, getProfileOrder, getSingleProduct } = require('../controller/userAuthController');
 const { adminVerifyToken } = require('../middleware/adminAuthMiddleware');
 const Admin = require('../models/Admin');
 const { logoutAdmin, showOrder, showCustomer, getDashboard, getLineChart, getPieChart, getBarChart, getDashboardStats } = require('../controller/adminAuthController');
@@ -131,6 +131,11 @@ router.get('/order/success/:orderId', verifyToken, orderCOD)
 router.get('/error404', verifyToken, (req, res) => {
   res.render('user/404', {user: req.user})
 })
+
+///=======================================================
+
+//---------------checkout page----------------------
+router.get('/singleproduct/:id', verifyToken, getSingleProduct)
 
 ///=======================================================
 

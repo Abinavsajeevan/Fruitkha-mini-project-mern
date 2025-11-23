@@ -6,6 +6,7 @@ const cookieParser = require('cookie-parser');
 
 // all route files
 const routes = require('./routes/index')
+const stripeRoutes = require('./routes/stripe')
 const session = require('express-session');
 const passport = require('passport');
 require('./config/passport')
@@ -25,6 +26,8 @@ app.set('views', 'views')
 app.use(cookieParser()); 
 app.use('/user', express.static(path.join(__dirname, 'public', 'user')));
 app.use('/admin', express.static(path.join(__dirname, 'public', 'admin')));
+app.use('/', stripeRoutes)
+//stripe
 app.use(express.json())
 app.use(express.urlencoded({extended: true}))
 app.use(session({

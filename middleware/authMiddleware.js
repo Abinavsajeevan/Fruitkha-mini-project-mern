@@ -5,6 +5,7 @@ async function verifyToken(req, res, next) {
     console.log('token verification started...');
     //taking token id  from cookies
     const token = await req.cookies?.token;
+    console.log(token)
     if(token) {
         try {
             //here token verifies and it stored in to vrifies 
@@ -13,6 +14,7 @@ async function verifyToken(req, res, next) {
             req.user = await User.findById(verifies.tokenId).select("-password");
             if(req.user.isBlocked) {
                  await res.clearCookie("token");
+                 console.log('abi its token ')
                  res.redirect('/login')
             }
             next();
@@ -20,6 +22,8 @@ async function verifyToken(req, res, next) {
             console.log('an error occured in token validation: ', err);
         }
     }else {
+                 console.log('abi its tokennot ')
+
        
         return res.redirect(`/login`)
        

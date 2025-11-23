@@ -5,9 +5,9 @@ const router = express.Router();
 
 router.get('/payment/:orderId', verifyToken, getStripe);
 router.post('/webhook', express.raw({ type: 'application/json' }), postStripe)
-router.get('/order/success/:sessionId',verifyToken, stripeSuccess)
+router.get('/order/success/:sessionId', stripeSuccess)
 router.get('/checkout/cancel', (req, res) => {
-    res.redirect("/")
+    res.redirect("/checkout")
 });
 
 module.exports = router

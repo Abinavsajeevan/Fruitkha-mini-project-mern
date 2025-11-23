@@ -100,7 +100,7 @@ const loginUser = async (req, res) => {
         const token = jwt.sign({tokenId: user._id}, process.env.JWT_SECRET_KEY, {expiresIn: '2d'} )
         // storing token in cookie
         console.log('storing token in to cookie...')
-        res.cookie("token", token, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 , sameSite: 'strict'});
+        res.cookie("token", token, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 , sameSite: 'lax'});
         console.log('login completed....')
         
         res.redirect('/');
@@ -828,6 +828,21 @@ const addTowishlist = async (req, res) => {
   }
 }
 
+//show single  product METHOD = GET
+const getSingleProduct = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const _id = req.params.id;
+
+    const product = await Product.findById(_id);
+    if(!product) return res.redirect('/shop');
+    
+    res.render("user/single-product", {user: req.user, product})
+  }catch(err) {
+    console.log('error occured in single product', err);
+  }
+}
+
 //checkout get page
 const getCheckout = async (req, res) => {
   try {
@@ -945,10 +960,11 @@ const orderCOD = async (req, res) => {
 //get stripe
 const getStripe = async (req, res) => {
   try {
+    console.log('stripe worked get ....')
     const { orderId } = req.params;
     const order = await Order.findById(orderId);
     if(!order) return res.redirect('/checkout');
-    if(order.paymentMethod !== 'card') return res.render('/checkout');
+    if(order.paymentMethod !== 'card') return res.redirect('/checkout');
 
     const line_items = order.items.map(item => ({
           price_data: {
@@ -964,13 +980,15 @@ const getStripe = async (req, res) => {
       mode: 'payment',
       line_items,
       metadata: { orderId: order._id.toString(), userId: order.userId.toString() },
-      success_url: (process.env.STRIPE_SUCCESS_URL || `${req.protocol}://${req.get('host')}/order/success`) + '?session_id={CHECKOUT_SESSION_ID}',
+      success_url: process.env.STRIPE_SUCCESS_URL ||  `${req.protocol}://${req.get("host")}/order/success/{CHECKOUT_SESSION_ID}`,
       cancel_url: process.env.STRIPE_CANCEL_URL || `${req.protocol}://${req.get('host')}/checkout`,
     });
 
         order.stripeSessionId = session.id;
     if (session.payment_intent) order.stripePaymentIntentId = session.payment_intent;
     await order.save();
+    console.log('stripe worked successfully get ....')
+
 
         return res.redirect(303, session.url);
   }catch(err) {
@@ -981,13 +999,16 @@ const getStripe = async (req, res) => {
 //post stripe
 
 const postStripe =async (req, res) => {
+    console.log('stripe worked post ....')
+
   console.log("Loaded Stripe key:", process.env.STRIPE_SECRET_KEY);
   const sig = req.headers['stripe-signature'];
   const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
+  console.log('sig:', sig, 'endpoint', endpointSecret, 'req,', req.body)
 
   let event;
   try {
-    event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
+    event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);//verify stripe event
   } catch (err) {
     console.error('Webhook signature verification failed:', err.message);
     return res.status(400).send(`Webhook Error: ${err.message}`);
@@ -1005,7 +1026,7 @@ const postStripe =async (req, res) => {
           if (order && order.paymentStatus !== 'paid') {
             order.paymentStatus = 'paid';
             order.stripePaymentIntentId = session.payment_intent || order.stripePaymentIntentId;
-            order.orderStatus = 'pending'; // or whatever next state
+            order.orderStatus = 'pending'; 
             await order.save();
 
             // decrement product stock
@@ -1037,17 +1058,19 @@ const postStripe =async (req, res) => {
     }
   } catch (err) {
     console.error('Error handling webhook event:', err);
-    // We should respond 200 so Stripe doesn't retry repeatedly? Best to return 500 if processing failed so Stripe retries.
+    
     return res.status(500).send();
   }
+    console.log('stripe worked post completed ....')
 
-  // Return a 200 to acknowledge receipt of the event
   res.json({ received: true });
 };
 
 //success stripe
 const stripeSuccess = async (req, res) => {
     try {
+    console.log('stripe worked success ....')
+
         const sessionId = req.params.sessionId;
 
         // 1. Retrieve the Checkout Session
@@ -1056,21 +1079,14 @@ const stripeSuccess = async (req, res) => {
         // 2. Retrieve the PaymentIntent
         const paymentIntent = await stripe.paymentIntents.retrieve(session.payment_intent);
 
-        // 3. Update the order in DB
-        await Order.findOneAndUpdate(
-            { stripeSessionId: sessionId },
-            {
-                paymentStatus: 'paid',
-                stripePaymentIntentId: session.payment_intent,
-                orderStatus: 'pending'
-            }
-        );
+        const order = await Order.findOne({_id: session.metadata.orderId})
+        // 3. Show "payment successful" page
+    console.log('stripe worked success completed ....')
+     if(order.address.email) {
+      await sendOrderPDFEmail(order, order.address.email)
+    }
 
-        // 4. Show "payment successful" page
-        res.render('user/paymentSuccess', {
-            orderId: sessionId,
-            amount: session.amount_total / 100
-        });
+        res.render('user/orderConfirmation', {order});
 
     } catch (err) {
         console.error("Success route error:", err);
@@ -1108,6 +1124,7 @@ module.exports = {
     getWishlist,
     remeoveWishlist,
     addTowishlist,
+    getSingleProduct,
     getCheckout,
     postCheckout,
     orderCOD,

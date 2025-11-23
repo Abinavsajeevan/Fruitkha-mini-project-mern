@@ -14,6 +14,7 @@ const productSchema = new Schema(
   price: { type: Number, required: true },
   stock: { type: Number, required: true, min: 0 },
   image: { type: String },
+  gallery: [{ type: String }],
   discount: { type: String },
   origin: { type: String, default: "India" },
 }, { timestamps: true });

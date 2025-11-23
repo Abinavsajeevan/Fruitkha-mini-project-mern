@@ -242,7 +242,7 @@ const getDashboardStats = async (req, res) => {
                 }
             }
         ];
-
+        
         const grouped = await Order.aggregate(pipeline);
 
         let receivedAmount = 0;
@@ -271,7 +271,7 @@ const getDashboardStats = async (req, res) => {
 
         totalRevenue = pendingAmount + receivedAmount;
         totalCount = pendingCount + receivedCount;
-        console.log('work' + totalRevenue, totalCount)
+        
 
         res.json({
             totalRevenue, 
