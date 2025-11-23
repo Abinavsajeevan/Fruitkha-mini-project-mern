@@ -224,36 +224,41 @@ router.get('/admin/customers', adminVerifyToken, showCustomer)
 //--------------------------------------
 //----------admin analytics page -------------
 //---------------------------------------
-router.get('/admin/analytics', async(req, res) => {
+router.get('/admin/analytics',adminVerifyToken, async(req, res) => {
   res.render('admin/analytics')
 })
 
 //--------------------------------------
 //----------admin coupons page -------------
 //---------------------------------------
-router.get('/admin/coupons', async(req, res) => {
+router.get('/admin/coupons',adminVerifyToken, async(req, res) => {
   res.render('admin/coupons')
 })
 
 //--------------------------------------
 //----------admin support page -------------
 //---------------------------------------
-router.get('/admin/support', async(req, res) => {
+router.get('/admin/support',adminVerifyToken, async(req, res) => {
   res.render('admin/support')
 })
 
 //--------------------------------------
 //----------admin logs page -------------
 //---------------------------------------
-router.get('/admin/logs', async(req, res) => {
+router.get('/admin/logs',adminVerifyToken, async(req, res) => {
   res.render('admin/logs')
 })
 
 //--------------------------------------
 //----------admin profile page -------------
 //---------------------------------------
-router.get('/admin/profile', async(req, res) => {
+router.get('/admin/profile',adminVerifyToken, async(req, res) => {
   res.render('admin/profile')
+})
+
+
+router.get('/admin/editProduct', adminVerifyToken, (req, res) => {
+  res.render("admin/editProduct")
 })
 
 module.exports = router;
