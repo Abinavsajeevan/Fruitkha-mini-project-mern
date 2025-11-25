@@ -1000,11 +1000,8 @@ const getStripe = async (req, res) => {
 
 const postStripe =async (req, res) => {
     console.log('stripe worked post ....')
-
-  console.log("Loaded Stripe key:", process.env.STRIPE_SECRET_KEY);
   const sig = req.headers['stripe-signature'];
   const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
-  console.log('sig:', sig, 'endpoint', endpointSecret, 'req,', req.body)
 
   let event;
   try {

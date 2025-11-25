@@ -5,7 +5,7 @@ const {verifyToken, verifyTokenIndex} = require('../middleware/authMiddleware');
 const { googleLogin, resendOtp, logout, deleteAccount, getShop, getCart, getWishlist, getCheckout, addressProfile, orderCOD, getProfileOrder, getSingleProduct } = require('../controller/userAuthController');
 const { adminVerifyToken } = require('../middleware/adminAuthMiddleware');
 const Admin = require('../models/Admin');
-const { logoutAdmin, showOrder, showCustomer, getDashboard, getLineChart, getPieChart, getBarChart, getDashboardStats } = require('../controller/adminAuthController');
+const { logoutAdmin, showOrder, showCustomer, getDashboard, getLineChart, getPieChart, getBarChart, getDashboardStats, productSearch } = require('../controller/adminAuthController');
 const Product = require('../models/Product');
 //=================================================
 
@@ -222,11 +222,13 @@ router.get('/admin/orders',adminVerifyToken, showOrder)
 router.get('/admin/customers', adminVerifyToken, showCustomer)
 
 //--------------------------------------
-//----------admin analytics page -------------
+//----------admin gallery page -------------
 //---------------------------------------
-router.get('/admin/analytics',adminVerifyToken, async(req, res) => {
-  res.render('admin/analytics')
+router.get('/admin/editProduct', adminVerifyToken, (req, res) => {
+  res.render("admin/editProduct", {product: null})
 })
+
+router.get('/admin/editProduct/product-search', adminVerifyToken, productSearch)
 
 //--------------------------------------
 //----------admin coupons page -------------
@@ -257,8 +259,5 @@ router.get('/admin/profile',adminVerifyToken, async(req, res) => {
 })
 
 
-router.get('/admin/editProduct', adminVerifyToken, (req, res) => {
-  res.render("admin/editProduct")
-})
 
 module.exports = router;

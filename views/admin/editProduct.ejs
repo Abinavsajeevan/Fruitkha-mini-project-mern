@@ -78,59 +78,40 @@
       <a href="/admin/orders" class="list-group-item list-group-item-action">Orders</a>
       <a href="/admin/products" class="list-group-item list-group-item-action ">Products</a>
       <a href="/admin/customers" class="list-group-item list-group-item-action">Customers</a>
+      <a href="/admin/editProduct" class="list-group-item list-group-item-action active">Gallery</a>
       <a href="/admin/coupons" class="list-group-item list-group-item-action">Coupons</a>
       <a href="/admin/settings" class="list-group-item list-group-item-action">Settings</a>
       <a href="/admin/support" class="list-group-item list-group-item-action">Support</a>
-      <a href="/admin/profile" class="list-group-item list-group-item-action active">Profile</a>
+      <a href="/admin/profile" class="list-group-item list-group-item-action">Profile</a>
     </nav>
     </aside>
 
-  <main class="flex-fill p-4" style="background:#e27a25;min-height:100vh;">
-     <div class="card shadow p-4">
-      <h3 class="fw-bold mb-4">Edit Product Gallery</h3>
+  <main class="flex-fill p-4" style="background:#e27a25; min-height:100vh;">
 
-      <form id="productForm"
-            action="/admin/products/product._id %>/gallery"
-            method="POST"
-            enctype="multipart/form-data">
+    <div class="card shadow p-4">
+      <h3 class="fw-bold mb-4">Fruit Search</h3>
 
-        <div class="mb-3">
-          <label class="form-label">Existing Gallery</label>
-          <div id="existingGallery" class="d-flex flex-wrap gap-2 mb-2">
-            <!--  if (product.gallery && product.gallery.length) { 
-              product.gallery.forEach((img, idx) => { %> -->
-                <div class="position-relative" style="width:120px;">
-                  <img src="" class="img-thumbnail" style="width:120px;height:80px;object-fit:cover;">
-                  <button type="button"
-                    class="btn btn-sm btn-danger position-absolute"
-                    style="top:2px; right:2px;"
-                    onclick="deleteGalleryImage">×</button>
-                </div>
-              <!-- %>
-             else %>
-              <small class="text-muted">No images yet.</small>
-            %> -->
-          </div>
-
-          <label class="form-label mt-3">Add New Images (max 10)</label>
-          <input id="galleryInput"
-                 name="galleryImages"
-                 type="file"
-                 accept="image/*"
-                 multiple
-                 class="form-control">
-
-          <div id="preview" class="d-flex flex-wrap gap-2 mt-2"></div>
-
-          <small class="form-text">
-            Remaining images: <span id="remainingCount"></span>
-          </small>
+      <!-- Search Form -->
+      <form id="searchForm" class="mb-4">
+        <div class="d-flex gap-2">
+          <input 
+            type="text" 
+            id="fruitName" 
+            placeholder="Enter fruit name..." 
+            class="form-control"
+            required
+          >
+          <button class="btn btn-dark px-4">Search</button>
         </div>
-
-        <button class="btn btn-dark px-4">Save</button>
       </form>
+
+    <div id="resultBox">
+
     </div>
+    </div>
+
   </main>
+
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
@@ -138,6 +119,67 @@
   const toggleBtn=document.getElementById('menu-toggle');
   const sidebar=document.getElementById('sidebar');
   toggleBtn.addEventListener('click',()=>{sidebar.classList.toggle('show');toggleBtn.classList.toggle('active');});
+</script>
+
+<script>
+  document.getElementById("serarchForm").addEventListener("submit", async function(e){
+    e.preventDefault();//stop reload
+
+    const name = document.getElementById("fruitName").value;
+    if(!name) return;
+    
+    const res = await fetch(`/admin/editProduct/product-search?fruitName=${encodeURIComponent(name)}`);
+
+        const data = await res.json();
+
+    const box = document.getElementById("resultBox");
+
+    if (!data.product) {
+        box.innerHTML = `<p class="text-danger fw-bold mt-3">Product not found</p>`;
+        return;
+    }
+
+    const p = data.product;
+
+    box.innerHTML = `
+    <div class="table-responsive mt-4">
+      <table class="table table-bordered align-middle text-center">
+        <thead class="table-dark">
+          <tr>
+            <th>Fruit Gallery</th>
+            <th>Fruit Name</th>
+            <th>Category</th>
+            <th>Fruit Images</th>
+            <th>Add Images</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><img src="${p.image}" style="width:100px;height:80px;object-fit:cover;"></td>
+
+            <td>${p.name}</td>
+            <td>${p.category}</td>
+
+            <td class="text-center">
+              <div class="d-flex flex-wrap gap-2 justify-content-center">
+                ${
+                  p.gallery.map(img => 
+                    `<img src="${img}" style="width:100px;height:80px;object-fit:cover;">`
+                  ).join("")
+                }
+              </div>
+            </td>
+
+            <td>
+              <input type="file" accept="image/*" multiple class="form-control">
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    `;
+  } )
+
 </script>
 </body>
 </html>

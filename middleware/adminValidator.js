@@ -1,6 +1,7 @@
 const { body, validationResult } = require('express-validator');
 const Admin = require('../models/Admin');
 const Product = require('../models/Product');
+
 const adminLoginValidation = [
     body('email')
     .notEmpty().withMessage('Email is required')

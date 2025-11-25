@@ -221,6 +221,26 @@ const blockUser = async (req, res) => {
   }
 };
 
+//edit product gallery
+//--------------------
+//product search get method
+const productSearch = async (req, res) => {
+    try {
+        const { fruitName } = req.query;
+        if(!fruitName ) {
+            return res.status(400).json({error: 'Fruit name required'});
+        } 
+
+        const product = await Product.findOne({ name: { $regex: new RegExp("^" + fruitName + "$", "i") } });
+        if(!product) return res.status(404).json({error: `${fruitName} is not found`});
+
+        return res.json({product})
+
+    }catch (err) {
+        console.log('error occured in product search in edit  product');
+    }
+}
+
 //Index or Dashboard
 //------------------
 //dashboard stats
@@ -440,6 +460,7 @@ module.exports = {
     updateOrderStatus,
     showCustomer,
     blockUser,
+    productSearch,
     getDashboardStats,
     getLineChart,
     getPieChart,
