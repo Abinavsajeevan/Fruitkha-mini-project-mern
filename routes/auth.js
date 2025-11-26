@@ -3,7 +3,7 @@ const { registerUser, loginUser, forgotPassword, otpVerify, resetPassword, delet
 const { signupValidation, loginValidation, forgotValidation, resetPasswordValidation, updateProfileValidation, addressValidation, addressEditValidation } = require('../middleware/userValidator');
 const { verifyToken } = require('../middleware/authMiddleware');
 const createMulter = require('../middleware/profilePhotoUpload');
-const { loginAdmin, settings, addProduct, editProduct, deleteProduct, updateOrderStatus, blockUser, addProductGallery } = require('../controller/adminAuthController');
+const { loginAdmin, settings, addProduct, editProduct, deleteProduct, updateOrderStatus, blockUser, addProductGallery, deleteGalleryImage } = require('../controller/adminAuthController');
 const { adminLoginValidation, adminSettingValidation, adminProductValidation } = require('../middleware/adminValidator');
 const { adminVerifyToken } = require('../middleware/adminAuthMiddleware');
 const router = express.Router();
@@ -88,5 +88,7 @@ router.put('/admin/users/:id/block', adminVerifyToken, blockUser)
 //---------------------------------------
 const productGallery = createMulter('gallery');
 router.post('/admin/editProduct/add-gallery/:id', adminVerifyToken, productGallery.array("images", 6), addProductGallery)
+
+router.delete('/admin/editProduct/delete-image/:id', adminVerifyToken, deleteGalleryImage);//delete the gallery
 
 module.exports = router 

@@ -151,7 +151,7 @@
             <th>Name</th>
             <th>Category</th>
             ${(p.gallery && p.gallery.length > 0)? `<th>Gallery</th>`:''}
-            <th>Add Images</th>
+            ${(!p.gallery || !(p.gallery.length > 5))?`<th>Add Images</th>`:''}
           </tr>
         </thead>
         <tbody>
@@ -166,7 +166,16 @@
               <div class="d-flex flex-wrap gap-2 justify-content-center">
                 ${
                   p.gallery.map(img => 
-                    `<img src="${img}" style="width:100px;height:80px;object-fit:cover;">`
+                    `<div class="position-relative text-center">
+                      <img src="${img}" style="width:100px;height:80px;object-fit:cover;">
+                      <button 
+                        class="btn btn-danger btn-sm mt-1 deleteImageBtn" 
+                        data-id="${p._id}"
+                        data-img="${img}"
+                      >
+                        Delete
+                      </button>
+                  </div>`
                   ).join('')
                 }
               </div>
@@ -219,6 +228,32 @@ document.addEventListener("click", async function(e) {
   }
 
 });
+</script>
+
+<script>
+  document.addEventListener("click", async function(e) {
+  if (e.target.classList.contains("deleteImageBtn")) {
+
+    const productId = e.target.getAttribute("data-id");
+    const imagePath = e.target.getAttribute("data-img");
+
+    const res = await fetch(`/admin/editProduct/delete-image/${productId}`, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ img: imagePath })
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+      alert("Image deleted");
+      document.getElementById("searchForm").dispatchEvent(new Event("submit"));
+    } else {
+      alert("Failed");
+    }
+  }
+});
+
 </script>
 
 

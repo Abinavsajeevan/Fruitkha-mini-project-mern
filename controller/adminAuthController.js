@@ -267,6 +267,29 @@ const addProductGallery = async (req, res) => {
   }
 }
 
+//delete the image  in gallery METHOD = POST
+const deleteGalleryImage = async (req, res) => {
+  try {
+    const productId = req.params.id;
+    const { img } = req.body;
+
+    if (!img) return res.status(400).json({ error: "Image required" });
+
+    const product = await Product.findByIdAndUpdate(
+      productId,
+      { $pull: { gallery: img } },
+      { new: true }
+    );
+
+    return res.json({ success: true, product });
+
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ error: err.message });
+  }
+};
+
+
 //Index or Dashboard
 //------------------
 //dashboard stats
@@ -488,6 +511,7 @@ module.exports = {
     blockUser,
     productSearch,
     addProductGallery,
+    deleteGalleryImage,
     getDashboardStats,
     getLineChart,
     getPieChart,
