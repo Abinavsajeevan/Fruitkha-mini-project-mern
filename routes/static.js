@@ -228,7 +228,7 @@ router.get('/admin/editProduct', adminVerifyToken, (req, res) => {
   res.render("admin/editProduct", {product: null})
 })
 
-router.get('/admin/editProduct/product-search', adminVerifyToken, productSearch)
+router.get('/admin/editProduct/product-search', adminVerifyToken, productSearch)//search product
 
 //--------------------------------------
 //----------admin coupons page -------------

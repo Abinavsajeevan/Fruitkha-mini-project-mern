@@ -241,6 +241,16 @@ const productSearch = async (req, res) => {
     }
 }
 
+//product image gallery METHOD = POST
+// const addProductGallery = async (req, res) => {
+//     try {
+
+
+//     }catch (err) {
+//         console.log('error occured in product gallery add', err);
+//     }
+// }
+
 //Index or Dashboard
 //------------------
 //dashboard stats
@@ -461,6 +471,7 @@ module.exports = {
     showCustomer,
     blockUser,
     productSearch,
+    addProductGallery,
     getDashboardStats,
     getLineChart,
     getPieChart,

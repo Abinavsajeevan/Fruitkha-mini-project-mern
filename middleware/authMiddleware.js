@@ -22,9 +22,7 @@ async function verifyToken(req, res, next) {
             console.log('an error occured in token validation: ', err);
         }
     }else {
-                 console.log('abi its tokennot ')
-
-       
+                
         return res.redirect(`/login`)
        
     }

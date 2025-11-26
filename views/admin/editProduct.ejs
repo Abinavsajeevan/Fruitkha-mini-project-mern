@@ -122,7 +122,8 @@
 </script>
 
 <script>
-  document.getElementById("serarchForm").addEventListener("submit", async function(e){
+  document.getElementById("searchForm").addEventListener("submit", async function(e){
+
     e.preventDefault();//stop reload
 
     const name = document.getElementById("fruitName").value;
@@ -146,10 +147,10 @@
       <table class="table table-bordered align-middle text-center">
         <thead class="table-dark">
           <tr>
-            <th>Fruit Gallery</th>
-            <th>Fruit Name</th>
+            <th>Image</th>
+            <th>Name</th>
             <th>Category</th>
-            <th>Fruit Images</th>
+            ${(p.gallery && p.gallery.length > 0)? `<th>Gallery</th>`:''}
             <th>Add Images</th>
           </tr>
         </thead>
@@ -160,7 +161,8 @@
             <td>${p.name}</td>
             <td>${p.category}</td>
 
-            <td class="text-center">
+            ${(p.gallery && p.gallery.length > 0)? 
+            `<td class="text-center">
               <div class="d-flex flex-wrap gap-2 justify-content-center">
                 ${
                   p.gallery.map(img => 
@@ -168,11 +170,13 @@
                   ).join("")
                 }
               </div>
-            </td>
-
-            <td>
-              <input type="file" accept="image/*" multiple class="form-control">
-            </td>
+            </td>`:''}
+            
+            ${(!p.gallery || !(p.gallery.length > 5))? 
+            ` <td>
+              <input type="file" name='images' accept="image/*" multiple class="form-control">
+            </td>`: ''}
+           
           </tr>
         </tbody>
       </table>

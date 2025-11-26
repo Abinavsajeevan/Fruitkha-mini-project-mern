@@ -3,7 +3,7 @@ const { registerUser, loginUser, forgotPassword, otpVerify, resetPassword, delet
 const { signupValidation, loginValidation, forgotValidation, resetPasswordValidation, updateProfileValidation, addressValidation, addressEditValidation } = require('../middleware/userValidator');
 const { verifyToken } = require('../middleware/authMiddleware');
 const createMulter = require('../middleware/profilePhotoUpload');
-const { loginAdmin, settings, addProduct, editProduct, deleteProduct, updateOrderStatus, blockUser } = require('../controller/adminAuthController');
+const { loginAdmin, settings, addProduct, editProduct, deleteProduct, updateOrderStatus, blockUser, addProductGallery } = require('../controller/adminAuthController');
 const { adminLoginValidation, adminSettingValidation, adminProductValidation } = require('../middleware/adminValidator');
 const { adminVerifyToken } = require('../middleware/adminAuthMiddleware');
 const router = express.Router();
@@ -82,5 +82,11 @@ router.post('/admin/products/delete/:id', adminVerifyToken, deleteProduct)
 
 router.post('/admin/orders/:id/status', adminVerifyToken, updateOrderStatus)
 router.put('/admin/users/:id/block', adminVerifyToken, blockUser)
+
+//--------------------------------------
+//---------- GALLERY SECTIONS -------------
+//---------------------------------------
+const productGallery = createMulter('gallery');
+router.post('/admin/editProduct/add-gallery', adminVerifyToken, productGallery.array("images", 6), addProductGallery)
 
 module.exports = router 
