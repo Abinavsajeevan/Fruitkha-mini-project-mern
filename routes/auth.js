@@ -87,6 +87,6 @@ router.put('/admin/users/:id/block', adminVerifyToken, blockUser)
 //---------- GALLERY SECTIONS -------------
 //---------------------------------------
 const productGallery = createMulter('gallery');
-router.post('/admin/editProduct/add-gallery', adminVerifyToken, productGallery.array("images", 6), addProductGallery)
+router.post('/admin/editProduct/add-gallery/:id', adminVerifyToken, productGallery.array("images", 6), addProductGallery)
 
 module.exports = router 

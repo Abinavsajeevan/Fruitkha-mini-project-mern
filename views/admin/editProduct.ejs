@@ -167,14 +167,15 @@
                 ${
                   p.gallery.map(img => 
                     `<img src="${img}" style="width:100px;height:80px;object-fit:cover;">`
-                  ).join("")
+                  ).join('')
                 }
               </div>
             </td>`:''}
             
             ${(!p.gallery || !(p.gallery.length > 5))? 
             ` <td>
-              <input type="file" name='images' accept="image/*" multiple class="form-control">
+              <input type="file" id="galleryInput" name='images' accept="image/*" multiple class="form-control">
+               <button class="btn btn-primary mt-2" id="uploadBtn" data-id="${p._id}">Upload</button>
             </td>`: ''}
            
           </tr>
@@ -185,5 +186,41 @@
   } )
 
 </script>
+<script>
+document.addEventListener("click", async function(e) {
+
+  if (e.target.id === "uploadBtn") {
+    const productId = e.target.getAttribute("data-id");
+    const input = document.getElementById("galleryInput");
+
+    if (!input.files.length) {
+      alert("Select images first");
+      return;
+    }
+
+    const formData = new FormData();
+    for (let img of input.files) {
+      formData.append("images", img);
+    }
+
+    const res = await fetch(`/admin/editProduct/add-gallery/${productId}`, {
+      method: "POST",
+      body: formData
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+      alert("Uploaded successfully!");
+      document.getElementById("searchForm").dispatchEvent(new Event("submit"));
+    } else {
+      alert("Upload failed");
+    }
+  }
+
+});
+</script>
+
+
 </body>
 </html>

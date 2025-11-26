@@ -242,14 +242,30 @@ const productSearch = async (req, res) => {
 }
 
 //product image gallery METHOD = POST
-// const addProductGallery = async (req, res) => {
-//     try {
+const addProductGallery = async (req, res) => {
+   try {
+    const productId = req.params.id
+    console.log('worked');
+    
 
+    if(!req.files || req.files.length === 0) {
+        return res.status(400).json({ error: "No images uploaded"});
+    }
 
-//     }catch (err) {
-//         console.log('error occured in product gallery add', err);
-//     }
-// }
+    const imagePaths = req.files.map(file => "/uploads/gallery/" + file.filename);
+
+    const product = await Product.findByIdAndUpdate(
+        productId,
+        {$push: {gallery: { $each: imagePaths}}},
+        {new: true}
+    )
+
+    return res.json({success: true, product })
+
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+}
 
 //Index or Dashboard
 //------------------
