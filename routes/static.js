@@ -96,6 +96,11 @@ router.get('/profileSetting', verifyToken, (req, res) => {
 //logout
 router.get('/logout', verifyToken, logout)
 
+///=======================================================
+
+//---------------single product page----------------------
+router.get('/singleproduct/:id', verifyToken, getSingleProduct)
+
 
 ///=======================================================
 
@@ -132,10 +137,7 @@ router.get('/error404', verifyToken, (req, res) => {
   res.render('user/404', {user: req.user})
 })
 
-///=======================================================
 
-//---------------checkout page----------------------
-router.get('/singleproduct/:id', verifyToken, getSingleProduct)
 
 ///=======================================================
 
@@ -225,7 +227,7 @@ router.get('/admin/customers', adminVerifyToken, showCustomer)
 //----------admin gallery page -------------
 //---------------------------------------
 router.get('/admin/editProduct', adminVerifyToken, (req, res) => {
-  res.render("admin/editProduct", {product: null})
+  res.render("admin/editProduct")
 })
 
 router.get('/admin/editProduct/product-search', adminVerifyToken, productSearch)//search product

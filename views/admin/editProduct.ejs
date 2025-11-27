@@ -223,6 +223,7 @@ document.addEventListener("click", async function(e) {
       alert("Uploaded successfully!");
       document.getElementById("searchForm").dispatchEvent(new Event("submit"));
     } else {
+      if(data.error) return alert(data.error)
       alert("Upload failed");
     }
   }

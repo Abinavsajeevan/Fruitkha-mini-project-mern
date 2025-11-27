@@ -245,14 +245,15 @@ const productSearch = async (req, res) => {
 const addProductGallery = async (req, res) => {
    try {
     const productId = req.params.id
-    console.log('worked');
-    
 
     if(!req.files || req.files.length === 0) {
         return res.status(400).json({ error: "No images uploaded"});
     }
 
     const imagePaths = req.files.map(file => "/uploads/gallery/" + file.filename);
+    const prod = await Product.findById(productId);
+       
+    if((imagePaths.length + prod.gallery.length) > 6 )  return res.status(400).json({ error: "Maximum 6 images allowed"});
 
     const product = await Product.findByIdAndUpdate(
         productId,

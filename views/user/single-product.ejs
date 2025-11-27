@@ -45,6 +45,63 @@
   transform: none !important;
   box-shadow: none !important;
 }
+
+.no-image {
+    color: #ff0000;        /* red text */
+    font-weight: bold;     /* bold */
+    font-size: 18px;       /* bigger font */
+    text-align: center;    /* center in the div */
+    padding: 20px 0;       /* spacing */
+    background-color: #f2f2f2; /* optional background */
+    border: 1px dashed #ccc;  /* optional border */
+    border-radius: 5px;       /* rounded corners */
+}
+/* .product-img {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    margin: 5px;
+} */
+
+.gallery-slider {
+    position: relative;
+    width: 100%;
+    height: 400px; /* adjust as needed */
+    overflow: hidden;
+}
+
+.gallery-slider img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: none;
+}
+
+.gallery-slider img.active {
+    display: block;
+}
+
+.prev-btn, .next-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: rgba(0,0,0,0.5);
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 20px;
+    border-radius: 3px;
+    z-index: 10;
+}
+
+.prev-btn { left: 10px; opacity: 0.6;}
+.next-btn { right: 10px; opacity: 0.6; }
+
+
 	</style>
 
 </head>
@@ -83,7 +140,17 @@
 			<div class="row">
 				<div class="col-md-5">
 					<div class="single-product-img">
-						<img src="/user/assets/img/products/product-img-5.jpg" alt="">
+					<% if(product.gallery && product.gallery.length > 0) { %>
+						<div class="gallery-slider">
+						<% product.gallery.forEach((image, index) => { %>
+							<img src="<%= image %>" alt="" class="product-img <%= index === 0 ? 'active' : '' %>">
+						<% }) %>
+						<button class="prev-btn">&#10094;</button>
+						<button class="next-btn">&#10095;</button>
+						</div>
+					<% } else { %>
+						<p class="no-image">No image found</p>
+					<% } %>
 					</div>
 				</div>
 				<div class="col-md-7">
@@ -329,6 +396,36 @@
 		});
 	});
 </script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const slider = document.querySelector(".gallery-slider");
+    if (!slider) return;
+
+    const images = slider.querySelectorAll("img");
+    const prevBtn = slider.querySelector(".prev-btn");
+    const nextBtn = slider.querySelector(".next-btn");
+
+    let current = 0;
+
+    function showImage(index) {
+        images.forEach(img => img.classList.remove("active"));
+        images[index].classList.add("active");
+    }
+
+    prevBtn.addEventListener("click", () => {
+        current = (current - 1 + images.length) % images.length;
+        showImage(current);
+    });
+
+    nextBtn.addEventListener("click", () => {
+        current = (current + 1) % images.length;
+        showImage(current);
+    });
+});
+</script>
+
+
 
 </body>
 </html>

@@ -557,6 +557,21 @@ const cancelOrder = async (req, res) => {
   }
 }
 
+//show single  product METHOD = GET
+const getSingleProduct = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const _id = req.params.id;
+
+    const product = await Product.findById(_id);
+    if(!product) return res.redirect('/shop');
+    
+    res.render("user/single-product", {user: req.user, product})
+  }catch(err) {
+    console.log('error occured in single product', err);
+  }
+}
+
 //shop page METHOD = GET
 const getShop = async (req, res) => {
   try {
@@ -825,21 +840,6 @@ const addTowishlist = async (req, res) => {
   } catch (err) {
     console.log('Error occurred in adding to cart:', err);
     res.json({ success: false, message: "Server error" });
-  }
-}
-
-//show single  product METHOD = GET
-const getSingleProduct = async (req, res) => {
-  try {
-    const userId = req.user._id;
-    const _id = req.params.id;
-
-    const product = await Product.findById(_id);
-    if(!product) return res.redirect('/shop');
-    
-    res.render("user/single-product", {user: req.user, product})
-  }catch(err) {
-    console.log('error occured in single product', err);
   }
 }
 
@@ -1112,6 +1112,7 @@ module.exports = {
     setDefaultAddress,
     getProfileOrder,
     cancelOrder,
+    getSingleProduct,
     getShop,
     addToCart,
     getCart,
@@ -1121,7 +1122,6 @@ module.exports = {
     getWishlist,
     remeoveWishlist,
     addTowishlist,
-    getSingleProduct,
     getCheckout,
     postCheckout,
     orderCOD,
