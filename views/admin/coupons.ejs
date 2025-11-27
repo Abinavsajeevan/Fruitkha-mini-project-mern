@@ -208,8 +208,14 @@
                   >
                     Edit
                   </button>
-                  <button class="btn btn-sm btn-outline-danger">Delete</button>
-                  <button class="btn btn-sm btn-outline-secondary">Block</button>
+                  <button class="btn btn-sm btn-outline-danger delete-btn" data-id="<%= coupon._id %>">Delete</button>
+                 <button 
+                    class="btn btn-sm btn-outline-secondary block-btn" 
+                    data-id="<%= coupon._id %>" 
+                    data-status="<%= coupon.status %>"
+                  >
+                    <%= coupon.status === 'Active' ? 'Block' : 'Unblock' %>
+                  </button>
                 </td>
               </tr>
               <% }) %>
@@ -332,6 +338,78 @@ document.addEventListener("click", function (e) {
   }
 });
 </script>
+
+<script>
+  document.querySelectorAll('.block-btn').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+        const id = btn.dataset.id;
+
+        try {
+            const res = await fetch(`/admin/coupons/block/${id}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            });
+
+            const data = await res.json();
+            if (data.success) {
+                // Update button text
+                btn.textContent = data.status === 'Active' ? 'Block' : 'Unblock';
+                btn.dataset.status = data.status;
+
+                // Update badge color
+                const row = btn.closest('tr');
+                const badge = row.querySelector('.badge');
+                if (data.status === 'Active') {
+                    badge.textContent = 'Active';
+                    badge.classList.remove('bg-secondary');
+                    badge.classList.add('bg-success');
+                } else {
+                    badge.textContent = 'Blocked';
+                    badge.classList.remove('bg-success');
+                    badge.classList.add('bg-secondary');
+                }
+            }
+        } catch (err) {
+            console.error('Error toggling status:', err);
+            alert('Failed to update status');
+        }
+    });
+});
+
+</script>
+
+<script>
+document.querySelectorAll('.delete-btn').forEach(btn => {
+  btn.addEventListener('click', async (e) => {
+    const id = btn.dataset.id;
+
+    if (!confirm("Are you sure you want to delete this coupon?")) return;
+
+    try {
+      const res = await fetch(`/admin/coupons/delete/${id}`, {
+        method: 'DELETE', // Use DELETE method
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        // Remove row from table
+        const row = btn.closest('tr');
+        row.remove();
+
+        // Optionally show a message
+        alert("Coupon deleted successfully");
+      } else {
+        alert(data.message || "Failed to delete coupon");
+      }
+    } catch (err) {
+      console.error('Error deleting coupon:', err);
+      alert('Failed to delete coupon');
+    }
+  });
+});
+</script>
+
 
 </body>
 </html>

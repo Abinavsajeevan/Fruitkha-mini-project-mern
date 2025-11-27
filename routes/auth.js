@@ -1,9 +1,9 @@
 const express = require('express');
-const { registerUser, loginUser, forgotPassword, otpVerify, resetPassword, deleteAccount, forgotProfile, changePassword, updateProfile, addToCart, updateCart, removeCart, wishlistAdd, remeoveWishlist, addTowishlist, addAddress, editAddress, deleteAddress, setDefaultAddress, postCheckout, cancelOrder } = require('../controller/userAuthController');
+const { registerUser, loginUser, forgotPassword, otpVerify, resetPassword, deleteAccount, forgotProfile, changePassword, updateProfile, addToCart, updateCart, removeCart, wishlistAdd, remeoveWishlist, addTowishlist, addAddress, editAddress, deleteAddress, setDefaultAddress, postCheckout, cancelOrder, couponAdd } = require('../controller/userAuthController');
 const { signupValidation, loginValidation, forgotValidation, resetPasswordValidation, updateProfileValidation, addressValidation, addressEditValidation } = require('../middleware/userValidator');
 const { verifyToken } = require('../middleware/authMiddleware');
 const createMulter = require('../middleware/profilePhotoUpload');
-const { loginAdmin, settings, addProduct, editProduct, deleteProduct, updateOrderStatus, blockUser, addProductGallery, deleteGalleryImage, addCoupon } = require('../controller/adminAuthController');
+const { loginAdmin, settings, addProduct, editProduct, deleteProduct, updateOrderStatus, blockUser, addProductGallery, deleteGalleryImage, addCoupon, editCoupon, blockCoupon, deleteCoupon } = require('../controller/adminAuthController');
 const { adminLoginValidation, adminSettingValidation, adminProductValidation } = require('../middleware/adminValidator');
 const { adminVerifyToken } = require('../middleware/adminAuthMiddleware');
 const router = express.Router();
@@ -36,6 +36,7 @@ router.put('/cancel-order/:id', verifyToken, cancelOrder)
 router.post('/shop/add-to-cart', verifyToken, addToCart)//adding to cart
 router.post('/cart/update', verifyToken, updateCart)//update cart
 router.post('/cart/remove', verifyToken, removeCart)//removing cart
+router.post('/cart/coupon-add', verifyToken, couponAdd)
 
 
 
@@ -95,6 +96,10 @@ router.delete('/admin/editProduct/delete-image/:id', adminVerifyToken, deleteGal
 //---------- COUPONS SECTION -------------
 //---------------------------------------
 
-router.post('/admin/coupons', adminVerifyToken, addCoupon)
+router.post('/admin/coupons', adminVerifyToken, addCoupon)//add coupon
+router.post('/admin/coupons/edit', adminVerifyToken, editCoupon)//edit coupon
+router.post('/admin/coupons/block/:id', adminVerifyToken, blockCoupon)//block coupon
+router.delete('/admin/coupons/delete/:id', adminVerifyToken, deleteCoupon)//delete coupon
+
 
 module.exports = router 

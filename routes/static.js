@@ -129,7 +129,7 @@ router.get('/checkout', verifyToken, getCheckout)
 ///=======================================================
 
 //---------------order COD ----------------------
-router.get('/order/success/:orderId', verifyToken, orderCOD)
+router.get('/order/success/cod/:orderId', verifyToken, orderCOD)
 ///=======================================================
 
 //---------------404 error ----------------------

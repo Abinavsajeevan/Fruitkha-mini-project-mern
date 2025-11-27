@@ -16,6 +16,7 @@ const Address = require('../models/Address');
 const defaultAddress = require('../utils/defaultAddress');
 const Order = require('../models/Order');
 const sendOrderPDFEmail = require('../utils/sendOrderPDFEmail');
+const Coupon = require("../models/Coupon");
 
 
 
@@ -693,6 +694,19 @@ const removeCart = async (req, res) => {
     }
 }
 
+//coupon add 
+const couponAdd = async (req, res) => {
+  try {
+    const { couponName } = req.body;
+    if(!couponName) return res.json({error: 'no input values'});
+    
+    const coupon = await Coupon.findOne({couponCode: couponName});
+    
+
+  }catch(err) {
+    console.log('error occured in coupon add', err);
+  }
+}
 //wishlist add METHOD = POST
 const wishlistAdd = async (req, res) => {
     try {
@@ -904,7 +918,8 @@ const postCheckout = async (req, res) => {
       name: item.product.name,
       quantity: item.quantity,
       price: item.price,
-      total: item.quantity * item.price
+      total: item.quantity * item.price,
+      image: item.product.image
       })),
       totalAmount: cart.total,
       paymentMethod,
@@ -913,8 +928,7 @@ const postCheckout = async (req, res) => {
       deliveryInstruction: instructions || '',
       orderDate,
       deliveredAt:'',
-      cancelDate: ''
-
+      cancelDate: '',
     });
 
     if (paymentMethod == 'cod') {
@@ -924,8 +938,9 @@ const postCheckout = async (req, res) => {
           {$inc: {stock: -item.quantity}}
         );
       }
-
-      return res.redirect(`/order/success/${order._id}`);
+      console.log('working');
+      
+      return res.redirect(`/order/success/cod/${order._id}`);
     } else {
       return res.redirect(`/payment/${order._id}`);
     }
@@ -1118,6 +1133,7 @@ module.exports = {
     getCart,
     updateCart,
     removeCart,
+    couponAdd,
     wishlistAdd,
     getWishlist,
     remeoveWishlist,

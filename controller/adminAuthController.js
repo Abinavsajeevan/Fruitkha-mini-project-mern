@@ -507,6 +507,16 @@ const getBarChart = async (req, res) => {
 const getCoupon = async (req, res) => {
     try {
         const coupons = await Coupon.find();
+       const now = new Date();
+
+        for (const coupon of coupons) {
+            const expiryDate = new Date(coupon.expiry);
+
+            if (expiryDate < now && coupon.status !== 'Blocked') {
+                coupon.status = 'Blocked';
+                await coupon.save(); 
+            }
+        }
         return res.render('admin/coupons', {coupons})
 
     }catch(er) {
@@ -547,6 +557,59 @@ const addCoupon = async (req, res) => {
     }
 }
 
+//coupon edit 
+const editCoupon = async (req, res) => {
+    try{
+        const { id, code, discount, expiry } = req.body;
+        if(!id || !code || !discount || !expiry) return res.redirect("/admin/coupons");
+
+        const expiryDate = parseDateFromForm(expiry);
+        if(!expiryDate) return res.status(400).send('Invalid  expiry date')
+
+        await Coupon.findByIdAndUpdate(
+            id,
+            {
+                couponCode: code.trim().toUpperCase(),
+                discount: Number(discount),
+                expiry: expiryDate
+            }, {new: true}
+        );
+
+        return res.redirect('/admin/coupons');
+
+    }catch(err) {
+        console.log('error occured in editcoupon', err)
+    }
+}
+
+//block coupon
+const blockCoupon = async (req, res) => {
+    try {
+        const coupon = await Coupon.findById(req.params.id);
+        if (!coupon) return res.status(404).send('Coupon not found');
+
+        coupon.status = coupon.status === 'Active' ? 'Blocked' : 'Active';
+        await coupon.save();
+
+        res.json({ success: true, status: coupon.status });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Server error');
+    }
+}
+
+//delete coupon
+const deleteCoupon = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await Coupon.findByIdAndDelete(id);
+    res.json({ success: true });
+  } catch (err) {
+    console.error(err);
+    res.json({ success: false, message: 'Error deleting coupon' });
+  }
+}
+
 
 module.exports = {
     loginAdmin,
@@ -567,5 +630,8 @@ module.exports = {
     getPieChart,
     getBarChart,
     getCoupon,
-    addCoupon
+    addCoupon,
+    editCoupon,
+    blockCoupon,
+    deleteCoupon
 }

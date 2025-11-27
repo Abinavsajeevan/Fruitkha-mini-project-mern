@@ -42,6 +42,10 @@ const orderSchema = new Schema(
                 total: {
                     type: Number,
                     required: true
+                },
+                image: {
+                type: String,
+                default: null
                 }
             }
         ],

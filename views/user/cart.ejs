@@ -154,6 +154,12 @@
 									<td><strong>Shipping: </strong></td>
 									<td>₹<%= cart.shipping %></td>
 								</tr>
+								<% if(cart.coupon) {%>
+								<tr class="total-data">
+									<td><strong>Coupon: </strong></td>
+									<td>₹<%= cart.coupenPrice %></td>
+								</tr>
+								<% } %>
 								<tr class="total-data">
 									<td><strong>Total: </strong></td>
 									<td>₹<%= cart.total %></td>
@@ -169,7 +175,7 @@
 						<h3>Apply Coupon</h3>
 						<div class="coupon-form-wrap">
 							<form action="index.html">
-								<p><input type="text" placeholder="Coupon"></p>
+								<p><input type="text" placeholder="Coupon" name="couponName"></p>
 								<p><input type="submit" value="Apply"></p>
 							</form>
 						</div>

@@ -80,6 +80,14 @@
       transition:background-color .3s ease;
     }
     .btn-cancel:hover { background-color:#d46d1d; }
+
+    .order-item-img {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
   </style>
 
 
@@ -173,12 +181,15 @@
     <table class="table table-dark table-striped mt-3">
       <thead>
         <tr>
-          <th>Product</th><th>Qty</th><th>Price</th>
+          <th>Image</th><th>Product</th><th>Qty</th><th>Price</th>
         </tr>
       </thead>
       <tbody>
         <% order.items.forEach(item => { %>
-        <tr><td><%= item.name %></td><td><%= item.quantity %> kg</td><td>₹<%= item.total %></td></tr>
+        <tr><td>
+  <img src="<%= item.image %>" class="order-item-img" alt="product">
+</td>
+<td><%= item.name %></td><td><%= item.quantity %> kg</td><td>₹<%= item.total %></td></tr>
         <%}) %>
       </tbody>
     </table>
