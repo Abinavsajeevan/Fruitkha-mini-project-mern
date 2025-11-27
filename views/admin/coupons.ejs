@@ -167,6 +167,7 @@
         <button class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#addCouponModal">+ Add Coupon</button>
       </div>
 
+      <% if(coupons && coupons.length > 0) { %>
       <!-- Coupon Table -->
       <div class="card shadow-sm">
         <div class="card-header bg-dark text-white">
@@ -185,36 +186,39 @@
               </tr>
             </thead>
             <tbody>
+              <% coupons.forEach((coupon, index) => { %>
               <tr>
-                <td>1</td>
-                <td>WELCOME10</td>
-                <td>10%</td>
-                <td>2025-12-31</td>
-                <td><span class="badge bg-success">Active</span></td>
+                <td><%= index+1 %></td>
+                <td><%= coupon.couponCode %></td>
+                <td><%= coupon.discount %>%</td>
+                <td> <%= new Date(coupon.expiry).toLocaleDateString('en-US', {
+                      month: 'short',
+                      day: 'numeric',
+                      year: 'numeric'
+                    }).replace(',', '') 
+                %></td>
+                <td><span class="badge <%= coupon.status === 'Active'? 'bg-success':'bg-secondary' %>"><%= coupon.status %></span></td>
                 <td>
-                  <button class="btn btn-sm btn-outline-warning">Edit</button>
+                  <button 
+                    class="btn btn-sm btn-outline-warning edit-btn"
+                    data-id="<%= coupon._id %>"
+                    data-code="<%= coupon.couponCode %>"
+                    data-discount="<%= coupon.discount %>"
+                    data-expiry="<%= coupon.expiry.toISOString().split('T')[0] %>"
+                  >
+                    Edit
+                  </button>
                   <button class="btn btn-sm btn-outline-danger">Delete</button>
                   <button class="btn btn-sm btn-outline-secondary">Block</button>
                 </td>
               </tr>
-              <tr>
-                <td>2</td>
-                <td>FESTIVE20</td>
-                <td>20%</td>
-                <td>2025-11-30</td>
-                <td><span class="badge bg-secondary">Blocked</span></td>
-                <td>
-                  <button class="btn btn-sm btn-outline-warning">Edit</button>
-                  <button class="btn btn-sm btn-outline-danger">Delete</button>
-                  <button class="btn btn-sm btn-outline-success">Unblock</button>
-                </td>
-              </tr>
+              <% }) %>
             </tbody>
           </table>
         </div>
 
         <!-- Pagination -->
-        <div class="card-footer d-flex justify-content-between align-items-center">
+        <!-- <div class="card-footer d-flex justify-content-between align-items-center">
           <span>Showing 1–10 of 20</span>
           <nav>
             <ul class="pagination pagination-sm mb-0">
@@ -224,15 +228,24 @@
               <li class="page-item"><a class="page-link" href="#">Next</a></li>
             </ul>
           </nav>
-        </div>
+        </div> -->
       </div>
     </main>
   </div>
+  <% }else { %>
+     <div class="card shadow-sm text-center mt-4">
+    <div class="card-body">
+      <h5 class="card-title">No Coupons Found</h5>
+      <p class="card-text">You currently have no coupons. Click <strong>+ Add Coupon</strong> to create one.</p>
+    </div>
+  </div>
+
+  <% } %>
 
   <!-- Add Coupon Modal -->
   <div class="modal fade" id="addCouponModal" tabindex="-1" aria-labelledby="addCouponLabel" aria-hidden="true">
     <div class="modal-dialog">
-      <form class="modal-content">
+      <form class="modal-content" action="/admin/coupons" method="POST">
         <div class="modal-header bg-dark text-white">
           <h5 class="modal-title" id="addCouponLabel">Add New Coupon</h5>
           <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
@@ -240,15 +253,15 @@
         <div class="modal-body">
           <div class="mb-3">
             <label class="form-label">Coupon Code</label>
-            <input type="text" class="form-control" required>
+            <input type="text" class="form-control" name="code" required>
           </div>
           <div class="mb-3">
             <label class="form-label">Discount (%)</label>
-            <input type="number" class="form-control" min="1" max="100" required>
+            <input type="number" name="discount" class="form-control" min="1" max="100" required>
           </div>
           <div class="mb-3">
             <label class="form-label">Expiry Date</label>
-            <input type="date" class="form-control" required>
+            <input type="date" name="expiry" class="form-control" required>
           </div>
         </div>
         <div class="modal-footer">
@@ -259,6 +272,66 @@
     </div>
   </div>
 
+
+  <!-- Edit Coupon Modal -->
+<div class="modal fade" id="editCouponModal" tabindex="-1">
+  <div class="modal-dialog">
+    <form class="modal-content" action="/admin/coupons/edit" method="POST">
+
+      <input type="hidden" name="id" id="edit-id">
+
+      <div class="modal-header bg-warning text-dark">
+        <h5 class="modal-title">Edit Coupon</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+        <div class="mb-3">
+          <label class="form-label">Coupon Code</label>
+          <input type="text" class="form-control" name="code" id="edit-code" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Discount (%)</label>
+          <input type="number" class="form-control" name="discount" id="edit-discount" min="1" max="100" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Expiry Date</label>
+          <input type="date" class="form-control" name="expiry" id="edit-expiry" required>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-warning">Update</button>
+      </div>
+
+    </form>
+  </div>
+</div>
+
+
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+document.addEventListener("click", function (e) {
+  if (e.target.classList.contains("edit-btn")) {
+
+    const id = e.target.dataset.id;
+    const code = e.target.dataset.code;
+    const discount = e.target.dataset.discount;
+    const expiry = e.target.dataset.expiry;
+
+    // Fill modal inputs
+    document.getElementById("edit-id").value = id;
+    document.getElementById("edit-code").value = code;
+    document.getElementById("edit-discount").value = discount;
+    document.getElementById("edit-expiry").value = expiry;
+
+    // Show modal
+    const modal = new bootstrap.Modal(document.getElementById("editCouponModal"));
+    modal.show();
+  }
+});
+</script>
+
 </body>
 </html>

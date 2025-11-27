@@ -8,6 +8,7 @@ const getPaginatedOrders = require("../utils/paginationAdminOrder");
 const getPaginatedCustomers = require("../utils/paginationCustomers");
 const User = require("../models/User");
 const getRangeStart = require("../utils/admindashboardline");
+const Coupon = require("../models/Coupon");
 
 const loginAdmin = async(req, res) => {
     try {
@@ -499,6 +500,54 @@ const getBarChart = async (req, res) => {
 }
 
 
+//COUPONS 
+//---------------
+
+//coupon page get
+const getCoupon = async (req, res) => {
+    try {
+        const coupons = await Coupon.find();
+        return res.render('admin/coupons', {coupons})
+
+    }catch(er) {
+        console.log('error occured in getcoupon', err);
+    }
+}
+
+//it is for format date
+function parseDateFromForm(value) {
+  // form date input "YYYY-MM-DD" -> Date object at local midnight
+  if (!value) return null;
+  const d = new Date(value);
+  if (isNaN(d.getTime())) return null;
+  return d;
+}
+
+//coupon add METHOD = POST
+const addCoupon = async (req, res) => {
+    try {
+        const {code, discount, expiry} = req.body;
+        if(!code || !discount || !expiry ) return res.status(400).send("Missing required fields")
+
+        const expiryDate = parseDateFromForm(expiry);
+        if(!expiryDate) return res.status(400).send('Invalid  expiry date')
+
+        const coupon = new Coupon({
+            couponCode: code.trim().toUpperCase(),
+            discount: Number(discount),
+            expiry: expiryDate,
+        });
+        await coupon.save();
+        console.log('worked');
+        
+        res.redirect('/admin/coupons');
+
+    }catch(err) {
+        console.log('error occured in add coupon', err)
+    }
+}
+
+
 module.exports = {
     loginAdmin,
     settings,
@@ -516,5 +565,7 @@ module.exports = {
     getDashboardStats,
     getLineChart,
     getPieChart,
-    getBarChart
+    getBarChart,
+    getCoupon,
+    addCoupon
 }
