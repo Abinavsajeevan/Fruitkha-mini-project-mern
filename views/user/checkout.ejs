@@ -389,6 +389,13 @@ textarea.form-control:focus {
             <p class="mb-0 text-muted">₹<%= cart.shipping %></p>
           </div>
 
+          <% if(cart.coupon) { %>
+          <div class="d-flex justify-content-between pt-2">
+            <p class="mb-0 text-muted">Coupon discount</p>
+            <p class="mb-0 text-muted"><%= cart.couponDiscount %>% <b>Off</b></p>
+          </div>
+          <% } %>
+
           <div class="d-flex justify-content-between border-top pt-3 mt-3">
             <h4 class="fw-bold text-dark">Total</h4>
             <h4 class="fw-bold text-dark">₹<%= cart.total %></h4>

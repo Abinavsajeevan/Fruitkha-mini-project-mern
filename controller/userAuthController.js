@@ -226,6 +226,15 @@ const resetPassword = async (req, res) => {
     }
 }
 
+//contactUs METHOD = POST
+const contactUs = async (req, res) => {
+  try {
+
+  }catch (err) {
+    console.log('error occured in post contact us', err);
+  }
+}
+
 //profile forgot password
 const forgotProfile = async (req, res) => {
     try {
@@ -623,7 +632,7 @@ const addToCart = async (req, res) => {
     // ---------- Update Totals ----------
     cart.subTotal = cart.products.reduce((sum, item) => sum + item.totalPrice, 0);
     cart.shipping = 45;
-    cart.total = cart.subTotal + cart.shipping;
+    cart.total = cart.coupon? ((cart.subTotal + cart.shipping) * (100 - cart.couponDiscount)) / 100: cart.subTotal + cart.shipping;
     await cart.save();
 
     // ---------- Render Shop Page ----------
@@ -642,8 +651,10 @@ const getCart = async (req, res) => {
         const userId = req.user._id;
         const msg = req.query.msg || '';
         const prodId = req.query.id || '';
+        const couponMsg = req.query.couponMsg || '';
         const cart = await Cart.findOne({user: userId}).populate('products.product');
-        return res.render('user/cart', { cart, user: req.user,msg,prodId });
+       
+        return res.render('user/cart', { cart, user: req.user,msg,prodId, couponMsg });
         
     } catch (err) {
         console.log('error occured in getting cart', err)
@@ -663,8 +674,12 @@ const updateCart = async (req, res) => {
         productItem.totalPrice = productItem.quantity * productItem.price;
         //calculating sub total
         cart.subTotal = cart.products.reduce((sum, product) => sum + product.totalPrice, 0);
-        cart.total = cart.subTotal + cart.shipping;
+        cart.total = cart.coupon? ((cart.subTotal + cart.shipping) * (100 -cart.couponDiscount)) / 100: cart.subTotal + cart.shipping;
+
         await cart.save();
+
+
+
         return res.redirect('/cart')
 
     }catch(err) {
@@ -684,7 +699,7 @@ const removeCart = async (req, res) => {
         )
         const cart = await Cart.findOne({ user: userId});
         cart.subTotal = cart.products.reduce((sum, item) => sum + item.totalPrice, 0);
-        cart.total = cart.shipping + cart.subTotal;
+        cart.total = cart.coupon? ((cart.subTotal + cart.shipping) * (100 - cart.couponDiscount)) / 100: cart.subTotal + cart.shipping;
         await cart.save();
         return res.redirect('/cart');
 
@@ -698,15 +713,54 @@ const removeCart = async (req, res) => {
 const couponAdd = async (req, res) => {
   try {
     const { couponName } = req.body;
-    if(!couponName) return res.json({error: 'no input values'});
+
     
     const coupon = await Coupon.findOne({couponCode: couponName});
-    
+    if(!coupon || coupon.status ===  'Blocked') return res.redirect(`/cart?couponMsg=${'Invalid Coupon'}`)
+
+    const cart = await Cart.findOne({user: req.user._id});   
+    if( cart.couponName.length > 0 && cart.couponName.includes(coupon.couponCode) ) {
+      return res.redirect(`/cart?couponMsg=${'Coupon Already Used'}`);
+    } 
+    if(cart.coupon) {
+      cart.couponName.pop()
+      cart.total = cart.total / (1 - cart.couponDiscount / 100)
+    }
+
+    cart.coupon = true;
+    cart.couponDiscount = Number(coupon.discount)
+    cart.couponName.push(coupon.couponCode);
+    await cart.save();
+
+     if(cart.total && cart.coupon) {
+          cart.total = (cart.total *(100 - cart.couponDiscount)) / 100
+          await cart.save();
+        }
+
+    res.redirect('/cart')
 
   }catch(err) {
     console.log('error occured in coupon add', err);
   }
 }
+
+//coupon remove
+const removeCoupon = async (req, res) => {
+  try {
+    const cart = await Cart.findOne({user: req.user._id})
+    cart.coupon = false;
+    cart.total = cart.total / (1 - cart.couponDiscount / 100);
+    cart.couponDiscount = null
+    cart.couponName.pop();
+
+    await cart.save()
+    return res.redirect('/cart');
+
+  }catch (err) {
+    console.log('error occured in removing coupon', err)
+  }
+}
+
 //wishlist add METHOD = POST
 const wishlistAdd = async (req, res) => {
     try {
@@ -839,7 +893,7 @@ const addTowishlist = async (req, res) => {
     // ---------- Update Totals ----------
     cart.subTotal = cart.products.reduce((sum, item) => sum + item.totalPrice, 0);
     cart.shipping = 45;
-    cart.total = cart.subTotal + cart.shipping;
+    cart.total = cart.coupon? ((cart.subTotal + cart.shipping) * (100 - cart.couponDiscount)) / 100: cart.subTotal + cart.shipping;
     await cart.save();
 
     // wishlist.products = wishlist.products.filter(item => item._id.toString() !== productId.toString())
@@ -958,7 +1012,16 @@ const orderCOD = async (req, res) => {
     const order = await Order.findOne({userId, _id:orderId})
 
     //cart data will be empty
-    await Cart.findOneAndUpdate({user:userId }, { $set: { products: [] } })
+    const cart = await Cart.findOne({user:userId })
+    
+    cart.products = [];
+    cart.subTotal = 0;
+    cart.total = 0;
+    cart.coupon = false;
+    cart.couponDiscount = null;
+    await cart.save()
+    console.log('cart');
+
     if(order.address.email) {
       await sendOrderPDFEmail(order, order.address.email)
     }
@@ -985,7 +1048,7 @@ const getStripe = async (req, res) => {
           price_data: {
             currency: 'inr',                                 // use currency your store uses
             product_data: { name: item.name },
-            unit_amount: Math.round(item.price * 100)       // convert rupees to paise
+            unit_amount: Math.round(item.total * 100)       // convert rupees to paise
           },
           quantity: item.quantity
         }));
@@ -1115,6 +1178,7 @@ module.exports = {
     otpVerify,
     resendOtp,
     resetPassword,
+    contactUs,
     logout,
     deleteAccount,
     forgotProfile,
@@ -1134,6 +1198,7 @@ module.exports = {
     updateCart,
     removeCart,
     couponAdd,
+    removeCoupon,
     wishlistAdd,
     getWishlist,
     remeoveWishlist,

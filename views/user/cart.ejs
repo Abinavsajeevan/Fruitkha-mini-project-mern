@@ -157,7 +157,7 @@
 								<% if(cart.coupon) {%>
 								<tr class="total-data">
 									<td><strong>Coupon: </strong></td>
-									<td>₹<%= cart.coupenPrice %></td>
+									<td><%= cart.couponDiscount %>% <b>Off</b></td>
 								</tr>
 								<% } %>
 								<tr class="total-data">
@@ -166,18 +166,29 @@
 								</tr>
 							</tbody>
 						</table>
-						<div class="cart-buttons">
-							<a href="/checkout" class="boxed-btn black">Check Out</a>
+						<div class="d-flex justify-content-between">
+							<div class="cart-buttons">
+								<a href="/checkout" class="boxed-btn black">Check Out</a>
+							</div>
+							<% if(cart.coupon) { %>
+							<div class="cart-buttons">
+								<form method="POST" action="/cart/coupon-remove"><button type="submit" class="boxed-btn black" style="color: red;">Remove Coupon</button></form>
+							</div>
+							<% } %>
 						</div>
 					</div>
 
 					<div class="coupon-section">
 						<h3>Apply Coupon</h3>
 						<div class="coupon-form-wrap">
-							<form action="index.html">
-								<p><input type="text" placeholder="Coupon" name="couponName"></p>
+							<form action="/cart/coupon-add" method="POST">
+								<p><input type="text" placeholder="Coupon" name="couponName" required></p>
+								<% if(couponMsg) { %>
+								<p class="text-danger coupon-error-msg"><%= couponMsg %></p>
+							<% } %>
 								<p><input type="submit" value="Apply"></p>
 							</form>
+							
 						</div>
 					</div>
 				</div>
@@ -244,6 +255,18 @@
     }
 
   })
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const input = document.querySelector('input[name="couponName"]');
+    const errorMsg = document.querySelector(".coupon-error-msg");
+
+    if(input && errorMsg){
+        input.addEventListener("input", () => {
+            errorMsg.style.display = "none";
+        });
+    }
+});
 </script>
 
 

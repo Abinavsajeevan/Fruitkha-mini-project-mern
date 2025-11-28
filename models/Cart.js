@@ -43,8 +43,12 @@ const cartSchema = new Schema({
         type: Boolean,
         default: false
     },
-    couponPrice: {
+    couponDiscount: {
         type: Number
+    },
+    couponName: {
+        type: [String],
+        default: []
     },
     total: {
         type: Number,

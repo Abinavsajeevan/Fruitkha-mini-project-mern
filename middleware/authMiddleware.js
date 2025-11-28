@@ -5,7 +5,6 @@ async function verifyToken(req, res, next) {
     console.log('token verification started...');
     //taking token id  from cookies
     const token = await req.cookies?.token;
-    console.log(token)
     if(token) {
         try {
             //here token verifies and it stored in to vrifies 

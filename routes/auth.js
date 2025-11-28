@@ -1,5 +1,5 @@
 const express = require('express');
-const { registerUser, loginUser, forgotPassword, otpVerify, resetPassword, deleteAccount, forgotProfile, changePassword, updateProfile, addToCart, updateCart, removeCart, wishlistAdd, remeoveWishlist, addTowishlist, addAddress, editAddress, deleteAddress, setDefaultAddress, postCheckout, cancelOrder, couponAdd } = require('../controller/userAuthController');
+const { registerUser, loginUser, forgotPassword, otpVerify, resetPassword, deleteAccount, forgotProfile, changePassword, updateProfile, addToCart, updateCart, removeCart, wishlistAdd, remeoveWishlist, addTowishlist, addAddress, editAddress, deleteAddress, setDefaultAddress, postCheckout, cancelOrder, couponAdd, removeCoupon, contactUs } = require('../controller/userAuthController');
 const { signupValidation, loginValidation, forgotValidation, resetPasswordValidation, updateProfileValidation, addressValidation, addressEditValidation } = require('../middleware/userValidator');
 const { verifyToken } = require('../middleware/authMiddleware');
 const createMulter = require('../middleware/profilePhotoUpload');
@@ -14,6 +14,11 @@ router.post('/login', loginValidation, loginUser)
 router.post('/forgotPassword', forgotValidation, forgotPassword)
 router.post('/verifyOtp', otpVerify)
 router.post('/resetPassword', resetPasswordValidation, resetPassword)
+// ----------------------------------------------
+//  --------CONTACT US SECTIONS------------------
+// ------------------------------------------------
+
+router.post('/contact', contactUs)
 
 // ----------------------------------------------
 //  --------PROFILE SECTIONS------------------
@@ -36,8 +41,8 @@ router.put('/cancel-order/:id', verifyToken, cancelOrder)
 router.post('/shop/add-to-cart', verifyToken, addToCart)//adding to cart
 router.post('/cart/update', verifyToken, updateCart)//update cart
 router.post('/cart/remove', verifyToken, removeCart)//removing cart
-router.post('/cart/coupon-add', verifyToken, couponAdd)
-
+router.post('/cart/coupon-add', verifyToken, couponAdd)//applying coupon
+router.post('/cart/coupon-remove', verifyToken, removeCoupon)//removing applied coupon
 
 
 // ----------------------------------------------
