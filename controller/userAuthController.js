@@ -17,6 +17,7 @@ const defaultAddress = require('../utils/defaultAddress');
 const Order = require('../models/Order');
 const sendOrderPDFEmail = require('../utils/sendOrderPDFEmail');
 const Coupon = require("../models/Coupon");
+const Enquiry = require("../models/Enquiry");
 
 
 
@@ -229,6 +230,16 @@ const resetPassword = async (req, res) => {
 //contactUs METHOD = POST
 const contactUs = async (req, res) => {
   try {
+    const { name, email, phone, subject, message } = req.body;
+    if( !name || !email || !phone || !subject || !message ) return res.redirect('/contact');
+    await Enquiry.create({
+      name,
+      email,
+      phone,
+      subject,
+      message
+    });
+    res.redirect('/contact')
 
   }catch (err) {
     console.log('error occured in post contact us', err);
@@ -722,6 +733,7 @@ const couponAdd = async (req, res) => {
     if( cart.couponName.length > 0 && cart.couponName.includes(coupon.couponCode) ) {
       return res.redirect(`/cart?couponMsg=${'Coupon Already Used'}`);
     } 
+    //
     if(cart.coupon) {
       cart.couponName.pop()
       cart.total = cart.total / (1 - cart.couponDiscount / 100)

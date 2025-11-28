@@ -7,6 +7,7 @@ const { adminVerifyToken } = require('../middleware/adminAuthMiddleware');
 const Admin = require('../models/Admin');
 const { logoutAdmin, showOrder, showCustomer, getDashboard, getLineChart, getPieChart, getBarChart, getDashboardStats, productSearch, getCoupon } = require('../controller/adminAuthController');
 const Product = require('../models/Product');
+const Enquiry = require('../models/Enquiry');
 //=================================================
 
 //------------------USER SIDE----------------------
@@ -64,10 +65,10 @@ router.get('/about', verifyTokenIndex, async (req, res) => {
     res.render('user/about', {user: req.user, });
 })
 //------------contact page----------
-router.get('/contact', verifyTokenIndex, async (req, res) => { 
+router.get('/contact', verifyTokenIndex, (req, res) => {
     req.session.email = null;
-    res.render('user/contact', {user: req.user});
-})
+    res.render('user/contact', { user: req.user });
+});
 
 ///=======================================================
 
@@ -241,7 +242,8 @@ router.get('/admin/coupons',adminVerifyToken, getCoupon)
 //----------admin support page -------------
 //---------------------------------------
 router.get('/admin/support',adminVerifyToken, async(req, res) => {
-  res.render('admin/support')
+  const enquiries = await Enquiry.find();
+  res.render('admin/support', {enquiries})
 })
 
 //--------------------------------------

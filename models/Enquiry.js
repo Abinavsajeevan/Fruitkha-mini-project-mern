@@ -16,7 +16,7 @@ const enquirySchema = new Schema({
         lowercase: true,
         trim: truncates
     },
-    mobile: {
+    phone: {
          type: String, 
          trim: true,
         match: [/^\d{10,13}$/, 'Mobile number must be 10-13 digits'] 
@@ -27,7 +27,7 @@ const enquirySchema = new Schema({
         maxlength: 100, 
         trim: true
     },
-    description: {
+    message: {
         type: String,
         required: true,
         maxlength: 1000, 
@@ -37,6 +37,10 @@ const enquirySchema = new Schema({
         type: String, 
         enum: ['Pending','Resolved'], 
         default: 'Pending' 
+    },
+    reply: {
+        type: Boolean,
+        default: false
     }
 
 },{timestamps: true});

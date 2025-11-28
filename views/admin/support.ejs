@@ -164,7 +164,7 @@
       <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
         <h3 class="mb-0">Support Messages</h3>
       </div>
-
+      <% if(enquiries) { %>
       <!-- Support Table -->
       <div class="card shadow-sm">
         <div class="card-header bg-dark text-white">
@@ -184,35 +184,39 @@
               </tr>
             </thead>
             <tbody>
+              <% enquiries.forEach((enquiry, index) => { %>
               <tr>
-                <td>1</td>
-                <td>Aarav</td>
-                <td>aarav@example.com</td>
-                <td>Refund Issue</td>
-                <td>Haven’t received refund for my last order.</td>
-                <td><span class="badge bg-warning text-dark">Pending</span></td>
+                <td><%= index + 1 %></td>
+                <td><%= enquiry.name %></td>
+                <td><%= enquiry.email %></td>
+                <td><%= enquiry.subject %></td>
+                <td><%= enquiry.message %></td>
+                <td><% if(enquiry.status === 'Pending') { %><span class="badge bg-warning text-dark"><%= enquiry.status %></span><% }else { %><span class="badge bg-success">Resolved</span><% } %></td>
                 <td>
-                  <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#replyModal">Reply</button>
+                  <% if(!enquiry.reply) { %>
+                    <button 
+                      class="btn btn-sm btn-outline-primary reply-btn"
+                      data-bs-toggle="modal" 
+                      data-bs-target="#replyModal"
+                      data-email="<%= enquiry.email %>"
+                      data-id="<%= enquiry._id %>" >
+                      Reply
+                    </button>
+                  <% }else { %>
+                      <button class="btn btn-sm btn-outline-secondary" disabled>Replied</button>
+                    <% } %>
+                    <% if(enquiry.status === 'Pending') { %>
                   <button class="btn btn-sm btn-outline-success">Mark Resolved</button>
+                    <% } %>
                 </td>
               </tr>
-              <tr>
-                <td>2</td>
-                <td>Priya</td>
-                <td>priya@example.com</td>
-                <td>Coupon not working</td>
-                <td>My FESTIVE20 coupon isn’t applying at checkout.</td>
-                <td><span class="badge bg-success">Resolved</span></td>
-                <td>
-                  <button class="btn btn-sm btn-outline-secondary" disabled>Replied</button>
-                </td>
-              </tr>
+              <% }) %>
             </tbody>
           </table>
         </div>
 
         <!-- Pagination -->
-        <div class="card-footer d-flex justify-content-between align-items-center">
+        <!-- <div class="card-footer d-flex justify-content-between align-items-center">
           <span>Showing 1–10 of 25</span>
           <nav>
             <ul class="pagination pagination-sm mb-0">
@@ -222,9 +226,16 @@
               <li class="page-item"><a class="page-link" href="#">Next</a></li>
             </ul>
           </nav>
-        </div>
-      </div>
-
+        </div> -->
+      <!-- </div> -->
+      <% }else { %>
+          <div class="card shadow-sm text-center mt-4">
+              <div class="card-body">
+                <h5 class="card-title">No Enquiry Found</h5>
+                <p class="card-text">You currently have no enquiries.</p>
+              </div>
+            </div>
+        <% } %>
     </main>
   </div>
 
@@ -239,7 +250,8 @@
         <div class="modal-body">
           <div class="mb-3">
             <label class="form-label">To (Email)</label>
-            <input type="email" class="form-control" value="aarav@example.com" readonly>
+            <input type="email" id="replyEmail" class="form-control" readonly>
+            <input type="hidden" id="enquiryId" name="enquiryId">
           </div>
           <div class="mb-3">
             <label class="form-label">Your Reply</label>
@@ -264,5 +276,23 @@
       toggleBtn.classList.toggle('active');
     });
   </script>
+  <script>
+document.addEventListener('DOMContentLoaded', () => {
+  const replyModal = document.getElementById('replyModal');
+
+  replyModal.addEventListener('show.bs.modal', function (event) {
+    const button = event.relatedTarget;   // The button that opened the modal
+    const email = button.getAttribute('data-email');
+    const id = button.getAttribute('data-id');
+
+    // Put email inside modal input
+    document.getElementById('replyEmail').value = email;
+
+    // (Optional) Save id to hidden input for form submission
+    document.getElementById('enquiryId').value = id;
+  });
+});
+</script>
+
 </body>
 </html>
