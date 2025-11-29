@@ -9,6 +9,7 @@ const getPaginatedCustomers = require("../utils/paginationCustomers");
 const User = require("../models/User");
 const getRangeStart = require("../utils/admindashboardline");
 const Coupon = require("../models/Coupon");
+const Enquiry = require("../models/Enquiry");
 
 const loginAdmin = async(req, res) => {
     try {
@@ -610,6 +611,23 @@ const deleteCoupon = async (req, res) => {
   }
 }
 
+//SUPPORT 
+//---------------
+
+//resolve button
+const resolveSupport = async (req, res) =>  {
+    try {
+        const { id } = req.body;
+    if (!id) return res.status(400).json({ error: "Missing ID" });
+
+    await Enquiry.findByIdAndUpdate(id, { status: "Resolved" });
+
+    return res.json({ success: true });
+
+    }catch(err) {
+        console.log('error occuredin resolve', err)
+    }
+}
 
 module.exports = {
     loginAdmin,
@@ -633,5 +651,6 @@ module.exports = {
     addCoupon,
     editCoupon,
     blockCoupon,
-    deleteCoupon
+    deleteCoupon,
+    resolveSupport
 }

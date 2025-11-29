@@ -191,7 +191,7 @@
                 <td><%= enquiry.email %></td>
                 <td><%= enquiry.subject %></td>
                 <td><%= enquiry.message %></td>
-                <td><% if(enquiry.status === 'Pending') { %><span class="badge bg-warning text-dark"><%= enquiry.status %></span><% }else { %><span class="badge bg-success">Resolved</span><% } %></td>
+                <td><% if(enquiry.status === 'Pending') { %><span class="badge bg-warning text-dark"><%= enquiry.status %></span><% }else { %><span class="badge bg-success"><%= enquiry.status %></span><% } %></td>
                 <td>
                   <% if(!enquiry.reply) { %>
                     <button 
@@ -206,7 +206,11 @@
                       <button class="btn btn-sm btn-outline-secondary" disabled>Replied</button>
                     <% } %>
                     <% if(enquiry.status === 'Pending') { %>
-                  <button class="btn btn-sm btn-outline-success">Mark Resolved</button>
+                  <button 
+                    class="btn btn-sm btn-outline-success resolve-btn" 
+                    data-id="<%= enquiry._id %>">
+                    Mark Resolved
+                  </button>
                     <% } %>
                 </td>
               </tr>
@@ -292,6 +296,37 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('enquiryId').value = id;
   });
 });
+</script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+
+    document.querySelectorAll('.resolve-btn').forEach(btn => {
+      btn.addEventListener('click', async function () {
+        const id = this.getAttribute('data-id');
+
+        const response = await fetch('/admin/support/resolve', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id })
+        });
+        const result = await response.json();
+        if(result.success) {
+          const row  = this.closest('tr');
+
+        row.querySelector('td:nth-child(6)').innerHTML =
+          `<span class="badge bg-success">Resolved</span>`;
+
+        this.remove(); // remove the button
+      } else {
+        alert("Failed to update status");
+      }
+
+      })
+    })
+
+  })
+
 </script>
 
 </body>
