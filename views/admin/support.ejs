@@ -246,7 +246,7 @@
   <!-- Reply Modal -->
   <div class="modal fade" id="replyModal" tabindex="-1" aria-labelledby="replyModalLabel" aria-hidden="true">
     <div class="modal-dialog">
-      <form class="modal-content">
+      <form class="modal-content" id="replyForm">
         <div class="modal-header bg-dark text-white">
           <h5 class="modal-title" id="replyModalLabel">Reply to User</h5>
           <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
@@ -326,6 +326,30 @@ document.addEventListener('DOMContentLoaded', () => {
     })
 
   })
+
+</script>
+
+<script>
+  document.getElementById("replyForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const email = document.getElementById("replyEmail").value;
+  const enquiryId = document.getElementById("enquiryId").value;
+  const reply = document.querySelector("#replyModal textarea").value;
+
+  const res = await fetch("/admin/support/reply", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, reply, enquiryId })
+  });
+
+  const data = await res.json();
+  if (data.success) {
+    location.reload();
+  } else {
+    alert("Failed to send reply");
+  }
+});
 
 </script>
 

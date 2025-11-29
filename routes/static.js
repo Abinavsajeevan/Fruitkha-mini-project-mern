@@ -100,7 +100,7 @@ router.get('/logout', verifyToken, logout)
 ///=======================================================
 
 //---------------single product page----------------------
-router.get('/singleproduct/:id', verifyToken, getSingleProduct)
+router.get('/singleproduct/:id', verifyTokenIndex, getSingleProduct)
 
 
 ///=======================================================

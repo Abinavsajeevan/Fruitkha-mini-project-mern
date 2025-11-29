@@ -18,6 +18,8 @@ const Order = require('../models/Order');
 const sendOrderPDFEmail = require('../utils/sendOrderPDFEmail');
 const Coupon = require("../models/Coupon");
 const Enquiry = require("../models/Enquiry");
+const { ensureEmbeddingForProduct } = require("../lib/embeddings");
+const mongoose = require('mongoose')
 
 
 
@@ -578,20 +580,6 @@ const cancelOrder = async (req, res) => {
   }
 }
 
-//show single  product METHOD = GET
-const getSingleProduct = async (req, res) => {
-  try {
-    const userId = req.user._id;
-    const _id = req.params.id;
-
-    const product = await Product.findById(_id);
-    if(!product) return res.redirect('/shop');
-    
-    res.render("user/single-product", {user: req.user, product})
-  }catch(err) {
-    console.log('error occured in single product', err);
-  }
-}
 
 //shop page METHOD = GET
 const getShop = async (req, res) => {
@@ -1179,6 +1167,66 @@ const stripeSuccess = async (req, res) => {
         console.error("Success route error:", err);
         res.status(500).send("Payment success processing failed.");
     }
+}
+
+
+
+// ============== AI =========================
+async function getSingleProduct(req, res) {
+  try {
+    const id = req.params.id;
+    if (!mongoose.Types.ObjectId.isValid(id)) return res.status(400).send('Invalid id');
+
+    const product = await Product.findById(id).lean();
+    if (!product) return res.status(404).render('user/404');
+
+    // Ensure embedding exists (on-demand) - will generate & save if missing
+    // Note: product was returned by .lean(); to call ensureEmbedding we need the document model.
+    let productDoc = await Product.findById(id);
+    // await ensureEmbeddingForProduct(productDoc);
+
+    // After ensure, fetch a fresh copy (with embedding array)
+    const freshProduct = await Product.findById(id).lean();
+
+    // If embedding still missing -> fallback to random suggestions or top products
+    if (!freshProduct.embedding || freshProduct.embedding.length === 0) {
+      const fallback = await Product.find({ _id: { $ne: freshProduct._id } }).limit(6).lean();
+      return res.render('user/single-product', { user: req.user||null, product: freshProduct, suggestions: fallback });
+    }
+
+    // Vector search using MongoDB Atlas $search knnBeta
+    // IMPORTANT: your MongoDB cluster must have a vector index on "embedding"
+    const k = 6; // fetch 6 candidates then exclude current and show top 4
+    const agg = [
+      {
+        $search: {
+          index: 'default', // your vector index name
+          knnBeta: {
+            vector: freshProduct.embedding,
+            path: 'embedding',
+            k: k
+          }
+        }
+      },
+      // exclude same product
+      { $match: { _id: { $ne: freshProduct._id } } },
+      { $limit: k },
+      // optional: project fields you need
+      { $project: { name: 1, price: 1, image: 1, gallery:1, category:1, description:1 } }
+    ];
+
+    const results = await Product.aggregate(agg).allowDiskUse(true);
+
+    // results is array of similar products ordered by similarity (closest first)
+    // choose top 4 to display
+    const suggestions = results.slice(0, 4);
+
+    // Render server-side (EJS) with suggestions injected
+    res.render('user/single-product', {user: req.user||null, product: freshProduct, suggestions });
+  } catch (err) {
+    console.error('single product error', err);
+    res.status(500).send('Server error');
+  }
 }
 
 

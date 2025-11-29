@@ -1,0 +1,66 @@
+<!-- views/partials/aiSuggestions.ejs -->
+<% if (suggestions && suggestions.length) { %>
+  <div class="related-products mt-4">
+    <h4 class="mb-3">You may also like</h4>
+
+    <div class="row product-lists">
+      <% suggestions.forEach(s => { %>
+        <div class="col-lg-4 col-md-6 text-center strawberry">
+          <div class="single-product-item">
+
+            <!-- Wishlist Button -->
+            <form class="wishlist-form" data-product-id="<%= s._id %>">
+              <button type="button" class="wishlist-btn" style="background:none; border:none;">
+                <i class="fas fa-heart"></i>
+              </button>
+            </form>
+
+            <!-- Product Image -->
+            <div class="product-image">
+              <a href="/singleproduct/<%= s._id %>">
+                <% if (s.image) { %>
+                  <img src="<%= s.image %>" alt="<%= s.name %>">
+                <% } else if (s.gallery && s.gallery.length) { %>
+                  <img src="<%= s.gallery[0] %>" alt="<%= s.name %>">
+                <% } else { %>
+                  <img src="/images/no-image.png" alt="No Image">
+                <% } %>
+              </a>
+            </div>
+
+            <!-- Product Name -->
+            <h3><%= s.name %></h3>
+
+            <!-- Static Rating (same as your main product cards) -->
+            <div class="product-rating mb-2">
+              <i class="fas fa-star" style="color:#F28123;"></i>
+              <i class="fas fa-star" style="color:#F28123;"></i>
+              <i class="fas fa-star" style="color:#F28123;"></i>
+              <i class="fas fa-star" style="color:#F28123;"></i>
+              <i class="far fa-star" style="color:#F28123;"></i>
+              <span class="ms-2">(4.0)</span>
+            </div>
+
+            <!-- Product Price -->
+            <p class="product-price"><span>Per Kg</span> ₹<%= s.price %></p>
+
+            <!-- Add to Cart -->
+            <form class="add-to-cart-form" data-product-id="<%= s._id %>">
+              <button type="button"
+                class="cart-btn-custom add-to-cart-btn <%= s.status === 'Out Of Stock' ? 'disabled-btn' : '' %>"
+                <%= s.status === 'Out Of Stock' ? 'disabled' : '' %>>
+                <i class="fas fa-shopping-cart"></i> Add to Cart
+              </button>
+            </form>
+
+            <p class="fw-bold mt-3 <%= s.status === 'In Stock' ? 'text-success' : s.status === 'Out Of Stock' ? 'text-danger' : 'text-warning' %>"
+               style="font-weight:700 !important;">
+              <%= s.status %>
+            </p>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+
+  </div>
+<% } %>

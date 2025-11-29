@@ -10,6 +10,7 @@ const productSchema = new Schema(
     enum: ["berries", "tropical fruits", "citrus fruits", "pome fruits", "stone fruits", "melons", "dry fruits", "exotic fruits"], 
     default: "tropical fruits" 
   },
+  description: { type: String, required: true, trim: true },
   status: { type: String, required: true},
   price: { type: Number, required: true },
   stock: { type: Number, required: true, min: 0 },
@@ -17,6 +18,9 @@ const productSchema = new Schema(
   gallery: [{ type: String }],
   discount: { type: String },
   origin: { type: String, default: "India" },
+
+  embedding: { type: [Number], default: [] }
+
 }, { timestamps: true });
 
 const Product = mongoose.model("Product", productSchema);

@@ -10,6 +10,7 @@ const User = require("../models/User");
 const getRangeStart = require("../utils/admindashboardline");
 const Coupon = require("../models/Coupon");
 const Enquiry = require("../models/Enquiry");
+const transporter = require("../utils/mailer");
 
 const loginAdmin = async(req, res) => {
     try {
@@ -74,7 +75,7 @@ const logoutAdmin = async(req, res) => {
 // ---------------
 const addProduct = async(req, res) => {
     try {
-        const {name, category, price, stock} = req.body;
+        const {name, category, price, stock, description} = req.body;
         let status;
         const existingProduct = await Product.findOne({name});
         const getProducts = await Product.find();
@@ -95,9 +96,11 @@ const addProduct = async(req, res) => {
             price,
             stock,
             status,
-            image: req.file?`/uploads/product/${req.file.filename}`:''
+            image: req.file?`/uploads/product/${req.file.filename}`:'',
+            description
         })
         await newProduct.save();
+        await ensureEmbeddingForProduct(newProduct);
         console.log('product added')
         return res.render('admin/products', {errors: [{msg:`${name} updated successfully`, path: 'success'}], showAddProductModal: true, products: getProducts, showEditProductModal: false, prod: false, admin: req.admin})
 
@@ -108,12 +111,12 @@ const addProduct = async(req, res) => {
 
 const editProduct = async(req, res) => {
     try{
-        const {id, name, category, price, stock} = req.body;
+        const {id, name, category, price, stock, description} = req.body;
         let status;
         const getProducts = await Product.find();
         const product = await Product.findById(id);
         console.log('work')
-        if(product.name == name && product.category == category && product.price == price && product.stock == stock && !req.file) return res.render('admin/products', {errors: [{msg:`already exists`, path: 'name'}], showAddProductModal: false, products: getProducts, showEditProductModal: true, prod: product, admin: req.admin});
+        if(product.name == name && product.category == category && product.price == price && product.stock == stock && !req.file && product.description == description) return res.render('admin/products', {errors: [{msg:`already exists`, path: 'name'}], showAddProductModal: false, products: getProducts, showEditProductModal: true, prod: product, admin: req.admin});
 
          if(stock > 15) {
                 status = 'In Stock'
@@ -128,10 +131,17 @@ const editProduct = async(req, res) => {
         product.price = price;
         product.stock = stock;
         product.status = status;
+        product.description = description;
 
         if(req.file) product.image = `/uploads/product/${req.file.filename}`
 
         await product.save();
+        const needsEmbeddingUpdate =
+  product.isModified('name') || product.isModified('description');
+
+if (needsEmbeddingUpdate) {
+  await ensureEmbeddingForProduct(product);
+}
         const getNewProducts = await Product.find();
         const newProduct = await Product.findById(id);
         return res.render('admin/products', {errors: [{msg:`updated successfully`, path: 'success'}], showAddProductModal: false, products: getNewProducts, showEditProductModal: true, prod: newProduct, admin: req.admin});
@@ -629,6 +639,36 @@ const resolveSupport = async (req, res) =>  {
     }
 }
 
+//send reply to email by admin support
+const sendReply = async (req, res) => {
+  const { email, reply, enquiryId } = req.body;
+
+  if (!email || !reply) {
+    return res.json({ success: false, msg: "Invalid input" });
+  }
+
+  try {
+    // Send email
+    await transporter.sendMail({
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: "Support Reply",
+      text: reply
+    });
+
+    // Save reply in db
+    await Enquiry.findByIdAndUpdate(enquiryId, {
+      reply: true,
+      status: "Resolved"
+    });
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error("MAIL ERROR:", err);
+    res.json({ success: false });
+  }
+};
+
 module.exports = {
     loginAdmin,
     settings,
@@ -652,5 +692,6 @@ module.exports = {
     editCoupon,
     blockCoupon,
     deleteCoupon,
-    resolveSupport
+    resolveSupport,
+    sendReply
 }
