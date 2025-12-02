@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Profile - My Admin</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    .sidebar{width:150px;height:100vh;overflow-y:auto;position:sticky;top:0;background:#051922;border-right:1px solid #033047;transition:all .3s ease;}
+    .sidebar h5{color:#F28123;position:sticky;top:0;background:#051922;padding:.75rem;border-bottom:1px solid #033047;}
+    .sidebar .list-group-item{background:#051922;color:white;border:none;transition:.3s;}
+    .sidebar .list-group-item:hover{background:#F28123;color:#051922;}
+    .sidebar .list-group-item.active{background:#F28123;color:#051922;font-weight:600;}
+    .mobile-header{background:#051922;border-bottom:1px solid #033047;}
+    #menu-toggle{border:none;background:none;width:30px;height:24px;position:relative;display:flex;flex-direction:column;justify-content:space-between;cursor:pointer;padding:0;}
+    #menu-toggle::before,#menu-toggle::after,#menu-toggle span{content:'';display:block;height:3px;width:100%;background:white;border-radius:2px;transition:all .3s;}
+    #menu-toggle.active::before{transform:translateY(9px) rotate(45deg);background:orange;}
+    #menu-toggle.active::after{transform:translateY(-9px) rotate(-45deg);background:orange;}
+    #menu-toggle.active span{background:transparent;}
+    @media(max-width:767.98px){.sidebar{width:100%;height:auto;display:none;border-bottom:1px solid #033047;}.sidebar.show{display:block;}}
+  </style>
+</head>
+<body class="bg-light">
+
+<header class="mobile-header d-flex justify-content-between align-items-center p-2 d-md-none">
+  <h5 class="mb-0 text-light">My Admin</h5>
+  <button id="menu-toggle"><span></span></button>
+</header>
+
+<div class="d-flex flex-column flex-md-row">
+    <!-- Sidebar -->
+    <aside class="sidebar border-end" id="sidebar">
+      <h5 class="p-3 border-bottom d-none d-md-block">My Admin</h5>
+    <nav class="list-group list-group-flush">
+      <a href="/admin" class="list-group-item list-group-item-action ">Dashboard</a>
+      <a href="/admin/orders" class="list-group-item list-group-item-action">Orders</a>
+      <a href="/admin/products" class="list-group-item list-group-item-action ">Products</a>
+      <a href="/admin/customers" class="list-group-item list-group-item-action">Customers</a>
+      <a href="/admin/editProduct" class="list-group-item list-group-item-action">Gallery</a>
+      <a href="/admin/coupons" class="list-group-item list-group-item-action">Coupons</a>
+      <a href="/admin/banner" class="list-group-item list-group-item-action active">Banner</a>
+      <a href="/admin/settings" class="list-group-item list-group-item-action">Settings</a>
+      <a href="/admin/support" class="list-group-item list-group-item-action">Support</a>
+    </nav>
+    </aside>
+
+<main class="flex-fill p-4" style="background:#e27a25;min-height:100vh;">
+
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <h3 class="fw-bold mb-0">Manage Banners</h3>
+    <button class="btn text-white" style="background-color:#F28123;" data-bs-toggle="modal" data-bs-target="#addBannerModal">
+      + Add Banner
+    </button>
+  </div>
+
+  <!-- Banner List -->
+  <div class="card shadow-sm mb-4">
+    <div class="card-header bg-dark text-white">All Banners</div>
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-striped align-middle mb-0">
+          <thead class="table-dark">
+            <tr>
+              <th style="width:180px;">Banner</th>
+              <th>Main Text</th>
+              <th>Sub Text</th>
+              <th style="width:150px;">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+
+            <!-- Example Row 1 -->
+            <tr>
+              <td>
+                <img src="/images/sample1.jpg" alt="Banner" style="width:160px;height:70px;object-fit:cover;border-radius:5px;">
+              </td>
+              <td>Fresh Fruits Sale</td>
+              <td>Best organic fruits delivered</td>
+              <td>
+                <button class="btn btn-sm btn-primary me-2" data-bs-toggle="modal" data-bs-target="#editBannerModal">Edit</button>
+                <button class="btn btn-sm btn-danger">Delete</button>
+              </td>
+            </tr>
+
+            <!-- Example Row 2 -->
+            <tr>
+              <td>
+                <img src="/images/sample2.jpg" alt="Banner" style="width:160px;height:70px;object-fit:cover;border-radius:5px;">
+              </td>
+              <td>Seasonal Offers</td>
+              <td>Get up to 40% off</td>
+              <td>
+                <button class="btn btn-sm btn-primary me-2" data-bs-toggle="modal" data-bs-target="#editBannerModal">Edit</button>
+                <button class="btn btn-sm btn-danger">Delete</button>
+              </td>
+            </tr>
+
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Banner Modal -->
+  <div class="modal fade" id="addBannerModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header bg-dark text-white">
+          <h5 class="modal-title">Add New Banner</h5>
+          <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+
+        <div class="modal-body">
+          <form>
+            <div class="mb-3">
+              <label class="form-label fw-bold">Main Text</label>
+              <input type="text" class="form-control" placeholder="Enter main banner text">
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-bold">Sub Text</label>
+              <input type="text" class="form-control" placeholder="Enter sub text">
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-bold">Banner Image</label>
+              <input type="file" class="form-control" id="bannerUpload">
+              <div class="mt-3">
+                <img id="bannerPreview" src="#" alt="" style="display:none;width:100%;max-height:250px;object-fit:cover;border-radius:10px;">
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button class="btn text-white" style="background-color:#F28123;">Save Banner</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Banner Modal -->
+  <div class="modal fade" id="editBannerModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header bg-dark text-white">
+          <h5 class="modal-title">Edit Banner</h5>
+          <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+
+        <div class="modal-body">
+          <form>
+            <div class="mb-3">
+              <label class="form-label fw-bold">Main Text</label>
+              <input type="text" class="form-control" value="Fresh Fruits Sale">
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-bold">Sub Text</label>
+              <input type="text" class="form-control" value="Best organic fruits delivered">
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-bold">Banner Image</label>
+              <input type="file" class="form-control" id="editBannerUpload">
+              <div class="mt-3">
+                <img id="editBannerPreview" src="/images/sample1.jpg" style="width:100%;max-height:250px;object-fit:cover;border-radius:10px;">
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button class="btn text-white" style="background-color:#F28123;">Update Banner</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  // Preview for Add Banner
+  document.getElementById("bannerUpload")?.addEventListener("change", function (e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    const preview = document.getElementById("bannerPreview");
+    preview.src = url;
+    preview.style.display = "block";
+  });
+
+  // Preview for Edit Banner
+  document.getElementById("editBannerUpload")?.addEventListener("change", function (e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    const preview = document.getElementById("editBannerPreview");
+    preview.src = url;
+  });
+</script>
+</body>
+</html>

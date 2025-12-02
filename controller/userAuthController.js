@@ -595,6 +595,36 @@ const getShop = async (req, res) => {
   }
  }
 
+ //add ratings
+const ratings = async(req, res) => {
+   const { rating, comment } = req.body;
+   const productId = req.params.id;
+ 
+   try {
+     const product = await Product.findById(productId);
+     if (!product) return res.json({ success: false, message: "Invalid product" });
+ 
+     // push review
+     product.reviews.push({
+       userId: req.user._id,
+       rating,
+       comment
+     });
+ 
+     // update totals
+     product.totalReviews = product.reviews.length;
+ 
+     const sum = product.reviews.reduce((acc, r) => acc + r.rating, 0);
+     product.averageRating = Number((sum / product.totalReviews).toFixed(1));
+ 
+     await product.save();
+ 
+     res.json({ success: true, message: "Rating added", averageRating: product.averageRating });
+ 
+   } catch (err) {
+     res.status(500).json({ success: false, message: "Server error" });
+   }
+ }
 //add to cart METHOD = POST
 const addToCart = async (req, res) => {
   try {
@@ -1182,11 +1212,15 @@ async function getSingleProduct(req, res) {
 
     // Ensure embedding exists (on-demand) - will generate & save if missing
     // Note: product was returned by .lean(); to call ensureEmbedding we need the document model.
-    let productDoc = await Product.findById(id);
-    // await ensureEmbeddingForProduct(productDoc);
+let freshProduct = product;
+try {
+  const productDoc = await Product.findById(id);
+  await ensureEmbeddingForProduct(productDoc);
+  freshProduct = await Product.findById(id).lean();
+} catch (embeddingErr) {
+  console.warn('Embedding skipped, fallback suggestions:', embeddingErr.message);
+}
 
-    // After ensure, fetch a fresh copy (with embedding array)
-    const freshProduct = await Product.findById(id).lean();
 
     // If embedding still missing -> fallback to random suggestions or top products
     if (!freshProduct.embedding || freshProduct.embedding.length === 0) {
@@ -1253,6 +1287,7 @@ module.exports = {
     cancelOrder,
     getSingleProduct,
     getShop,
+    ratings,
     addToCart,
     getCart,
     updateCart,

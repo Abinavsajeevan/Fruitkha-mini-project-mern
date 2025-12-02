@@ -181,7 +181,7 @@
     <table class="table table-dark table-striped mt-3">
       <thead>
         <tr>
-          <th>Image</th><th>Product</th><th>Qty</th><th>Price</th>
+          <th>Image</th><th>Product</th><th>Qty</th><th>Price</th><th>rate</th>
         </tr>
       </thead>
       <tbody>
@@ -189,7 +189,15 @@
         <tr><td>
   <img src="<%= item.image %>" class="order-item-img" alt="product">
 </td>
-<td><%= item.name %></td><td><%= item.quantity %> kg</td><td>₹<%= item.total %></td></tr>
+<td><%= item.name %></td><td><%= item.quantity %> kg</td><td>₹<%= item.total %></td> <td>
+    <button
+      class="btn btn-sm btn-warning rate-product-btn"
+      data-product-id="<%= item.productId %>"
+      data-product-name="<%= item.name %>"
+    >
+      Rate
+    </button>
+  </td></tr>
         <%}) %>
       </tbody>
     </table>
@@ -249,6 +257,40 @@
     </div>
   </div>
 </div>
+<!-- Rating Modal -->
+<div class="modal fade" id="ratingModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-2 border-warning">
+      <div class="modal-header">
+        <h5 class="modal-title text-warning fw-bold">Rate Product</h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+        <h6 id="ratingProductName" class="mb-3"></h6>
+
+        <label class="fw-bold">Your Rating:</label>
+        <select id="ratingValue" class="form-control mb-3">
+          <option value="">Select Rating</option>
+          <option value="1">1 - Very Bad</option>
+          <option value="2">2 - Bad</option>
+          <option value="3">3 - Okay</option>
+          <option value="4">4 - Good</option>
+          <option value="5">5 - Excellent</option>
+        </select>
+
+        <label class="fw-bold">Review:</label>
+        <textarea id="ratingComment" class="form-control" rows="3" placeholder="Write your review..."></textarea>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button class="btn btn-warning" id="submitRatingBtn">Submit</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 	
 	<!-- jquery -->
 	<script src="user/assets/js/jquery-1.11.3.min.js"></script>
@@ -337,7 +379,50 @@
     }
   });
 </script>
+<script>
+  let selectedProductId = null;
+const ratingModal = new bootstrap.Modal(document.getElementById('ratingModal'));
 
+document.querySelectorAll('.rate-product-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    selectedProductId = btn.dataset.productId;
+
+    document.getElementById('ratingProductName').textContent = btn.dataset.productName;
+
+    ratingModal.show();
+  });
+});
+
+document.getElementById('submitRatingBtn').addEventListener('click', async () => {
+  const rating = document.getElementById('ratingValue').value;
+  const comment = document.getElementById('ratingComment').value.trim();
+
+  if (!rating) return alert('Please select a rating.');
+  if (!comment) return alert('Please write a review.');
+
+  try {
+    const res = await fetch(`/product/${selectedProductId}/rate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ rating, comment })
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+      alert('Thank you for your rating!');
+      ratingModal.hide();
+      location.reload(); 
+    } else {
+      alert(data.message);
+    }
+  } catch (err) {
+    console.error(err);
+    alert('Something went wrong.');
+  }
+});
+
+</script>
 
 </body>
 </html>

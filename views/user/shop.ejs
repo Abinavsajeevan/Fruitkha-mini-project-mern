@@ -312,13 +312,20 @@
 
 						<!-- Customer Rating -->
 						<div class="product-rating mb-2">
-						<i class="fas fa-star" style="color: #F28123;"></i>
-						<i class="fas fa-star" style="color: #F28123;"></i>
-						<i class="fas fa-star" style="color: #F28123;"></i>
-						<i class="fas fa-star" style="color: #F28123;"></i>
-						<i class="far fa-star" style="color: #F28123;"></i>
-						<span class="ms-2">(4.0)</span>
+
+						<% for (let i = 1; i <= 5; i++) { %>
+							<% if (i <= Math.floor(product.averageRating)) { %>
+							<i class="fas fa-star" style="color:#F28123;"></i>
+							<% } else if (i - product.averageRating < 1) { %>
+							<i class="fas fa-star-half-alt" style="color:#F28123;"></i>
+							<% } else { %>
+							<i class="far fa-star" style="color:#F28123;"></i>
+							<% } %>
+						<% } %>
+
+						<span class="ms-2">(<%= product.averageRating %>)</span>
 						</div>
+
 
 						<!-- Product Price -->
 						<p class="product-price"><span>Per Kg</span> ₹<%= product.price %></p>

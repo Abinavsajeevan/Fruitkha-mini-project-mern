@@ -12,6 +12,7 @@ const passport = require('passport');
 require('./config/passport')
 const flash = require('connect-flash');
 
+console.log('some',process.env.OPENAI_API_KEY)
 
 // port 
 const PORT = process.env.PORT || 8000

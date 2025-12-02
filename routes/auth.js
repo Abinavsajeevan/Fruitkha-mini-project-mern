@@ -1,5 +1,5 @@
 const express = require('express');
-const { registerUser, loginUser, forgotPassword, otpVerify, resetPassword, deleteAccount, forgotProfile, changePassword, updateProfile, addToCart, updateCart, removeCart, wishlistAdd, remeoveWishlist, addTowishlist, addAddress, editAddress, deleteAddress, setDefaultAddress, postCheckout, cancelOrder, couponAdd, removeCoupon, contactUs } = require('../controller/userAuthController');
+const { registerUser, loginUser, forgotPassword, otpVerify, resetPassword, deleteAccount, forgotProfile, changePassword, updateProfile, addToCart, updateCart, removeCart, wishlistAdd, remeoveWishlist, addTowishlist, addAddress, editAddress, deleteAddress, setDefaultAddress, postCheckout, cancelOrder, couponAdd, removeCoupon, contactUs, ratings } = require('../controller/userAuthController');
 const { signupValidation, loginValidation, forgotValidation, resetPasswordValidation, updateProfileValidation, addressValidation, addressEditValidation } = require('../middleware/userValidator');
 const { verifyToken } = require('../middleware/authMiddleware');
 const createMulter = require('../middleware/profilePhotoUpload');
@@ -34,6 +34,13 @@ router.post('/editAddress', verifyToken,addressEditValidation, editAddress)//edi
 router.post('/deleteAddress/:id', verifyToken, deleteAddress)//delete address
 router.post('/setDefaultAddress/:id', verifyToken, setDefaultAddress)//default address
 router.put('/cancel-order/:id', verifyToken, cancelOrder)
+
+// ----------------------------------------------
+//  --------SHOP SECTIONS------------------
+// ------------------------------------------------
+router.post("/product/:id/rate", verifyToken, ratings);
+
+
 
 // ----------------------------------------------
 //  --------CART SECTIONS------------------

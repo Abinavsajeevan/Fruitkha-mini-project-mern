@@ -256,7 +256,7 @@ router.get('/admin/logs',adminVerifyToken, async(req, res) => {
 //--------------------------------------
 //----------admin profile page -------------
 //---------------------------------------
-router.get('/admin/profile',adminVerifyToken, async(req, res) => {
+router.get('/admin/banner',adminVerifyToken, async(req, res) => {
   res.render('admin/profile')
 })
 

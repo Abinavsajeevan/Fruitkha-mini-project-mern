@@ -11,6 +11,7 @@ const getRangeStart = require("../utils/admindashboardline");
 const Coupon = require("../models/Coupon");
 const Enquiry = require("../models/Enquiry");
 const transporter = require("../utils/mailer");
+const Banner = require("../models/Banner");
 
 const loginAdmin = async(req, res) => {
     try {
@@ -619,6 +620,18 @@ const deleteCoupon = async (req, res) => {
     console.error(err);
     res.json({ success: false, message: 'Error deleting coupon' });
   }
+}
+
+//BANNER 
+//---------------
+const getBanner = async (req, res) => {
+    try {
+        const banners = await Banner.find();
+        res.render('admin/banner', { banners });
+    } catch (err) {
+        console.log(err);
+        res.status(500).send("Server Error");
+    }
 }
 
 //SUPPORT 

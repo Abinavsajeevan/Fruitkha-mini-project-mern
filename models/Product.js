@@ -4,6 +4,16 @@ const { Schema } = mongoose;
 const productSchema = new Schema(
   {
   name: { type: String, required: true, trim: true },
+    averageRating: { type: Number, default: 0 },        // stores 0–5
+  totalReviews: { type: Number, default: 0 },
+  reviews: [
+    {
+      userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+      rating: { type: Number, min: 1, max: 5, required: true },
+      comment: { type: String, trim: true },
+      createdAt: { type: Date, default: Date.now }
+    }
+  ],
   category: { 
     type: String, 
     required: true, 
