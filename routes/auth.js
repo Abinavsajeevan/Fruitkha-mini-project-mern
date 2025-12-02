@@ -3,7 +3,7 @@ const { registerUser, loginUser, forgotPassword, otpVerify, resetPassword, delet
 const { signupValidation, loginValidation, forgotValidation, resetPasswordValidation, updateProfileValidation, addressValidation, addressEditValidation } = require('../middleware/userValidator');
 const { verifyToken } = require('../middleware/authMiddleware');
 const createMulter = require('../middleware/profilePhotoUpload');
-const { loginAdmin, settings, addProduct, editProduct, deleteProduct, updateOrderStatus, blockUser, addProductGallery, deleteGalleryImage, addCoupon, editCoupon, blockCoupon, deleteCoupon, resolveSupport, sendReply, addBanner } = require('../controller/adminAuthController');
+const { loginAdmin, settings, addProduct, editProduct, deleteProduct, updateOrderStatus, blockUser, addProductGallery, deleteGalleryImage, addCoupon, editCoupon, blockCoupon, deleteCoupon, resolveSupport, sendReply, addBanner, editBanner, deleteBanner } = require('../controller/adminAuthController');
 const { adminLoginValidation, adminSettingValidation, adminProductValidation } = require('../middleware/adminValidator');
 const { adminVerifyToken } = require('../middleware/adminAuthMiddleware');
 const router = express.Router();
@@ -118,7 +118,15 @@ router.delete('/admin/coupons/delete/:id', adminVerifyToken, deleteCoupon)//dele
 //---------------------------------------
 
 const bannerUpload = createMulter('banner')
-router.post('/admin/banner', verifyToken, bannerUpload.single('bannerImage'), addBanner)//add  banner details
+router.post('/admin/banner', adminVerifyToken, bannerUpload.single('bannerImage'), addBanner)//add  banner details
+
+router.post("/admin/banner/edit/:id", bannerUpload.single('bannerImage'), editBanner);//edit banner 
+const fs = require("fs");
+const path = require("path");
+
+router.post("/admin/banner/delete/:id", deleteBanner);
+//delete banner
+
 
 //--------------------------------------
 //---------- SUPPORT SECTION -------------

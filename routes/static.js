@@ -8,6 +8,7 @@ const Admin = require('../models/Admin');
 const { logoutAdmin, showOrder, showCustomer, getDashboard, getLineChart, getPieChart, getBarChart, getDashboardStats, productSearch, getCoupon, getBanner } = require('../controller/adminAuthController');
 const Product = require('../models/Product');
 const Enquiry = require('../models/Enquiry');
+const Banner = require('../models/Banner');
 //=================================================
 
 //------------------USER SIDE----------------------
@@ -17,7 +18,8 @@ const Enquiry = require('../models/Enquiry');
 router.get('/', verifyTokenIndex, async (req, res) => { 
     req.session.email = null;
     const getProducts = await Product.find().limit(3);
-    res.render('user/index', {user: req.user, products: getProducts});
+    const banner = await Banner.findOne()
+    res.render('user/index', {user: req.user, products: getProducts, banner});
 })
 
 //-----------------user without login-------------------
@@ -254,9 +256,11 @@ router.get('/admin/logs',adminVerifyToken, async(req, res) => {
 })
 
 //--------------------------------------
-//----------admin profile page -------------
+//----------admin banner page -------------
 //---------------------------------------
-router.get('/admin/banner',adminVerifyToken, getBanner)
+router.get('/admin/banner',adminVerifyToken, getBanner);//show banner page
+router.get("/banner/edit/:id", adminVerifyToken, );//edit banner page
+
 
 
 

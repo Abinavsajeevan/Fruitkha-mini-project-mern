@@ -82,8 +82,24 @@
                         <td><%= b.main %></td>
                         <td><%= b.sub %></td>
                         <td>
-                            <a href="/admin/banner/edit/<%= b._id %>" class="btn btn-sm btn-primary me-2">Edit</a>
-                            <a href="/admin/banner/delete/<%= b._id %>" class="btn btn-sm btn-danger">Delete</a>
+                            <button 
+                                class="btn btn-sm btn-primary me-2 editBtn"
+                                data-id="<%= b._id %>"
+                                data-main="<%= b.main %>"
+                                data-sub="<%= b.sub %>"
+                                data-image="<%= b.bannerImage %>"
+                                data-bs-toggle="modal"
+                                data-bs-target="#editBannerModal"
+                                >
+                                Edit
+                                </button>
+                           <button 
+                            class="btn btn-sm btn-danger deleteBtn"
+                            data-id="<%= b._id %>"
+                            >
+                            Delete
+                            </button>
+
                         </td>
                     </tr>
                 <% }) %>
@@ -125,7 +141,7 @@
               </div>
             </div>
                     <div class="modal-footer">
-          <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <a href="/admin/banner"><button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button></a>
           <button class="btn text-white" style="background-color:#F28123;">Save Banner</button>
         </div>
           </form>
@@ -146,31 +162,33 @@
         </div>
 
         <div class="modal-body">
-          <form>
+            <form id="editBannerForm" method="POST" enctype="multipart/form-data">
+            <input type="hidden" name="id" id="editBannerId">
+
             <div class="mb-3">
-              <label class="form-label fw-bold">Main Text</label>
-              <input type="text" class="form-control" value="Fresh Fruits Sale">
+                <label class="form-label fw-bold">Main Text</label>
+                <input type="text" name="main" id="editMain" class="form-control">
             </div>
 
             <div class="mb-3">
-              <label class="form-label fw-bold">Sub Text</label>
-              <input type="text" class="form-control" value="Best organic fruits delivered">
+                <label class="form-label fw-bold">Sub Text</label>
+                <input type="text" name="sub" id="editSub" class="form-control">
             </div>
 
             <div class="mb-3">
-              <label class="form-label fw-bold">Banner Image</label>
-              <input type="file" class="form-control" id="editBannerUpload">
-              <div class="mt-3">
-                <img id="editBannerPreview" src="/images/sample1.jpg" style="width:100%;max-height:250px;object-fit:cover;border-radius:10px;">
-              </div>
+                <label class="form-label fw-bold">Banner Image</label>
+                <input type="file" name="bannerImage" class="form-control" id="editBannerUpload">
+                <img id="editBannerPreview" style="width:100%;max-height:250px;object-fit:cover;border-radius:10px;">
             </div>
-          </form>
-        </div>
-
-        <div class="modal-footer">
-          <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <div class="modal-footer">
+          <a href="/admin/banner"><button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button></a>
           <button class="btn text-white" style="background-color:#F28123;">Update Banner</button>
         </div>
+            </form>
+
+        </div>
+
+
       </div>
     </div>
   </div>
@@ -199,6 +217,35 @@
     const preview = document.getElementById("editBannerPreview");
     preview.src = url;
   });
+  document.querySelectorAll(".editBtn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.getElementById("editBannerId").value = btn.dataset.id;
+    document.getElementById("editMain").value = btn.dataset.main;
+    document.getElementById("editSub").value = btn.dataset.sub;
+    document.getElementById("editBannerPreview").src = btn.dataset.image;
+
+    // Set form action dynamically
+    document.getElementById("editBannerForm").action = `/admin/banner/edit/${btn.dataset.id}`;
+  });
+});
+
 </script>
+<form id="deleteBannerForm" method="POST" style="display:none;"></form>
+<script>
+    document.querySelectorAll(".deleteBtn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const id = btn.dataset.id;
+
+    const confirmed = confirm("Are you sure you want to delete this banner?");
+    if (!confirmed) return;
+
+    const form = document.getElementById("deleteBannerForm");
+    form.action = `/admin/banner/delete/${id}`;
+    form.submit();
+  });
+});
+
+</script>
+
 </body>
 </html>

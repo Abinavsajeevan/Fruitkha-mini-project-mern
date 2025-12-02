@@ -637,7 +637,6 @@ const getBanner = async (req, res) => {
 }
 
 //add banner page METHOD = POST
-
  const addBanner = async (req, res) => {
     try {
         console.log('hello');
@@ -655,6 +654,48 @@ const getBanner = async (req, res) => {
         console.log(err);
         res.status(500).send("Server Error");
     }
+}
+
+//edit banner page METHOD = GET
+const editBanner = async (req, res) => {
+  try {
+      const { main, sub } = req.body;
+
+      const updateData = { main, sub };
+
+      if (req.file) {
+          updateData.bannerImage = '/uploads/banner/' + req.file.filename;
+      }
+
+      await Banner.findByIdAndUpdate(req.params.id, updateData);
+      res.redirect("/admin/banner");
+  }
+  catch (err) {
+      console.log(err);
+      res.status(500).send("Server Error");
+  }
+}
+
+//delete banner
+const deleteBanner = async (req, res) => {
+  try {
+    const banner = await Banner.findById(req.params.id);
+    if (!banner) return res.redirect("/admin/banner");
+
+    // Remove banner image from uploads folder
+    // const imagePath = path.join(__dirname, "../..", banner.bannerImage);
+    // if (fs.existsSync(imagePath)) {
+    //   fs.unlinkSync(imagePath);
+    // }
+
+    await Banner.findByIdAndDelete(req.params.id);
+
+    res.redirect("/admin/banner");
+  }
+  catch (err) {
+    console.log(err);
+    res.status(500).send("Server Error");
+  }
 }
 
 //SUPPORT 
@@ -730,6 +771,8 @@ module.exports = {
     deleteCoupon,
     getBanner,
     addBanner,
+    editBanner,
+    deleteBanner,
     resolveSupport,
     sendReply
 }
