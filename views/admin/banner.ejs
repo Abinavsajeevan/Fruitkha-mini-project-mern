@@ -68,35 +68,28 @@
               <th style="width:150px;">Actions</th>
             </tr>
           </thead>
-          <tbody>
+            <tbody>
+            <% if (banners.length === 0) { %>
+                <tr>
+                    <td colspan="4" class="text-center py-4">No banners found</td>
+                </tr>
+            <% } else { %>
+                <% banners.forEach(b => { %>
+                    <tr>
+                        <td>
+                            <img src="<%= b.bannerImage %>" style="width:160px;height:70px;object-fit:cover;border-radius:5px;">
+                        </td>
+                        <td><%= b.main %></td>
+                        <td><%= b.sub %></td>
+                        <td>
+                            <a href="/admin/banner/edit/<%= b._id %>" class="btn btn-sm btn-primary me-2">Edit</a>
+                            <a href="/admin/banner/delete/<%= b._id %>" class="btn btn-sm btn-danger">Delete</a>
+                        </td>
+                    </tr>
+                <% }) %>
+            <% } %>
+            </tbody>
 
-            <!-- Example Row 1 -->
-            <tr>
-              <td>
-                <img src="/images/sample1.jpg" alt="Banner" style="width:160px;height:70px;object-fit:cover;border-radius:5px;">
-              </td>
-              <td>Fresh Fruits Sale</td>
-              <td>Best organic fruits delivered</td>
-              <td>
-                <button class="btn btn-sm btn-primary me-2" data-bs-toggle="modal" data-bs-target="#editBannerModal">Edit</button>
-                <button class="btn btn-sm btn-danger">Delete</button>
-              </td>
-            </tr>
-
-            <!-- Example Row 2 -->
-            <tr>
-              <td>
-                <img src="/images/sample2.jpg" alt="Banner" style="width:160px;height:70px;object-fit:cover;border-radius:5px;">
-              </td>
-              <td>Seasonal Offers</td>
-              <td>Get up to 40% off</td>
-              <td>
-                <button class="btn btn-sm btn-primary me-2" data-bs-toggle="modal" data-bs-target="#editBannerModal">Edit</button>
-                <button class="btn btn-sm btn-danger">Delete</button>
-              </td>
-            </tr>
-
-          </tbody>
         </table>
       </div>
     </div>
@@ -112,31 +105,33 @@
         </div>
 
         <div class="modal-body">
-          <form>
+          <form action="/admin/banner" method="POST" enctype="multipart/form-data">
+
             <div class="mb-3">
               <label class="form-label fw-bold">Main Text</label>
-              <input type="text" class="form-control" placeholder="Enter main banner text">
+              <input type="text" name="main" class="form-control" placeholder="Enter main banner text">
             </div>
 
             <div class="mb-3">
               <label class="form-label fw-bold">Sub Text</label>
-              <input type="text" class="form-control" placeholder="Enter sub text">
+              <input type="text" name="sub" class="form-control" placeholder="Enter sub text">
             </div>
 
             <div class="mb-3">
               <label class="form-label fw-bold">Banner Image</label>
-              <input type="file" class="form-control" id="bannerUpload">
+              <input type="file" class="form-control" name="bannerImage" id="bannerUpload">
               <div class="mt-3">
                 <img id="bannerPreview" src="#" alt="" style="display:none;width:100%;max-height:250px;object-fit:cover;border-radius:10px;">
               </div>
             </div>
-          </form>
-        </div>
-
-        <div class="modal-footer">
+                    <div class="modal-footer">
           <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
           <button class="btn text-white" style="background-color:#F28123;">Save Banner</button>
         </div>
+          </form>
+        </div>
+
+
       </div>
     </div>
   </div>

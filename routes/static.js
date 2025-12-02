@@ -5,7 +5,7 @@ const {verifyToken, verifyTokenIndex} = require('../middleware/authMiddleware');
 const { googleLogin, resendOtp, logout, deleteAccount, getShop, getCart, getWishlist, getCheckout, addressProfile, orderCOD, getProfileOrder, getSingleProduct } = require('../controller/userAuthController');
 const { adminVerifyToken } = require('../middleware/adminAuthMiddleware');
 const Admin = require('../models/Admin');
-const { logoutAdmin, showOrder, showCustomer, getDashboard, getLineChart, getPieChart, getBarChart, getDashboardStats, productSearch, getCoupon } = require('../controller/adminAuthController');
+const { logoutAdmin, showOrder, showCustomer, getDashboard, getLineChart, getPieChart, getBarChart, getDashboardStats, productSearch, getCoupon, getBanner } = require('../controller/adminAuthController');
 const Product = require('../models/Product');
 const Enquiry = require('../models/Enquiry');
 //=================================================
@@ -256,9 +256,7 @@ router.get('/admin/logs',adminVerifyToken, async(req, res) => {
 //--------------------------------------
 //----------admin profile page -------------
 //---------------------------------------
-router.get('/admin/banner',adminVerifyToken, async(req, res) => {
-  res.render('admin/profile')
-})
+router.get('/admin/banner',adminVerifyToken, getBanner)
 
 
 

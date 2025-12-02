@@ -624,10 +624,33 @@ const deleteCoupon = async (req, res) => {
 
 //BANNER 
 //---------------
+
+//banner get page
 const getBanner = async (req, res) => {
     try {
         const banners = await Banner.find();
         res.render('admin/banner', { banners });
+    } catch (err) {
+        console.log(err);
+        res.status(500).send("Server Error");
+    }
+}
+
+//add banner page METHOD = POST
+
+ const addBanner = async (req, res) => {
+    try {
+        console.log('hello');
+        
+        const { main, sub } = req.body;
+
+        await Banner.create({
+            main,
+            sub,
+            bannerImage: '/uploads/banner/' + req.file.filename
+        });
+
+        res.redirect('/admin/banner');
     } catch (err) {
         console.log(err);
         res.status(500).send("Server Error");
@@ -705,6 +728,8 @@ module.exports = {
     editCoupon,
     blockCoupon,
     deleteCoupon,
+    getBanner,
+    addBanner,
     resolveSupport,
     sendReply
 }
