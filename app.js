@@ -63,6 +63,6 @@ app.use((req, res, next) => {
  
 app.use('/', routes) 
  
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0',  () => {
     console.log(`server is running at port ${PORT}`);
 })  
