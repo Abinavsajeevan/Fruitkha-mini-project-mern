@@ -3,6 +3,9 @@ const express = require('express');
 const connectDb = require('./config/db');
 const path = require('path');
 const cookieParser = require('cookie-parser');
+const helmet = require("helmet");
+const cors = require("cors");
+
 
 // all route files
 const routes = require('./routes/index')
@@ -12,11 +15,12 @@ const passport = require('passport');
 require('./config/passport')
 const flash = require('connect-flash');
 
-console.log('some',process.env.OPENAI_API_KEY)
 
 // port 
 const PORT = process.env.PORT || 8000
 const app = express();
+app.use(helmet());
+app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }));
 
 // data base connection
 connectDb(); 
@@ -27,10 +31,10 @@ app.set('views', 'views')
 app.use(cookieParser()); 
 app.use('/user', express.static(path.join(__dirname, 'public', 'user')));
 app.use('/admin', express.static(path.join(__dirname, 'public', 'admin')));
-app.use('/', stripeRoutes)
-//stripe
 app.use(express.json())
 app.use(express.urlencoded({extended: true}))
+app.use('/', stripeRoutes)
+//stripe
 app.use(session({
   secret: process.env.SESSION_SECRET || 'secret_key',
   resave: false,
@@ -38,6 +42,8 @@ app.use(session({
    cookie: { maxAge: 24 * 60 * 60 * 1000 }
 })); 
 app.use('/uploads', express.static('uploads'));
+app.set('trust proxy', 1);
+
 
 // clear cache
 app.use((req, res, next) => {
