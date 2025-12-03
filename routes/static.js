@@ -18,8 +18,8 @@ const Banner = require('../models/Banner');
 router.get('/', verifyTokenIndex, async (req, res) => { 
     req.session.email = null;
     const getProducts = await Product.find().limit(3);
-    const banner = await Banner.findOne()
-    res.render('user/index', {user: req.user, products: getProducts, banner});
+    const banners = await Banner.find()
+    res.render('user/index', {user: req.user, products: getProducts, banners});
 })
 
 //-----------------user without login-------------------
