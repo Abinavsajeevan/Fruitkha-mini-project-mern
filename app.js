@@ -29,8 +29,9 @@ app.set('view engine', 'ejs')
 app.set('views', 'views')
   
 app.use(cookieParser()); 
-app.use('/user', express.static(path.join(__dirname, 'public', 'user')));
-app.use('/admin', express.static(path.join(__dirname, 'public', 'admin')));
+app.use( express.static(path.join(__dirname, 'public')));
+// app.use('/user', express.static(path.join(__dirname, 'public', 'user')));
+// app.use('/admin', express.static(path.join(__dirname, 'public', 'admin')));
 app.use(express.json())
 app.use(express.urlencoded({extended: true}))
 app.use('/', stripeRoutes)
