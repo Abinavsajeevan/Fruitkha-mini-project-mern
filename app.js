@@ -19,7 +19,7 @@ const flash = require('connect-flash');
 // port 
 const PORT = process.env.PORT || 8000
 const app = express();
-app.use(helmet());
+// app.use(helmet());
 app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }));
 
 // data base connection
