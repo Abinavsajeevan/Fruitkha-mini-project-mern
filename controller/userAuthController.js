@@ -1093,6 +1093,14 @@ const getStripe = async (req, res) => {
     });
 
         order.stripeSessionId = session.id;
+               const cart = await Cart.findOne({user: req.user._id })
+    
+    cart.products = [];
+    cart.subTotal = 0;
+    cart.total = 0;
+    cart.coupon = false;
+    cart.couponDiscount = null;
+    await cart.save()
     if (session.payment_intent) order.stripePaymentIntentId = session.payment_intent;
     await order.save();
     console.log('stripe worked successfully get ....')
@@ -1184,6 +1192,7 @@ const stripeSuccess = async (req, res) => {
         // 2. Retrieve the PaymentIntent
         const paymentIntent = await stripe.paymentIntents.retrieve(session.payment_intent);
 
+  
         const order = await Order.findOne({_id: session.metadata.orderId})
         // 3. Show "payment successful" page
     console.log('stripe worked success completed ....')
