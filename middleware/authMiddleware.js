@@ -4,7 +4,7 @@ const User = require('../models/User');
 async function verifyToken(req, res, next) {
     console.log('token verification started...');
     //taking token id  from cookies
-    const token = await req.cookies?.token;
+    const token = req.cookies?.token;
 
     if(!token) {
         
@@ -21,9 +21,9 @@ async function verifyToken(req, res, next) {
             if(req.user.isBlocked) {
                  await res.clearCookie("token");
                  console.log('abi its token ')
-                 res.redirect('/login')
+                 return res.redirect('/login')
             }
-            next();
+            return next();
         } catch( err ) {
             console.log('an error occured in token validation: ', err);
         }
@@ -35,6 +35,7 @@ async function verifyTokenIndex(req, res, next) {
     console.log('token verification started no user...');
 
     const token = req.cookies?.token;
+    console.log(token)
 
     if (!token) {
         // No user -> continue without user
@@ -53,15 +54,17 @@ async function verifyTokenIndex(req, res, next) {
 
         if (!req.user) {
             // User not found -> clear token
+            console.log('no user')
             res.clearCookie("token");
             return next();
         }
 
         if (req.user.isBlocked) {
+
             res.clearCookie("token");
             return res.redirect('/login');
         }
-
+        console.log('workk next')
         return next();
 
     } catch (err) {

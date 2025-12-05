@@ -145,7 +145,7 @@ h4.fw-bold {
 	             class="rounded-circle border border-4 shadow"
 	             style="border-color:#F28123; width:150px; height:150px; object-fit:cover;">
 
-        <h4 class="mt-3 fw-bold" style="color:#F28123;"><%=user.name%></h4>
+        <h4 class="mt-3 fw-bold" style="color:#F28123;"><%=user?user.name:''%></h4>
       </div>
 
       <hr class="mb-4" style="border-color:#F28123;">

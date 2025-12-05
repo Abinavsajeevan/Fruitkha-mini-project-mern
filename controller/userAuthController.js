@@ -118,10 +118,11 @@ const googleLogin = async (req, res) => {
     console.log('creating token for google')
     
     // create jwt 
-    const token = jwt.sign({tokenId: req.user._id}, process.env.JWT_SECRET_KEY, {expiresIn: '20d'});
+    const token = jwt.sign({tokenId: req.user._id}, process.env.JWT_SECRET_KEY, {expiresIn: '2d'});
 
     console.log('storing it in to cookie');
-    res.cookie('token', token, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000, sameSite: 'strict'});
+    res.cookie('token', token, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000, sameSite: 'lax'});
+    console.log(req.cookies)
 
     res.redirect('/');
 }
@@ -381,7 +382,9 @@ const updateProfile = async (req, res) => {
        if(req.file) user.profilePhoto = `/uploads/profile/${req.file.filename}`;
        
         await user.save();
-        const updateUser = await User.findOne({email: req.session.email})
+
+        const updateUser = await User.findOne({email})
+       console.log(updateUser)
    
         res.render('user/profile', {user:updateUser, error: 'updated',
         showEditProfileModal : true, success: true})
