@@ -5,7 +5,7 @@ const {verifyToken, verifyTokenIndex} = require('../middleware/authMiddleware');
 const { googleLogin, resendOtp, logout, deleteAccount, getShop, getCart, getWishlist, getCheckout, addressProfile, orderCOD, getProfileOrder, getSingleProduct } = require('../controller/userAuthController');
 const { adminVerifyToken } = require('../middleware/adminAuthMiddleware');
 const Admin = require('../models/Admin');
-const { logoutAdmin, showOrder, showCustomer, getDashboard, getLineChart, getPieChart, getBarChart, getDashboardStats, productSearch, getCoupon, getBanner } = require('../controller/adminAuthController');
+const { logoutAdmin, showOrder, showCustomer, getDashboard, getLineChart, getPieChart, getBarChart, getDashboardStats, productSearch, getCoupon, getBanner, editBanner } = require('../controller/adminAuthController');
 const Product = require('../models/Product');
 const Enquiry = require('../models/Enquiry');
 const Banner = require('../models/Banner');
@@ -230,7 +230,7 @@ router.get('/admin/customers', adminVerifyToken, showCustomer)
 //----------admin gallery page -------------
 //---------------------------------------
 router.get('/admin/editProduct', adminVerifyToken, (req, res) => {
-  res.render("admin/editProduct")
+  res.render("admin/editProduct",{admin: req.admin})
 })
 
 router.get('/admin/editProduct/product-search', adminVerifyToken, productSearch)//search product
@@ -245,21 +245,16 @@ router.get('/admin/coupons',adminVerifyToken, getCoupon)
 //---------------------------------------
 router.get('/admin/support',adminVerifyToken, async(req, res) => {
   const enquiries = await Enquiry.find();
-  res.render('admin/support', {enquiries})
+  res.render('admin/support', {enquiries, admin: req.admin})
 })
 
-//--------------------------------------
-//----------admin logs page -------------
-//---------------------------------------
-router.get('/admin/logs',adminVerifyToken, async(req, res) => {
-  res.render('admin/logs')
-})
+
 
 //--------------------------------------
 //----------admin banner page -------------
 //---------------------------------------
 router.get('/admin/banner',adminVerifyToken, getBanner);//show banner page
-router.get("/banner/edit/:id", adminVerifyToken, );//edit banner page
+// router.get("/banner/edit/:id", adminVerifyToken, editBanner);//edit banner page
 
 
 

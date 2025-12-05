@@ -529,7 +529,7 @@ const getCoupon = async (req, res) => {
                 await coupon.save(); 
             }
         }
-        return res.render('admin/coupons', {coupons})
+        return res.render('admin/coupons', {coupons, admin: req.admin})
 
     }catch(er) {
         console.log('error occured in getcoupon', err);
@@ -629,7 +629,7 @@ const deleteCoupon = async (req, res) => {
 const getBanner = async (req, res) => {
     try {
         const banners = await Banner.find();
-        res.render('admin/banner', { banners });
+        res.render('admin/banner', { banners, admin: req.admin });
     } catch (err) {
         console.log(err);
         res.status(500).send("Server Error");

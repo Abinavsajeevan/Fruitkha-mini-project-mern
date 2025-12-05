@@ -145,17 +145,17 @@
 
     <!-- Sidebar -->
     <aside class="sidebar border-end" id="sidebar">
-      <h5 class="p-3 border-bottom d-none d-md-block">My Admin</h5>
+    <h5 class="p-3 border-bottom d-none d-md-block"><%= admin.name.split(' ')[0] %></h5>
     <nav class="list-group list-group-flush">
-      <a href="/admin" class="list-group-item list-group-item-action ">Dashboard</a>
+      <a href="/admin" class="list-group-item list-group-item-action">Dashboard</a>
       <a href="/admin/orders" class="list-group-item list-group-item-action">Orders</a>
-      <a href="/admin/products" class="list-group-item list-group-item-action ">Products</a>
+      <a href="/admin/products" class="list-group-item list-group-item-action">Products</a>
       <a href="/admin/customers" class="list-group-item list-group-item-action active">Customers</a>
       <a href="/admin/editProduct" class="list-group-item list-group-item-action">Gallery</a>
       <a href="/admin/coupons" class="list-group-item list-group-item-action">Coupons</a>
+      <a href="/admin/banner" class="list-group-item list-group-item-action">Banner</a>
       <a href="/admin/settings" class="list-group-item list-group-item-action">Settings</a>
       <a href="/admin/support" class="list-group-item list-group-item-action">Support</a>
-      <a href="/admin/profile" class="list-group-item list-group-item-action">Profile</a>
     </nav>
     </aside>
 
