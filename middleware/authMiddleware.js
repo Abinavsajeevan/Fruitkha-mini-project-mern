@@ -5,7 +5,14 @@ async function verifyToken(req, res, next) {
     console.log('token verification started...');
     //taking token id  from cookies
     const token = await req.cookies?.token;
-    if(token) {
+
+    if(!token) {
+        
+        console.log('cart')
+                console.log('res.redirect(')
+        return res.redirect('/login')
+       
+    }
         try {
             //here token verifies and it stored in to vrifies 
             const verifies =await jwt.verify(token, process.env.JWT_SECRET_KEY);
@@ -20,16 +27,12 @@ async function verifyToken(req, res, next) {
         } catch( err ) {
             console.log('an error occured in token validation: ', err);
         }
-    }else {
-                
-        return res.redirect(`/login`)
-       
-    }
+    
     
     
 }
 async function verifyTokenIndex(req, res, next) {
-    console.log('token verification started...');
+    console.log('token verification started no user...');
 
     const token = req.cookies?.token;
 
