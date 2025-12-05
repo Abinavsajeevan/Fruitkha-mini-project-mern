@@ -93,8 +93,7 @@ const addressValidation = [
  const isDefAddress = await Address.findOne({userId, isDefault: true});
     const address = await Address.find(
       {
-        userId,
-        _id:{ $ne: isDefAddress._id}
+        userId
       }
     );
       if(!errors.isEmpty()) {

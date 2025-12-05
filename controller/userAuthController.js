@@ -384,7 +384,6 @@ const updateProfile = async (req, res) => {
         await user.save();
 
         const updateUser = await User.findOne({email})
-       console.log(updateUser)
    
         res.render('user/profile', {user:updateUser, error: 'updated',
         showEditProfileModal : true, success: true})
@@ -403,11 +402,13 @@ const updateProfile = async (req, res) => {
 const addressProfile = async (req, res) => {
   try {
     const userId = req.user._id;
+  
+    console.log('thing')
     const isDefAddress = await Address.findOne({userId, isDefault: true});
     const address = await Address.find(
       {
         userId,
-        _id:{ $ne: isDefAddress._id}
+        
       }
     );
 
@@ -416,6 +417,50 @@ const addressProfile = async (req, res) => {
     console.log('error occured in address page', err)
   }
 }
+// const addressProfile = async (req, res) => {
+//   try {
+//     const userId = req.user._id;
+
+//     const isDefAddress = await Address.findOne({ userId, isDefault: true });
+
+//     let address = [];
+
+//     if (isDefAddress) {
+//       // user has a default address → exclude it
+//       address = await Address.find({
+//         userId,
+//         _id: { $ne: isDefAddress._id }
+//       });
+//     } else {
+//       // user has NO default → show all addresses; don't filter
+//       address = await Address.find({ userId });
+//     }
+
+//     return res.render("user/profileAddress", {
+//       user: req.user,
+//       errors: [],
+//       showAddAddressModal: false,
+//       address,
+//       showEditAddressModal: false,
+//       data: null,
+//       def: isDefAddress
+//     });
+
+//   } catch (err) {
+//     console.log("error occured in address page", err);
+//     return res.render("user/profileAddress", {
+//       user: req.user || null,
+//       errors: [err.message],
+//       showAddAddressModal: false,
+//       address: [],
+//       showEditAddressModal: false,
+//       data: null,
+//       def: null
+//     });
+//   }
+// };
+
+
 
 //profile add address
 const addAddress = async (req, res) => {
@@ -436,8 +481,7 @@ const addAddress = async (req, res) => {
       const isDefAddress = await Address.findOne({userId, isDefault: true});
     const address = await Address.find(
       {
-        userId,
-        _id:{ $ne: isDefAddress._id}
+        userId
       }
     );
 
@@ -478,8 +522,7 @@ const editAddress = async (req, res) => {
  let isDefAddress = await Address.findOne({userId, isDefault: true});
     const address = await Address.find(
       {
-        userId,
-        _id:{ $ne: isDefAddress._id}
+        userId
       }
     );
     //existing error message
