@@ -12,6 +12,7 @@ const Coupon = require("../models/Coupon");
 const Enquiry = require("../models/Enquiry");
 const transporter = require("../utils/mailer");
 const Banner = require("../models/Banner");
+const { ensureEmbeddingForProduct } = require("../lib/embeddings");
 
 const loginAdmin = async(req, res) => {
     try {
