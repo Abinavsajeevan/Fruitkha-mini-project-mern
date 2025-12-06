@@ -999,8 +999,7 @@ const getCheckout = async (req, res) => {
     //-------CHECKOUT PAGE ------------------
     //-------Addresses ------------------
     const address = await Address.find({
-      userId, 
-      isDefault: {$ne: true}
+      userId
     });
     const isDef = await Address.findOne({userId, isDefault: true})//address contains default address
 
