@@ -1069,9 +1069,9 @@ const postCheckout = async (req, res) => {
       }
       console.log('working');
       
-      return res.redirect('/order/success/cod/${order._id}');
+      return res.redirect(`/order/success/cod/${order._id}`);
     } else {
-      return res.redirect('/payment/${order._id}');
+      return res.redirect(`/payment/${order._id}`);
     }
 
   }catch(err) {
