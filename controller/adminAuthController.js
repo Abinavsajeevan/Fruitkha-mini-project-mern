@@ -189,6 +189,7 @@ const updateOrderStatus = async(req, res) => {
                 day: 'numeric'
                 });
             order.deliveredAt = deliveryDate
+            order.paymentStatus = 'paid'
             await order.save()
         }
         await Order.findByIdAndUpdate(id, { orderStatus: status })

@@ -1239,6 +1239,22 @@ const stripeSuccess = async (req, res) => {
 
   
         const order = await Order.findOne({_id: session.metadata.orderId})
+                
+          if (order && order.paymentStatus !== 'paid') {
+            order.paymentStatus = 'paid';
+            order.stripePaymentIntentId = session.payment_intent || order.stripePaymentIntentId;
+            order.orderStatus = 'pending'; 
+            await order.save();
+
+            // decrement product stock
+            for (const item of order.items) {
+              await Product.findByIdAndUpdate(item.productId, { $inc: { stock: -item.quantity } });
+            }
+
+            // clear user's cart
+            await Cart.findOneAndDelete({ user: order.userId });
+          
+        }
         // 3. Show "payment successful" page
     console.log('stripe worked success completed ....')
      if(order.address.email) {
