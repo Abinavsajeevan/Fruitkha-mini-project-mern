@@ -17,6 +17,7 @@ const userSchema = new Schema({
     mobile: {
          type: String, 
       unique: true,
+      sparse: true,
       match: [/^\d{10,13}$/, 'Mobile number must be 10-13 digits'] 
     },
     password: {
